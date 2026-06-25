@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Event Loop en JS — Guía de estudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #8b91a8;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --yellow: #f4c542;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --teal: #2dd4bf;
+    --note-bg: rgba(124,106,247,0.08);
+    --note-border: rgba(124,106,247,0.35);
+    --warn-bg: rgba(244,197,66,0.07);
+    --warn-border: rgba(244,197,66,0.35);
+    --tip-bg: rgba(74,222,128,0.07);
+    --tip-border: rgba(74,222,128,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 2rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 2rem 6rem;
+  }
+
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(124,106,247,0.12);
+    border: 0.5px solid rgba(124,106,247,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  .page-header p { color: var(--muted); font-size: 15px; }
+  .page-header .meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 68px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  pre {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.4rem;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .kw  { color: var(--accent2); }
+  .fn  { color: var(--yellow); }
+  .str { color: var(--green); }
+  .cm  { color: #555e7a; font-style: italic; }
+  .num { color: var(--orange); }
+  .mt  { color: var(--teal); }
+  .op  { color: var(--red); }
+  .tp  { color: var(--blue); }
+
+  .output-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.3rem 0 0.2rem;
+  }
+  pre.output {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  .callout {
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 15px;
+  }
+  .callout.warn { border-left-color: var(--warn-border); background: var(--warn-bg); }
+  .callout.tip  { border-left-color: var(--tip-border);  background: var(--tip-bg); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--accent2);
+  }
+  .callout.warn .callout-label { color: var(--yellow); }
+  .callout.tip  .callout-label { color: var(--green); }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0 1.4rem;
+  }
+  .two-col pre { margin: 0; }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+  }
+
+  /* ── Autoevaluación (Ponete a prueba) ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.2rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 8px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 1.1rem; font-weight: 600; font-size: 15px; color: var(--text); list-style: none; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; color: var(--accent2); font-size: 19px; font-weight: 400; line-height: 1; flex-shrink: 0; }
+  details.q[open] summary::after { content: '\2212'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14.5px; color: var(--muted); line-height: 1.65; }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+
+  /* ── piezas del event loop ── */
+  .pieces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0; }
+  .piece { background: var(--bg2); border: 0.5px solid var(--border2); border-top: 2px solid var(--muted); border-radius: 8px; padding: 1rem 1.1rem; }
+  .piece-h { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .piece-d { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .piece.stack { border-top-color: var(--accent); } .piece.stack .piece-h { color: var(--accent2); }
+  .piece.apis  { border-top-color: var(--blue); }   .piece.apis .piece-h  { color: var(--blue); }
+  .piece.micro { border-top-color: var(--green); }  .piece.micro .piece-h { color: var(--green); }
+  .piece.macro { border-top-color: var(--orange); } .piece.macro .piece-h { color: var(--orange); }
+  @media (max-width:640px){ .pieces{ grid-template-columns:1fr; } }
+  /* ── ciclo numerado ── */
+  .cycle { counter-reset: step; list-style: none; padding: 0; margin: 1.2rem 0; }
+  .cycle li { counter-increment: step; position: relative; padding: 0.7rem 0 0.7rem 2.7rem; border-bottom: 0.5px solid var(--border); font-size: 15px; color: var(--text); }
+  .cycle li:last-child { border-bottom: none; }
+  .cycle li::before { content: counter(step); position: absolute; left: 0; top: 0.55rem; width: 1.7rem; height: 1.7rem; background: rgba(124,106,247,0.14); border: 0.5px solid var(--accent); color: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Event Loop</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#que-es">Qué es</a>
+  <a href="#piezas">Las piezas</a>
+  <a href="#prioridad">Prioridad</a>
+  <a href="#ejemplo">Ejemplo</a>
+  <a href="#macrotasks">Macrotasks</a>
+  <a href="#practica">En la práctica</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+  <a href="#resumen">Resumen</a>
+</nav>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>El Event Loop</h1>
+    <p>Material de estudio — Cómo JavaScript maneja la asincronía</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: asincronía (callbacks, promesas, async/await)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+    <p>El <strong>event loop</strong> es el mecanismo que le permite a JavaScript ser de un solo hilo (single-threaded) pero manejar operaciones asincrónicas —peticiones de red, timers, lectura de archivos— sin bloquearse. Esta guía explica cómo funciona por dentro y por qué importa en la práctica.</p>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">Qué es el event loop</div></div>
+      <div class="agenda-item"><div class="topic">Las piezas: call stack, Web APIs y colas</div></div>
+      <div class="agenda-item"><div class="topic">El orden de prioridad</div></div>
+      <div class="agenda-item"><div class="topic">El ejemplo clásico</div></div>
+      <div class="agenda-item"><div class="topic">Macrotasks en concreto</div></div>
+      <div class="agenda-item"><div class="topic">Por qué importa en la práctica</div></div>
+    </div>
+  </section>
+
+
+  <!-- QUÉ ES -->
+  <section id="que-es">
+    <div class="section-num">Bloque 1</div>
+    <h2>Qué es el event loop</h2>
+    <p>JavaScript ejecuta tu código en <strong>un solo hilo</strong>: hace una cosa a la vez. Entonces, ¿cómo puede manejar un timer, una petición de red y la respuesta del usuario sin congelarse? La respuesta es el <strong>event loop</strong>: un mecanismo que coordina el código sincrónico con las tareas asincrónicas que terminan "más tarde".</p>
+    <p>La idea central: cuando aparece una tarea que lleva tiempo, JS no se queda esperando. Se la delega al entorno (el navegador o Node), sigue ejecutando lo que viene, y cuando la tarea termina, su resultado (un callback) entra en una <strong>cola</strong> para ejecutarse apenas el hilo quede libre.</p>
+  </section>
+
+
+  <!-- LAS PIEZAS -->
+  <section id="piezas">
+    <div class="section-num">Bloque 2</div>
+    <h2>Las piezas del rompecabezas</h2>
+    <p>Para entender el event loop hay que conocer cuatro piezas y cómo se relacionan:</p>
+
+    <div class="pieces">
+      <div class="piece stack">
+        <div class="piece-h">Call Stack</div>
+        <div class="piece-d">La pila donde JS ejecuta el código sincrónico, función por función. Si una función llama a otra, se apila; cuando termina, se desapila.</div>
+      </div>
+      <div class="piece apis">
+        <div class="piece-h">Web APIs / Entorno</div>
+        <div class="piece-d">El navegador o Node manejan <code>setTimeout</code>, <code>fetch</code> y los eventos. JS les delega la tarea y sigue ejecutando sin esperar.</div>
+      </div>
+      <div class="piece micro">
+        <div class="piece-h">Microtask Queue</div>
+        <div class="piece-d">Cola de promesas (<code>.then</code>, <code>.catch</code>, <code>async/await</code>) y <code>queueMicrotask</code>. Tiene prioridad alta.</div>
+      </div>
+      <div class="piece macro">
+        <div class="piece-h">Macrotask Queue</div>
+        <div class="piece-d">Cola de <code>setTimeout</code>, <code>setInterval</code>, eventos de I/O y del DOM. Tiene prioridad menor que la de microtasks.</div>
+      </div>
+    </div>
+
+    <p>El <strong>event loop</strong> en sí es un bucle que pregunta constantemente: <em>"¿está vacío el call stack? Si lo está, ¿hay algo esperando en las colas para ejecutarse?"</em>. La clave está en que las dos colas <strong>no tienen la misma prioridad</strong>.</p>
+
+    <pre><code><span class="kw">function</span> <span class="fn">saludar</span>() {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"Hola"</span>);
+}
+<span class="fn">saludar</span>(); <span class="cm">// se apila, se ejecuta, se desapila</span></code></pre>
+  </section>
+
+
+  <!-- PRIORIDAD -->
+  <section id="prioridad">
+    <div class="section-num">Bloque 3</div>
+    <h2>El orden de prioridad</h2>
+    <p>En cada vuelta, el event loop sigue siempre el mismo orden:</p>
+    <ol class="cycle">
+      <li>Ejecuta todo el código <strong>sincrónico</strong> (vacía el call stack).</li>
+      <li>Vacía <strong>por completo</strong> la cola de microtasks.</li>
+      <li>Ejecuta <strong>una sola</strong> macrotask de la cola.</li>
+      <li>Vuelve a vaciar <strong>toda</strong> la cola de microtasks.</li>
+      <li>Repite desde el paso 3.</li>
+    </ol>
+    <div class="callout">
+      <div class="callout-label">La regla en una frase</div>
+      Entre cada macrotask, el event loop vacía <strong>toda</strong> la cola de microtasks. Por eso las promesas siempre se ejecutan antes que el próximo <code>setTimeout</code>.
+    </div>
+  </section>
+
+
+  <!-- EJEMPLO -->
+  <section id="ejemplo">
+    <div class="section-num">Bloque 4</div>
+    <h2>El ejemplo clásico</h2>
+    <p>Este es el ejemplo que conviene tener grabado. Tratá de predecir la salida antes de leer la explicación:</p>
+
+    <pre><code><span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"1"</span>);
+
+<span class="fn">setTimeout</span>(() <span class="op">=></span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"2"</span>);
+}, <span class="num">0</span>);
+
+<span class="tp">Promise</span>.<span class="mt">resolve</span>().<span class="mt">then</span>(() <span class="op">=></span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"3"</span>);
+});
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"4"</span>);</code></pre>
+
+    <div class="output-label">Salida</div>
+    <pre class="output"><code>1
+4
+3
+2</code></pre>
+
+    <p>¿Por qué ese orden?</p>
+    <ul>
+      <li><code>1</code> y <code>4</code> son sincrónicos &rarr; se ejecutan de inmediato.</li>
+      <li><code>3</code> es una promesa (microtask) &rarr; se ejecuta antes que cualquier macrotask, aunque el <code>setTimeout</code> tenga 0&nbsp;ms.</li>
+      <li><code>2</code> es una macrotask (<code>setTimeout</code>) &rarr; espera a que se vacíe primero toda la cola de microtasks.</li>
+    </ul>
+  </section>
+
+
+  <!-- MACROTASKS -->
+  <section id="macrotasks">
+    <div class="section-num">Bloque 5</div>
+    <h2>Macrotasks en concreto</h2>
+    <p>Estos son los casos más comunes que generan macrotasks.</p>
+
+    <h3>setTimeout</h3>
+    <p>Agrega <strong>una</strong> tarea a la cola de macrotasks cuando se cumple el tiempo (o apenas el call stack queda libre, si es <code>0</code>).</p>
+    <pre><code><span class="fn">setTimeout</span>(() <span class="op">=></span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"Corre en el próximo ciclo del event loop"</span>);
+}, <span class="num">1000</span>);</code></pre>
+
+    <h3>setInterval</h3>
+    <p>Igual que <code>setTimeout</code>, pero encola una macrotask nueva <strong>cada vez</strong> que se cumple el intervalo, hasta que lo cancelás con <code>clearInterval</code>.</p>
+    <pre><code><span class="kw">let</span> contador = <span class="num">0</span>;
+
+<span class="kw">const</span> id = <span class="fn">setInterval</span>(() <span class="op">=></span> {
+  contador++;
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"Tick"</span>, contador);
+  <span class="kw">if</span> (contador === <span class="num">5</span>) <span class="fn">clearInterval</span>(id);
+}, <span class="num">1000</span>);</code></pre>
+
+    <h3>Eventos de I/O (en Node.js)</h3>
+    <p>Operaciones de archivos, red, etc. El callback se encola como macrotask recién cuando el sistema operativo termina la operación en segundo plano.</p>
+    <pre><code><span class="kw">const</span> fs = <span class="fn">require</span>(<span class="str">'fs'</span>);
+
+fs.<span class="mt">readFile</span>(<span class="str">'archivo.txt'</span>, <span class="str">'utf8'</span>, (err, data) <span class="op">=></span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"Archivo leído:"</span>, data);
+});
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"Esto se ejecuta primero"</span>);</code></pre>
+    <div class="output-label">Salida</div>
+    <pre class="output"><code>Esto se ejecuta primero
+Archivo leído: [contenido del archivo]</code></pre>
+
+    <h3>Eventos del DOM (en el navegador)</h3>
+    <p>Clics, scroll, teclas. Cada vez que el usuario interactúa, el navegador encola el handler como macrotask: no corre "en el instante exacto" del clic, sino que espera su turno como cualquier otra tarea.</p>
+    <pre><code>document.<span class="fn">getElementById</span>(<span class="str">"miBoton"</span>)
+  .<span class="fn">addEventListener</span>(<span class="str">"click"</span>, () <span class="op">=></span> {
+    <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"Botón clickeado"</span>);
+  });</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Entre macrotasks no hay jerarquía fija</div>
+      El orden entre <strong>distintas</strong> macrotasks (un evento del DOM vs un <code>setTimeout</code> vs I/O) depende de <strong>cuál entró primero a la cola</strong>, no de su tipo. La jerarquía clara es solo <strong>microtasks sobre macrotasks</strong>: las promesas siempre van primero.
+    </div>
+  </section>
+
+
+  <!-- EN LA PRÁCTICA -->
+  <section id="practica">
+    <div class="section-num">Bloque 6</div>
+    <h2>Por qué importa en la práctica</h2>
+    <p>El error más común es pensar que <code>setTimeout(fn, 0)</code> ejecuta <code>fn</code> "inmediatamente después". En realidad <code>fn</code> siempre va a la cola de macrotasks, y las microtasks (promesas) tienen <strong>prioridad absoluta</strong> sobre ella. El <code>0</code> es un mínimo, no un "ya".</p>
+    <p>Entender esto explica comportamientos que de otra forma parecen mágicos: por qué un <code>.then()</code> corre antes que un <code>setTimeout(…, 0)</code> escrito antes, o por qué cierto código que depende del orden de ejecución funciona (o falla) como funciona.</p>
+  </section>
+
+
+  <!-- PONETE A PRUEBA -->
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+      <details class="q">
+        <summary>1. ¿Qué es el call stack?</summary>
+        <div class="a">Es la pila donde JS ejecuta el código sincrónico, función por función. Cuando una función llama a otra, se apila; cuando termina, se desapila.</div>
+      </details>
+      <details class="q">
+        <summary>2. Cuando llamás a <code>setTimeout</code> o <code>fetch</code>, ¿lo maneja el motor de JS o el entorno?</summary>
+        <div class="a">El entorno (navegador o Node), a través de las Web APIs. JS le delega la tarea y sigue ejecutando sin esperar; el callback vuelve a una cola cuando la operación termina.</div>
+      </details>
+      <details class="q">
+        <summary>3. Entre microtasks y macrotasks, ¿cuál tiene prioridad?</summary>
+        <div class="a">Las microtasks (promesas). El event loop vacía por completo la cola de microtasks antes de tomar una sola macrotask (como un <code>setTimeout</code>).</div>
+      </details>
+      <details class="q">
+        <summary>4. ¿Qué imprime y por qué? <code>console.log('1'); setTimeout(() => console.log('2'), 0); Promise.resolve().then(() => console.log('3')); console.log('4');</code></summary>
+        <div class="a">Imprime <code>1, 4, 3, 2</code>. Primero lo sincrónico (1 y 4). Después se vacía la cola de microtasks: la promesa (3). Por último, la macrotask del <code>setTimeout</code> (2), aunque tenga 0&nbsp;ms.</div>
+      </details>
+      <details class="q">
+        <summary>5. ¿<code>setTimeout(fn, 0)</code> ejecuta <code>fn</code> inmediatamente?</summary>
+        <div class="a">No. <code>fn</code> va a la cola de macrotasks y se ejecuta recién cuando el call stack está libre y se vaciaron las microtasks. El <code>0</code> es un mínimo, no un "ya".</div>
+      </details>
+      <details class="q">
+        <summary>6. ¿Las promesas son micro o macrotasks? ¿Y <code>setTimeout</code>?</summary>
+        <div class="a">Las promesas (<code>.then</code>/<code>.catch</code>, <code>async/await</code>) son microtasks. <code>setTimeout</code>, <code>setInterval</code>, I/O y eventos del DOM son macrotasks.</div>
+      </details>
+    </div>
+  </section>
+
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen</h2>
+    <ul>
+      <li>JS es de un solo hilo; el event loop le permite manejar tareas asincrónicas sin bloquearse.</li>
+      <li>El <strong>call stack</strong> ejecuta el código sincrónico; las <strong>Web APIs</strong> del entorno manejan las tareas que llevan tiempo.</li>
+      <li>Hay dos colas: <strong>microtasks</strong> (promesas) y <strong>macrotasks</strong> (<code>setTimeout</code>, <code>setInterval</code>, I/O, eventos del DOM).</li>
+      <li>En cada vuelta: código sincrónico &rarr; vaciar todas las microtasks &rarr; una macrotask &rarr; vaciar microtasks de nuevo &rarr; repetir.</li>
+      <li>Las <strong>microtasks tienen prioridad</strong> sobre las macrotasks. Entre macrotasks, manda el orden de llegada.</li>
+      <li><code>setTimeout(fn, 0)</code> no ejecuta <code>fn</code> "ya": lo encola como macrotask para cuando el hilo quede libre.</li>
+    </ul>
+    <div class="callout">
+      <div class="callout-label">Dónde encaja</div>
+      Esta guía profundiza el "por qué" detrás de la clase de <strong>asincronía</strong>: callbacks, promesas y <code>async/await</code> se apoyan todos en este mecanismo.
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

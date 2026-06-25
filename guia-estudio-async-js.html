@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asincronía en JS — Guía de estudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #8b91a8;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --yellow: #f4c542;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --teal: #2dd4bf;
+    --note-bg: rgba(124,106,247,0.08);
+    --note-border: rgba(124,106,247,0.35);
+    --warn-bg: rgba(244,197,66,0.07);
+    --warn-border: rgba(244,197,66,0.35);
+    --tip-bg: rgba(74,222,128,0.07);
+    --tip-border: rgba(74,222,128,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 2rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 2rem 6rem;
+  }
+
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(124,106,247,0.12);
+    border: 0.5px solid rgba(124,106,247,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  .page-header p { color: var(--muted); font-size: 15px; }
+  .page-header .meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 68px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  pre {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.4rem;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .kw  { color: var(--accent2); }
+  .fn  { color: var(--yellow); }
+  .str { color: var(--green); }
+  .cm  { color: #555e7a; font-style: italic; }
+  .num { color: var(--orange); }
+  .mt  { color: var(--teal); }
+  .op  { color: var(--red); }
+  .tp  { color: var(--blue); }
+
+  .output-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.3rem 0 0.2rem;
+  }
+  pre.output {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  .callout {
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 15px;
+  }
+  .callout.warn { border-left-color: var(--warn-border); background: var(--warn-bg); }
+  .callout.tip  { border-left-color: var(--tip-border);  background: var(--tip-bg); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--accent2);
+  }
+  .callout.warn .callout-label { color: var(--yellow); }
+  .callout.tip  .callout-label { color: var(--green); }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+
+  /* progresión callbacks → promesas → async */
+  .stage {
+    margin: 0 0 1rem;
+  }
+  .stage-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .stage-label.bad  { color: var(--red);    background: rgba(248,113,113,0.12); }
+  .stage-label.mid  { color: var(--yellow); background: rgba(244,197,66,0.12); }
+  .stage-label.good { color: var(--green);  background: rgba(74,222,128,0.12); }
+  .stage pre { margin-top: 0; }
+
+  /* diagrama de estados de promesa */
+  .states {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin: 1.4rem 0;
+    padding: 1.4rem;
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+  }
+  .state {
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    min-width: 150px;
+  }
+  .state-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .state-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .state.pending   { background: rgba(139,145,168,0.12); border: 0.5px solid var(--muted); }
+  .state.pending   .state-name { color: var(--text); }
+  .state.fulfilled { background: rgba(74,222,128,0.10); border: 0.5px solid var(--green); }
+  .state.fulfilled .state-name { color: var(--green); }
+  .state.rejected  { background: rgba(248,113,113,0.10); border: 0.5px solid var(--red); }
+  .state.rejected  .state-name { color: var(--red); }
+  .state-branches { display: flex; flex-direction: column; gap: 12px; }
+  .branch { display: flex; align-items: center; gap: 10px; }
+  .branch-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .branch-arrow b { color: var(--accent2); font-weight: 500; }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .states { flex-direction: column; align-items: stretch; }
+    .state { min-width: 0; }
+  }
+
+  /* ── Autoevaluación (Ponete a prueba) ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.2rem 0; }
+  details.q {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  details.q summary {
+    cursor: pointer;
+    padding: 0.9rem 1.1rem;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after {
+    content: '+';
+    color: var(--accent2);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  details.q[open] summary::after { content: '\2212'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a {
+    padding: 0.9rem 1.1rem;
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  details.q .a code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  details.q .a pre { margin: 0.6rem 0 0; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Async JS</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#problema">El problema</a>
+  <a href="#callbacks">Callbacks</a>
+  <a href="#promesas">Promesas</a>
+  <a href="#async">async / await</a>
+  <a href="#practica">En la práctica</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+  <a href="#resumen">Resumen</a>
+</nav>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Asincronía en JavaScript</h1>
+    <p>Callbacks, Promesas y async/await — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: funciones (arrow, callbacks, higher-order)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">Sincronía vs asincronía</div></div>
+      <div class="agenda-item"><div class="topic">Callbacks y callback hell</div></div>
+      <div class="agenda-item"><div class="topic">Promesas</div></div>
+      <div class="agenda-item"><div class="topic">async / await</div></div>
+      <div class="agenda-item"><div class="topic">En la práctica: fetch y errores</div></div>
+      <div class="agenda-item"><div class="topic">Cierre y paso a objetos</div></div>
+    </div>
+
+    
+  </section>
+
+
+  <!-- EL PROBLEMA -->
+  <section id="problema">
+    <div class="section-num">Bloque 1</div>
+    <h2>El problema: sincronía vs asincronía</h2>
+
+    <p>JavaScript es <strong>single-threaded</strong>: ejecuta una sola cosa a la vez, en un único hilo. Esto plantea un problema cuando una operación <em>tarda</em> — pedir datos a un servidor, leer un archivo, un temporizador. Si esa operación bloqueara el hilo, <strong>toda la aplicación se congelaría</strong> hasta que termine.</p>
+
+    <p>La <strong>asincronía</strong> resuelve esto: permite <em>arrancar</em> una operación lenta y seguir ejecutando el resto del código. Cuando la operación termina, recibimos el resultado.</p>
+
+    <h3>El ejemplo más simple: setTimeout</h3>
+    <pre><code><span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'1'</span>);
+
+<span class="fn">setTimeout</span>(() <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'2 (después de 2s)'</span>), <span class="num">2000</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'3'</span>);</code></pre>
+
+    <div class="output-label">Salida</div>
+    <pre class="output"><code>1
+3
+2 (después de 2s)</code></pre>
+
+    <p>El punto clave: <code>'3'</code> se imprime <strong>antes</strong> que <code>'2'</code>, aunque en el código esté después. El <code>setTimeout</code> no detiene la ejecución — programa el callback para más tarde y JS sigue de largo.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Importante</div>
+      El tiempo de <code>setTimeout</code> es un <strong>mínimo</strong>, no un valor exacto. JS primero termina de ejecutar todo el código sincrónico y recién después atiende los callbacks pendientes. <code>setTimeout(fn, 0)</code> no ejecuta <code>fn</code> "ya", sino "apenas se libere el hilo".
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-label">Para profundizar (opcional)</div>
+      Esto se explica con el <strong>event loop</strong>. El código sincrónico corre primero; después las promesas (microtasks); por último los timers (macrotasks). Ejemplo clásico:
+      <pre style="margin-top:0.8rem;"><code><span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'1'</span>);
+<span class="fn">setTimeout</span>(() <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'2'</span>), <span class="num">0</span>);
+<span class="tp">Promise</span>.<span class="mt">resolve</span>().<span class="mt">then</span>(() <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'3'</span>));
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'4'</span>);
+<span class="cm">// Salida: 1, 4, 3, 2</span></code></pre>
+      Primero lo sincrónico (<code>1</code>, <code>4</code>), después la promesa (<code>3</code>), y al final el timer (<code>2</code>) — aunque su delay sea 0.
+    </div>
+  </section>
+
+
+  <!-- CALLBACKS -->
+  <section id="callbacks">
+    <div class="section-num">Bloque 2</div>
+    <h2>Callbacks</h2>
+
+    <p>Un <strong>callback</strong> es una función que se pasa como argumento a otra para ejecutarse más tarde. Ya lo vimos en la clase de funciones. En el contexto asincrónico, el callback es la función que se ejecuta <strong>cuando la operación lenta termina</strong>.</p>
+
+    <h3>El patrón básico</h3>
+    <pre><code><span class="kw">function</span> <span class="fn">pedirDatos</span>(callback) {
+  <span class="fn">setTimeout</span>(() <span class="op">=></span> {
+    <span class="kw">const</span> datos = { id: <span class="num">1</span>, nombre: <span class="str">'Ada'</span> };
+    <span class="fn">callback</span>(datos); <span class="cm">// avisamos cuando "llegaron" los datos</span>
+  }, <span class="num">1000</span>);
+}
+
+<span class="fn">pedirDatos</span>((datos) <span class="op">=></span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'Llegaron:'</span>, datos);
+});</code></pre>
+
+    <h3>Convención error-first (Node.js)</h3>
+    <p>En Node.js se popularizó una convención: el <strong>primer parámetro del callback es el error</strong> (o <code>null</code> si todo salió bien), y el segundo son los datos.</p>
+
+    <pre><code><span class="fn">pedirDatos</span>((error, datos) <span class="op">=></span> {
+  <span class="kw">if</span> (error) {
+    <span class="mt">console</span>.<span class="mt">error</span>(<span class="str">'Algo falló:'</span>, error);
+    <span class="kw">return</span>;
+  }
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'Llegaron:'</span>, datos);
+});</code></pre>
+
+    <h3>El problema: callback hell</h3>
+    <p>Cuando una operación depende del resultado de otra, y esa de otra, los callbacks se <strong>anidan</strong>. Se forma la llamada <em>pirámide de la perdición</em> (pyramid of doom):</p>
+
+    <pre><code><span class="fn">getUser</span>(<span class="num">1</span>, (user) <span class="op">=></span> {
+  <span class="fn">getPosts</span>(user, (posts) <span class="op">=></span> {
+    <span class="fn">getComments</span>(posts[<span class="num">0</span>], (comments) <span class="op">=></span> {
+      <span class="mt">console</span>.<span class="mt">log</span>(comments);
+      <span class="cm">// ...y seguimos anidando hacia la derecha</span>
+    });
+  });
+});</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Por qué es un problema</div>
+      El código se desplaza hacia la derecha, se vuelve difícil de leer y de seguir. Pero el problema más serio es el <strong>manejo de errores</strong>: hay que controlarlo en cada nivel por separado, lo que es repetitivo y fácil de olvidar. Esto fue exactamente lo que motivó la creación de las <strong>Promesas</strong>.
+    </div>
+  </section>
+
+
+  <!-- PROMESAS -->
+  <section id="promesas">
+    <div class="section-num">Bloque 3</div>
+    <h2>Promesas</h2>
+
+    <p>Una <strong>Promise</strong> (promesa) es un <strong>objeto</strong> que representa el resultado futuro de una operación asincrónica. En vez de pasarle un callback a la operación, la operación nos <em>devuelve</em> una promesa, y nosotros le "enganchamos" qué hacer cuando se resuelva.</p>
+
+    
+
+    <h3>Los tres estados de una promesa</h3>
+    <div class="states">
+      <div class="state pending">
+        <div class="state-name">pending</div>
+        <div class="state-desc">Estado inicial. La operación todavía no terminó.</div>
+      </div>
+      <div class="state-branches">
+        <div class="branch">
+          <span class="branch-arrow"><b>resolve()</b> →</span>
+          <div class="state fulfilled">
+            <div class="state-name">fulfilled</div>
+            <div class="state-desc">Se cumplió. Hay un valor. Lo recibe <code>.then()</code></div>
+          </div>
+        </div>
+        <div class="branch">
+          <span class="branch-arrow"><b>reject()</b> &nbsp;→</span>
+          <div class="state rejected">
+            <div class="state-name">rejected</div>
+            <div class="state-desc">Falló. Hay un error. Lo recibe <code>.catch()</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>Una vez que una promesa pasa de <code>pending</code> a <code>fulfilled</code> o <code>rejected</code> (se dice que está <em>settled</em>, asentada), <strong>su estado ya no cambia más</strong>.</p>
+
+    <h3>Crear una promesa</h3>
+    <pre><code><span class="kw">const</span> promesa = <span class="kw">new</span> <span class="tp">Promise</span>((resolve, reject) <span class="op">=></span> {
+  <span class="fn">setTimeout</span>(() <span class="op">=></span> {
+    <span class="kw">const</span> exito = <span class="kw">true</span>;
+    <span class="kw">if</span> (exito) {
+      <span class="fn">resolve</span>({ id: <span class="num">1</span>, nombre: <span class="str">'Ada'</span> }); <span class="cm">// → fulfilled</span>
+    } <span class="kw">else</span> {
+      <span class="fn">reject</span>(<span class="kw">new</span> <span class="tp">Error</span>(<span class="str">'No se pudo'</span>));  <span class="cm">// → rejected</span>
+    }
+  }, <span class="num">1000</span>);
+});</code></pre>
+    <p>La función que recibe el constructor (el <em>executor</em>) recibe a su vez dos funciones: <code>resolve</code> (para cumplir la promesa) y <code>reject</code> (para rechazarla).</p>
+
+    <h3>Consumir una promesa</h3>
+    <pre><code>promesa
+  .<span class="mt">then</span>((datos) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'OK:'</span>, datos))      <span class="cm">// si se cumple</span>
+  .<span class="mt">catch</span>((error) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">error</span>(<span class="str">'Error:'</span>, error)) <span class="cm">// si falla</span>
+  .<span class="mt">finally</span>(() <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'Terminé igual'</span>));   <span class="cm">// pase lo que pase</span></code></pre>
+
+    <h3>Encadenar promesas (chaining)</h3>
+    <p>Acá está la clave que resuelve el callback hell. Cada <code>.then()</code> <strong>devuelve una nueva promesa</strong>, así que se pueden encadenar <strong>en plano</strong>, sin anidar:</p>
+
+    <pre><code><span class="fn">getUser</span>(<span class="num">1</span>)
+  .<span class="mt">then</span>((user) <span class="op">=></span> <span class="fn">getPosts</span>(user))
+  .<span class="mt">then</span>((posts) <span class="op">=></span> <span class="fn">getComments</span>(posts[<span class="num">0</span>]))
+  .<span class="mt">then</span>((comments) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(comments))
+  .<span class="mt">catch</span>((error) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">error</span>(error)); <span class="cm">// UN solo catch para toda la cadena</span></code></pre>
+
+    <div class="callout tip">
+      <div class="callout-label">Comparar con los callbacks</div>
+      Es la misma lógica que la pirámide de antes (usuario → posts → comentarios), pero <strong>plana y legible</strong>, y con un <strong>único punto de manejo de errores</strong>: si cualquier paso de la cadena falla, salta directo al <code>.catch()</code>.
+    </div>
+
+    <h3>Métodos estáticos útiles <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">— para profundizar</span></h3>
+    <p>Cuando se trabaja con <strong>varias promesas a la vez</strong>:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Método</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>Promise.all([...])</code></td><td>Espera a que <strong>todas</strong> se cumplan; devuelve un array con los resultados. Si <strong>una</strong> falla, rechaza de inmediato.</td></tr>
+          <tr><td><code>Promise.allSettled([...])</code></td><td>Espera a <strong>todas</strong>, nunca rechaza. Devuelve el resultado de cada una con su <code>status</code>.</td></tr>
+          <tr><td><code>Promise.race([...])</code></td><td>Se asienta con la <strong>primera</strong> que termine (se cumpla o falle).</td></tr>
+          <tr><td><code>Promise.any([...])</code></td><td>Se cumple con la primera que <strong>se cumpla</strong>; rechaza solo si fallan todas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- ASYNC / AWAIT -->
+  <section id="async">
+    <div class="section-num">Bloque 4</div>
+    <h2>async / await</h2>
+
+    <p><code>async/await</code> es <strong>azúcar sintáctico</strong> sobre las promesas: por debajo <em>siguen siendo promesas</em>, pero el código se escribe como si fuera sincrónico, de arriba hacia abajo.</p>
+
+    <h3>Dos reglas</h3>
+    <ul>
+      <li><code>async</code> antes de una función hace que <strong>siempre devuelva una promesa</strong>.</li>
+      <li><code>await</code> dentro de una función <code>async</code> <strong>pausa</strong> la ejecución hasta que la promesa se resuelva, y devuelve su valor.</li>
+    </ul>
+
+    <pre><code><span class="kw">async function</span> <span class="fn">mostrarUsuario</span>() {
+  <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">getUser</span>(<span class="num">1</span>); <span class="cm">// espera y guarda el VALOR, no la promesa</span>
+  <span class="mt">console</span>.<span class="mt">log</span>(user);
+}</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Dónde se puede usar await</div>
+      Solo dentro de funciones <code>async</code>. (Desde ES2022 también en el nivel superior de un módulo — <em>top-level await</em>.) Usar <code>await</code> en una función normal es un error de sintaxis.
+    </div>
+
+    <h3>Manejo de errores: try / catch</h3>
+    <p>En vez de <code>.catch()</code>, con async/await se usan <code>try/catch</code> — la misma estructura que ya conocen para errores sincrónicos:</p>
+
+    <pre><code><span class="kw">async function</span> <span class="fn">mostrar</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">getUser</span>(<span class="num">1</span>);
+    <span class="kw">const</span> posts = <span class="kw">await</span> <span class="fn">getPosts</span>(user);
+    <span class="kw">const</span> comments = <span class="kw">await</span> <span class="fn">getComments</span>(posts[<span class="num">0</span>]);
+    <span class="mt">console</span>.<span class="mt">log</span>(comments);
+  } <span class="kw">catch</span> (error) {
+    <span class="mt">console</span>.<span class="mt">error</span>(<span class="str">'Algo falló:'</span>, error);
+  }
+}</code></pre>
+
+    <h3>La misma lógica, tres formas</h3>
+    <p>Este es el mismo problema (usuario → posts → comentarios) resuelto de las tres maneras. La evolución del lenguaje en una imagen:</p>
+
+    <div class="stage">
+      <span class="stage-label bad">Callbacks · anidado</span>
+      <pre><code><span class="fn">getUser</span>(<span class="num">1</span>, (user) <span class="op">=></span> {
+  <span class="fn">getPosts</span>(user, (posts) <span class="op">=></span> {
+    <span class="fn">getComments</span>(posts[<span class="num">0</span>], (comments) <span class="op">=></span> {
+      <span class="mt">console</span>.<span class="mt">log</span>(comments);
+    });
+  });
+});</code></pre>
+    </div>
+
+    <div class="stage">
+      <span class="stage-label mid">Promesas · encadenado</span>
+      <pre><code><span class="fn">getUser</span>(<span class="num">1</span>)
+  .<span class="mt">then</span>((user) <span class="op">=></span> <span class="fn">getPosts</span>(user))
+  .<span class="mt">then</span>((posts) <span class="op">=></span> <span class="fn">getComments</span>(posts[<span class="num">0</span>]))
+  .<span class="mt">then</span>((comments) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(comments))
+  .<span class="mt">catch</span>((error) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">error</span>(error));</code></pre>
+    </div>
+
+    <div class="stage">
+      <span class="stage-label good">async / await · plano</span>
+      <pre><code><span class="kw">async function</span> <span class="fn">mostrar</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">getUser</span>(<span class="num">1</span>);
+    <span class="kw">const</span> posts = <span class="kw">await</span> <span class="fn">getPosts</span>(user);
+    <span class="kw">const</span> comments = <span class="kw">await</span> <span class="fn">getComments</span>(posts[<span class="num">0</span>]);
+    <span class="mt">console</span>.<span class="mt">log</span>(comments);
+  } <span class="kw">catch</span> (error) {
+    <span class="mt">console</span>.<span class="mt">error</span>(error);
+  }
+}</code></pre>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Idea central</div>
+      Las tres hacen <strong>lo mismo</strong>. <code>async/await</code> es la forma preferida en código moderno por su legibilidad, pero <strong>por debajo son promesas</strong>. Entender promesas no es opcional: es la base sobre la que está construido <code>async/await</code>.
+    </div>
+
+    <h3>async siempre devuelve una promesa</h3>
+    <pre><code><span class="kw">async function</span> <span class="fn">dameUno</span>() {
+  <span class="kw">return</span> <span class="num">1</span>;
+}
+
+<span class="fn">dameUno</span>().<span class="mt">then</span>((n) <span class="op">=></span> <span class="mt">console</span>.<span class="mt">log</span>(n)); <span class="cm">// 1 — el valor se envuelve en una promesa</span></code></pre>
+  </section>
+
+
+  <!-- EN LA PRÁCTICA -->
+  <section id="practica">
+    <div class="section-num">Bloque 5</div>
+    <h2>En la práctica</h2>
+
+    <h3>fetch: pedir datos a una API</h3>
+    <p>El uso más común de async/await en la práctica es <code>fetch</code>, para pedir datos a un servidor. <code>fetch</code> devuelve una promesa que se resuelve con un objeto <code>Response</code>.</p>
+
+    <pre><code><span class="kw">async function</span> <span class="fn">getUsuario</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.example.com/users/1'</span>);
+
+    <span class="kw">if</span> (!response.ok) {
+      <span class="kw">throw new</span> <span class="tp">Error</span>(<span class="str">`Error HTTP: <span class="op">${</span>response.status<span class="op">}</span>`</span>);
+    }
+
+    <span class="kw">const</span> datos = <span class="kw">await</span> response.<span class="mt">json</span>(); <span class="cm">// .json() también devuelve promesa</span>
+    <span class="mt">console</span>.<span class="mt">log</span>(datos);
+  } <span class="kw">catch</span> (error) {
+    <span class="mt">console</span>.<span class="mt">error</span>(<span class="str">'Falló el pedido:'</span>, error);
+  }
+}</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">⚠ Trampa clásica de fetch</div>
+      <code>fetch</code> <strong>solo rechaza ante errores de red</strong> (no hay conexión, el servidor no responde). Un código de error HTTP como <strong>404 o 500 NO hace que la promesa falle</strong> — la promesa se cumple igual. Por eso hay que chequear <code>response.ok</code> a mano y lanzar el error nosotros.
+    </div>
+
+    <h3>Errores comunes</h3>
+
+    <p><strong>1. Olvidarse el <code>await</code></strong></p>
+    <pre><code><span class="kw">const</span> user = <span class="fn">getUser</span>(<span class="num">1</span>);        <span class="cm">// ❌ user es una Promise, no el valor</span>
+<span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">getUser</span>(<span class="num">1</span>);  <span class="cm">// ✅ user es el valor</span></code></pre>
+
+    <p><strong>2. Secuencial cuando podría ser paralelo</strong></p>
+    <pre><code><span class="cm">// ❌ Secuencial — lento: espera a getUser y RECIÉN ahí arranca getProduct</span>
+<span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">getUser</span>(<span class="num">1</span>);
+<span class="kw">const</span> product = <span class="kw">await</span> <span class="fn">getProduct</span>(<span class="num">2</span>);
+
+<span class="cm">// ✅ Paralelo — las dos arrancan juntas, esperamos a ambas</span>
+<span class="kw">const</span> [user, product] = <span class="kw">await</span> <span class="tp">Promise</span>.<span class="mt">all</span>([
+  <span class="fn">getUser</span>(<span class="num">1</span>),
+  <span class="fn">getProduct</span>(<span class="num">2</span>),
+]);</code></pre>
+    <p>Usar <code>Promise.all</code> cuando las operaciones son <strong>independientes</strong> entre sí.</p>
+
+    <p><strong>3. <code>forEach</code> no respeta <code>await</code></strong></p>
+    <pre><code><span class="cm">// ❌ forEach ignora el await — 'listo' se imprime ANTES de terminar</span>
+ids.<span class="mt">forEach</span>(<span class="kw">async</span> (id) <span class="op">=></span> {
+  <span class="kw">await</span> <span class="fn">procesar</span>(id);
+});
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'listo'</span>);
+
+<span class="cm">// ✅ for...of espera correctamente cada iteración</span>
+<span class="kw">for</span> (<span class="kw">const</span> id <span class="kw">of</span> ids) {
+  <span class="kw">await</span> <span class="fn">procesar</span>(id);
+}
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'listo'</span>); <span class="cm">// ahora sí: después de procesar todos</span></code></pre>
+
+    <div class="callout tip">
+      <div class="callout-label">Conecta con la clase de sintaxis</div>
+      Como vimos en la tabla <code>for</code> vs <code>forEach</code>, <code>forEach</code> no funciona bien con <code>async/await</code>. Para iteración secuencial asincrónica, usar <code>for...of</code>. Para procesar todo en paralelo, <code>map</code> + <code>Promise.all</code>.
+    </div>
+  </section>
+
+
+    <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. Si JS es de un solo hilo, ¿por qué necesita asincronía?</summary>
+      <div class="a">Justamente porque es single-threaded: si una operación lenta (red, archivo, timer) bloqueara el único hilo, se congelaría toda la app. La asincronía permite arrancar la operación y seguir ejecutando, recibiendo el resultado cuando esté listo.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Qué imprime? <code>console.log(1); setTimeout(() => console.log(2), 0); console.log(3);</code></summary>
+      <div class="a">Imprime <code>1, 3, 2</code>. El <code>setTimeout</code> no detiene la ejecución: programa el callback para después, así que <code>3</code> sale antes que <code>2</code> aunque tenga 0&nbsp;ms.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Cuáles son los tres estados de una promesa?</summary>
+      <div class="a"><code>pending</code> (todavía no terminó), <code>fulfilled</code> (se cumplió, hay un valor) y <code>rejected</code> (falló, hay un error). Una vez que pasa a fulfilled o rejected, no cambia más.</div>
+    </details>
+    <details class="q">
+      <summary>4. ¿Qué hace <code>await</code> y dónde se puede usar?</summary>
+      <div class="a">Pausa la función hasta que la promesa se resuelva y devuelve su valor. Solo se puede usar dentro de una función <code>async</code> (o en el nivel superior de un módulo).</div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Por qué <code>fetch</code> no falla ante un error 404 o 500? ¿Qué hay que hacer?</summary>
+      <div class="a"><code>fetch</code> solo rechaza ante errores de red. Un 404/500 se considera una respuesta válida, así que la promesa se cumple igual. Hay que chequear <code>response.ok</code> y lanzar el error a mano.</div>
+    </details>
+    <details class="q">
+      <summary>6. Tengo dos operaciones independientes: ¿conviene <code>await</code> una y después la otra, o usar <code>Promise.all</code>?</summary>
+      <div class="a">Si son independientes, <code>Promise.all</code>: arrancan en paralelo y esperás a ambas, más rápido. Encadenar <code>await</code> las hace secuenciales (una espera a la otra sin necesidad).</div>
+    </details>
+    <details class="q">
+      <summary>7. ¿Por qué un <code>forEach</code> con <code>async</code> adentro no espera a que terminen las operaciones?</summary>
+      <div class="a">Porque <code>forEach</code> ignora la promesa que devuelve el callback y no la espera. Para iteración secuencial con <code>await</code> se usa <code>for...of</code>; para paralelo, <code>map</code> + <code>Promise.all</code>.</div>
+    </details>
+    </div>
+  </section>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen y paso a objetos</h2>
+
+    <h3>Puntos clave para recordar</h3>
+    <ul>
+      <li>JS es single-threaded; la asincronía evita bloquear el único hilo.</li>
+      <li><strong>Callbacks</strong>: función que se ejecuta al terminar la operación. Problema: anidamiento (callback hell) y errores difíciles de manejar.</li>
+      <li><strong>Promesas</strong>: objeto con tres estados — <code>pending</code> → <code>fulfilled</code> / <code>rejected</code>. Se consumen con <code>.then()</code>, <code>.catch()</code>, <code>.finally()</code>. Se encadenan en plano.</li>
+      <li><strong>async/await</strong>: azúcar sintáctico sobre promesas. Código sincrónico-looking, errores con <code>try/catch</code>.</li>
+      <li><code>fetch</code> no rechaza ante 404/500 — chequear <code>response.ok</code>.</li>
+      <li><code>forEach</code> no respeta <code>await</code> — usar <code>for...of</code>.</li>
+      <li>Operaciones independientes → <code>Promise.all</code> (paralelo, más rápido).</li>
+    </ul>
+
+    <h3>Transición a la clase de objetos</h3>
+    <div class="callout">
+      <div class="callout-label">Gancho para lo que sigue</div>
+      A lo largo de esta clase usamos promesas como <strong>objetos</strong> y llamamos a sus <strong>métodos</strong> (<code>.then</code>, <code>.catch</code>, <code>.finally</code>). La próxima clase, <strong>Objetos en JavaScript</strong>, da el marco completo para entender qué es un objeto, qué es un método, y cómo funciona todo esto por dentro — incluyendo las propias promesas.
+    </div>
+
+    <h3>Para profundizar (MDN)</h3>
+    <ul>
+      <li><em>Promise</em>, <em>async function</em>, <em>await</em>.</li>
+      <li><em>Using Fetch</em> y el objeto <em>Response</em>.</li>
+      <li><em>Event loop</em> (modelo de concurrencia), para los que quieran entender el orden de ejecución.</li>
+    </ul>
+  </section>
+
+</main>
+</body>
+</html>

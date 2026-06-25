@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objetos y JSON en JS — Guía de estudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #8b91a8;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --yellow: #f4c542;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --teal: #2dd4bf;
+    --note-bg: rgba(124,106,247,0.08);
+    --note-border: rgba(124,106,247,0.35);
+    --warn-bg: rgba(244,197,66,0.07);
+    --warn-border: rgba(244,197,66,0.35);
+    --tip-bg: rgba(74,222,128,0.07);
+    --tip-border: rgba(74,222,128,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 2rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 2rem 6rem;
+  }
+
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(124,106,247,0.12);
+    border: 0.5px solid rgba(124,106,247,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  .page-header p { color: var(--muted); font-size: 15px; }
+  .page-header .meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 68px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  pre {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.4rem;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .kw  { color: var(--accent2); }
+  .fn  { color: var(--yellow); }
+  .str { color: var(--green); }
+  .cm  { color: #555e7a; font-style: italic; }
+  .num { color: var(--orange); }
+  .mt  { color: var(--teal); }
+  .op  { color: var(--red); }
+  .tp  { color: var(--blue); }
+  .th  { color: var(--orange); }
+
+  .output-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.3rem 0 0.2rem;
+  }
+  pre.output {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  .callout {
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 15px;
+  }
+  .callout.warn { border-left-color: var(--warn-border); background: var(--warn-bg); }
+  .callout.tip  { border-left-color: var(--tip-border);  background: var(--tip-bg); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--accent2);
+  }
+  .callout.warn .callout-label { color: var(--yellow); }
+  .callout.tip  .callout-label { color: var(--green); }
+  .callout pre { margin: 0.8rem 0 0; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0 1.4rem;
+  }
+  .two-col pre { margin: 0; }
+
+  /* diagrama de cadena de prototipos */
+  .chain {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    margin: 1.4rem 0;
+    padding: 1.5rem 1.4rem;
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+  }
+  .chain-node {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.55rem 0.85rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .chain-node.obj   { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,247,0.10); }
+  .chain-node.null  { color: var(--muted); border-style: dashed; }
+  .chain-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0.7rem;
+    color: var(--muted);
+  }
+  .chain-arrow .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.03em;
+    margin-bottom: 1px;
+    white-space: nowrap;
+  }
+  .chain-arrow .ln { font-size: 17px; line-height: 1; color: var(--accent2); }
+  .chain-caption { font-size: 12px; color: var(--muted); margin-top: 0.4rem; }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .chain { flex-direction: column; align-items: flex-start; }
+    .chain-arrow { flex-direction: row; gap: 6px; padding: 0.2rem 0 0.2rem 0.6rem; }
+    .chain-arrow .ln { transform: rotate(90deg); }
+  }
+
+  /* ── Autoevaluación (Ponete a prueba) ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.2rem 0; }
+  details.q {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  details.q summary {
+    cursor: pointer;
+    padding: 0.9rem 1.1rem;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after {
+    content: '+';
+    color: var(--accent2);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  details.q[open] summary::after { content: '\2212'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a {
+    padding: 0.9rem 1.1rem;
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  details.q .a code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  details.q .a pre { margin: 0.6rem 0 0; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Objetos JS</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#que-son">Qué son</a>
+  <a href="#metodos">Métodos y this</a>
+  <a href="#recorrer">Recorrer</a>
+  <a href="#prototipos">Prototipos</a>
+  <a href="#construir">Construir</a>
+  <a href="#json">JSON</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+  <a href="#resumen">Resumen</a>
+</nav>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Objetos y JSON en JavaScript</h1>
+    <p>Clase 02.03 — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: funciones (métodos, this, arrow functions)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">Qué son los objetos y sus propiedades</div></div>
+      <div class="agenda-item"><div class="topic">Métodos y this</div></div>
+      <div class="agenda-item"><div class="topic">Recorrer y copiar objetos</div></div>
+      <div class="agenda-item"><div class="topic">Prototipos y prototype chain</div></div>
+      <div class="agenda-item"><div class="topic">Formas de construir objetos</div></div>
+      <div class="agenda-item"><div class="topic">JSON</div></div>
+    </div>
+
+    
+  </section>
+
+
+  <!-- QUÉ SON -->
+  <section id="que-son">
+    <div class="section-num">Bloque 1</div>
+    <h2>Qué son los objetos</h2>
+
+    <p>Un objeto en JS es un tipo de dato que permite agrupar <strong>datos y comportamiento</strong> en una sola entidad. Los datos se llaman <strong>propiedades</strong> y el comportamiento, <strong>métodos</strong> (que son funciones). Las propiedades son pares <strong>clave-valor</strong>: la clave es un string único dentro del objeto, y el valor puede ser cualquier cosa válida en JS — incluido otro objeto o un array.</p>
+
+    <pre><code><span class="kw">const</span> person = {
+  firstName: <span class="str">'Ada'</span>,
+  lastName: <span class="str">'Lovelace'</span>,
+  age: <span class="num">36</span>,
+  hobbies: [<span class="str">'matemática'</span>, <span class="str">'programación'</span>], <span class="cm">// un array</span>
+  address: {                              <span class="cm">// un objeto anidado</span>
+    street: <span class="str">'Calle 123'</span>,
+    city: <span class="str">'Londres'</span>,
+    country: <span class="str">'Inglaterra'</span>,
+  },
+};</code></pre>
+
+    <h3>Acceder a las propiedades: punto vs corchete</h3>
+    <p>Hay dos notaciones. La de <strong>punto</strong> es la habitual. La de <strong>corchete</strong> es necesaria cuando la clave tiene caracteres no válidos para un identificador (espacios, guiones) o cuando la clave es <strong>dinámica</strong> (está en una variable).</p>
+
+    <pre><code><span class="cm">// notación punto</span>
+<span class="mt">console</span>.<span class="mt">log</span>(person.firstName);            <span class="cm">// Ada</span>
+<span class="mt">console</span>.<span class="mt">log</span>(person.address.city);         <span class="cm">// Londres (anidado)</span>
+
+<span class="cm">// notación corchete — la clave es un string</span>
+<span class="mt">console</span>.<span class="mt">log</span>(person[<span class="str">'firstName'</span>]);         <span class="cm">// Ada</span>
+
+<span class="cm">// imprescindible cuando la clave es dinámica</span>
+<span class="kw">const</span> campo = <span class="str">'age'</span>;
+<span class="mt">console</span>.<span class="mt">log</span>(person[campo]);              <span class="cm">// 36</span></code></pre>
+
+    <h3>Agregar, modificar y borrar</h3>
+    <p>Los objetos son dinámicos: se pueden agregar y quitar propiedades después de crearlos.</p>
+
+    <pre><code>person.job = <span class="str">'matemática'</span>;   <span class="cm">// agregar una propiedad nueva</span>
+person.age = <span class="num">37</span>;             <span class="cm">// modificar una existente</span>
+<span class="kw">delete</span> person.job;           <span class="cm">// borrar una propiedad</span>
+
+<span class="cm">// ¿existe la propiedad?</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'age'</span> <span class="kw">in</span> person);   <span class="cm">// true</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'job'</span> <span class="kw">in</span> person);   <span class="cm">// false</span></code></pre>
+
+    <h3>Acceso seguro a propiedades anidadas: optional chaining</h3>
+    <p>Si intento acceder a una propiedad de algo que no existe, JS lanza un error. El operador <code>?.</code> (optional chaining, ES2020) devuelve <code>undefined</code> en vez de romper.</p>
+
+    <pre><code><span class="cm">// ❌ si 'contact' no existe, esto LANZA un error</span>
+<span class="cm">// console.log(person.contact.email);  → TypeError</span>
+
+<span class="cm">// ✅ optional chaining: devuelve undefined sin romper</span>
+<span class="mt">console</span>.<span class="mt">log</span>(person.contact?.email);   <span class="cm">// undefined</span>
+<span class="mt">console</span>.<span class="mt">log</span>(person.address?.city);    <span class="cm">// Londres</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Conecta con la clase de sintaxis</div>
+      Recordá que los objetos son un tipo <strong>no primitivo</strong>: se pasan y se asignan <strong>por referencia</strong>. Dos consecuencias: <code>const</code> no congela el contenido (podés modificar propiedades de un objeto <code>const</code>, solo no reasignarlo); y dos objetos distintos nunca son iguales aunque tengan el mismo contenido — <code>{a:1} === {a:1}</code> es <code>false</code>, porque se comparan las referencias, no los valores.
+    </div>
+  </section>
+
+
+  <!-- MÉTODOS Y THIS -->
+  <section id="metodos">
+    <div class="section-num">Bloque 2</div>
+    <h2>Métodos y this</h2>
+
+    <p>Un <strong>método</strong> es una función guardada como propiedad de un objeto. Se invoca con la clave seguida de <code>()</code>. Hay dos formas de definirlos: la sintaxis <em>shorthand</em> (recomendada) y la forma con <code>function</code>.</p>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px; color:var(--green); font-weight:600; margin-bottom:4px;">Shorthand (recomendada)</p>
+        <pre><code>greet() {
+  <span class="kw">return</span> <span class="str">'Hola'</span>;
+}</code></pre>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--muted); font-weight:600; margin-bottom:4px;">Con function (equivalente)</p>
+        <pre><code>greet: <span class="kw">function</span>() {
+  <span class="kw">return</span> <span class="str">'Hola'</span>;
+}</code></pre>
+      </div>
+    </div>
+
+    <h3>this: el objeto sobre el que se llama el método</h3>
+    <p>Dentro de un método, la palabra clave <code>this</code> apunta al <strong>objeto sobre el que se invocó el método</strong>. Es lo que permite que el método acceda a las otras propiedades del objeto.</p>
+
+    <pre><code><span class="kw">const</span> person = {
+  firstName: <span class="str">'Ada'</span>,
+  lastName: <span class="str">'Lovelace'</span>,
+  greet() {
+    <span class="kw">return</span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.firstName<span class="op">}</span> <span class="op">${</span><span class="kw">this</span>.lastName<span class="op">}</span>`</span>;
+  },
+};
+
+<span class="mt">console</span>.<span class="mt">log</span>(person.<span class="mt">greet</span>()); <span class="cm">// Hola, soy Ada Lovelace</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">⚠ Conecta con la clase de funciones</div>
+      Acá se ve <strong>por qué no se usan arrow functions como métodos</strong>. Las arrow functions no tienen su propio <code>this</code> — lo heredan del contexto exterior. Si <code>greet</code> fuera una arrow function, <code>this.firstName</code> no apuntaría a <code>person</code> y daría <code>undefined</code> (o un error). Para métodos: siempre shorthand o <code>function</code>, nunca arrow.
+    </div>
+
+    <pre><code><span class="kw">const</span> person = {
+  firstName: <span class="str">'Ada'</span>,
+  greetMal: () <span class="op">=></span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.firstName<span class="op">}</span>`</span>, <span class="cm">// ❌ arrow</span>
+  greetBien() { <span class="kw">return</span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.firstName<span class="op">}</span>`</span>; }, <span class="cm">// ✅ shorthand</span>
+};
+
+<span class="mt">console</span>.<span class="mt">log</span>(person.<span class="mt">greetMal</span>());  <span class="cm">// Hola, soy undefined</span>
+<span class="mt">console</span>.<span class="mt">log</span>(person.<span class="mt">greetBien</span>()); <span class="cm">// Hola, soy Ada</span></code></pre>
+  </section>
+
+
+  <!-- RECORRER -->
+  <section id="recorrer">
+    <div class="section-num">Bloque 3</div>
+    <h2>Recorrer y copiar objetos</h2>
+
+    <p>A diferencia de los arrays, los objetos no tienen índice ni <code>length</code>. Para recorrer sus propiedades, lo más común y seguro hoy es usar los métodos de <code>Object</code>:</p>
+
+    <pre><code><span class="kw">const</span> person = { firstName: <span class="str">'Ada'</span>, age: <span class="num">36</span>, city: <span class="str">'Londres'</span> };
+
+<span class="tp">Object</span>.<span class="mt">keys</span>(person);    <span class="cm">// ['firstName', 'age', 'city']  → las claves</span>
+<span class="tp">Object</span>.<span class="mt">values</span>(person);  <span class="cm">// ['Ada', 36, 'Londres']        → los valores</span>
+<span class="tp">Object</span>.<span class="mt">entries</span>(person); <span class="cm">// [['firstName','Ada'], ['age',36], ...] → pares</span>
+
+<span class="cm">// recorrer clave y valor con for...of + entries</span>
+<span class="kw">for</span> (<span class="kw">const</span> [clave, valor] <span class="kw">of</span> <span class="tp">Object</span>.<span class="mt">entries</span>(person)) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`<span class="op">${</span>clave<span class="op">}</span>: <span class="op">${</span>valor<span class="op">}</span>`</span>);
+}</code></pre>
+
+    
+
+    <h3>Copiar un objeto: el operador spread</h3>
+    <p>Como los objetos se pasan por referencia, asignar uno a otra variable <strong>no lo copia</strong> — ambas variables apuntan al mismo objeto. Para hacer una copia (superficial) se usa el operador spread <code>...</code>:</p>
+
+    <pre><code><span class="kw">const</span> original = { a: <span class="num">1</span>, b: <span class="num">2</span> };
+
+<span class="kw">const</span> referencia = original;        <span class="cm">// ❌ NO copia: misma referencia</span>
+<span class="kw">const</span> copia = { ...original };       <span class="cm">// ✅ copia superficial (shallow)</span>
+
+copia.a = <span class="num">99</span>;
+<span class="mt">console</span>.<span class="mt">log</span>(original.a); <span class="cm">// 1 — la copia es independiente</span>
+
+<span class="cm">// spread también sirve para combinar objetos</span>
+<span class="kw">const</span> combinado = { ...original, c: <span class="num">3</span> }; <span class="cm">// { a:1, b:2, c:3 }</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Ojo: copia superficial</div>
+      El spread copia un solo nivel. Si el objeto tiene objetos anidados, esos <strong>siguen compartiéndose por referencia</strong>. Para una copia profunda existe <code>structuredClone(objeto)</code>.
+    </div>
+  </section>
+
+
+  <!-- PROTOTIPOS -->
+  <section id="prototipos">
+    <div class="section-num">Bloque 4</div>
+    <h2>Prototipos y prototype chain</h2>
+
+    <p>Hasta acá creamos objetos, les pusimos propiedades y métodos... pero <strong>nunca definimos una clase</strong>. ¿No se supone que los objetos salen de una clase? En JS, no necesariamente.</p>
+
+    <p>JS no usa clases como mecanismo base, sino <strong>prototipos</strong>: cada objeto tiene una referencia a <strong>otro objeto</strong> llamado su <em>prototipo</em>, del cual hereda propiedades y métodos. Y ese prototipo tiene a su vez su propio prototipo, formando una <strong>cadena de prototipos</strong> (prototype chain).</p>
+
+    <h3>Cómo funciona la búsqueda</h3>
+    <p>Cuando pedís una propiedad o método de un objeto, JS la busca así:</p>
+    <ol>
+      <li>La busca en el <strong>propio objeto</strong>. Si está, la usa.</li>
+      <li>Si no está, la busca en su <strong>prototipo</strong>.</li>
+      <li>Si tampoco, sigue subiendo por la cadena, prototipo tras prototipo.</li>
+      <li>Termina al encontrarla, o al llegar a <code>null</code> (donde devuelve <code>undefined</code>).</li>
+    </ol>
+
+    <p>Todo objeto literal hereda por defecto de <code>Object.prototype</code> — de ahí salen métodos como <code>toString()</code> o <code>hasOwnProperty()</code> que ningún objeto define pero todos tienen.</p>
+
+    <div class="chain">
+      <div class="chain-node obj">person</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Object.prototype</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node null">null</div>
+    </div>
+    <p class="chain-caption">Cadena de prototipos de un objeto literal. <code>Object.prototype</code> es el final útil de la cadena; su prototipo es <code>null</code>.</p>
+
+    <h3><code>__proto__</code> vs <code>prototype</code> — la confusión clásica</h3>
+    <p>Son dos cosas distintas que conviene separar bien:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Propiedad</th><th>Quién la tiene</th><th>Qué es</th></tr></thead>
+        <tbody>
+          <tr><td><code>__proto__</code></td><td><strong>Todos</strong> los objetos</td><td>El prototipo <em>real</em> de <em>ese</em> objeto (de quién hereda).</td></tr>
+          <tr><td><code>prototype</code></td><td>Solo las <strong>funciones</strong> y clases</td><td>El objeto que se usará como prototipo de las instancias creadas con <code>new</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Forma correcta de acceder al prototipo</div>
+      <code>__proto__</code> es una propiedad heredada y considerada legada. La forma recomendada por el estándar para leer y escribir el prototipo es <code>Object.getPrototypeOf(obj)</code> y <code>Object.setPrototypeOf(obj, proto)</code>. (En esta clase usamos <code>__proto__</code> en algún ejemplo solo porque es más corto de leer.) Cambiar el prototipo de un objeto ya creado, además, perjudica el rendimiento: no es buena práctica.
+    </div>
+  </section>
+
+
+  <!-- CONSTRUIR -->
+  <section id="construir">
+    <div class="section-num">Bloque 5</div>
+    <h2>Formas de construir objetos</h2>
+
+    <p>Escribir cada objeto entero (literal) es cómodo para casos únicos, pero tedioso y propenso a errores si necesitás crear muchos objetos con la misma forma. Por eso existen varias maneras de construir objetos a partir de una definición.</p>
+
+    <h3>1. Object Factory (función fábrica)</h3>
+    <p>La forma más simple: una función común que arma el objeto y lo devuelve. No usa <code>new</code> ni prototipos especiales.</p>
+    <pre><code><span class="kw">function</span> <span class="fn">createPerson</span>(firstName, lastName, age) {
+  <span class="kw">return</span> {
+    firstName,            <span class="cm">// shorthand de firstName: firstName</span>
+    lastName,
+    age,
+    greet() {
+      <span class="kw">return</span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.firstName<span class="op">}</span>`</span>;
+    },
+  };
+}
+
+<span class="kw">const</span> sam = <span class="fn">createPerson</span>(<span class="str">'Sam'</span>, <span class="str">'Clemens'</span>, <span class="num">25</span>);
+<span class="mt">console</span>.<span class="mt">log</span>(sam.<span class="mt">greet</span>()); <span class="cm">// Hola, soy Sam</span></code></pre>
+
+    <h3>2. Constructor Function (forma histórica)</h3>
+    <p>Antes de ES6 era la forma estándar de crear objetos a partir de una plantilla. Es una función (por convención, con <strong>mayúscula inicial</strong>) que se invoca con <code>new</code>. El operador <code>new</code> crea un objeto nuevo, lo asigna a <code>this</code>, y lo devuelve automáticamente. Los métodos compartidos se ponen en <code>.prototype</code>.</p>
+
+    <pre><code><span class="kw">function</span> <span class="fn">Person</span>(firstName, lastName, age) {
+  <span class="kw">this</span>.firstName = firstName;
+  <span class="kw">this</span>.lastName = lastName;
+  <span class="kw">this</span>.age = age;
+}
+
+<span class="fn">Person</span>.prototype.greet = <span class="kw">function</span>() {
+  <span class="kw">return</span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.firstName<span class="op">}</span>`</span>;
+};
+
+<span class="kw">const</span> sam = <span class="kw">new</span> <span class="fn">Person</span>(<span class="str">'Sam'</span>, <span class="str">'Clemens'</span>, <span class="num">25</span>);
+<span class="mt">console</span>.<span class="mt">log</span>(sam.<span class="mt">greet</span>()); <span class="cm">// Hola, soy Sam</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">El error más común con constructor functions</div>
+      El prototipo del objeto creado (<code>sam</code>) <strong>no es la función <code>Person</code></strong>, sino <code>Person.prototype</code>. Tiene sentido: <code>sam</code> es un objeto, debe heredar de un objeto, no de una función. Por eso <code>Object.getPrototypeOf(sam) === Person.prototype</code> es <code>true</code>, pero <code>=== Person</code> es <code>false</code>.
+    </div>
+
+    <h3>3. Class (la forma moderna, desde ES6)</h3>
+    <p>La sintaxis de <code>class</code> hace exactamente lo mismo que las constructor functions, pero de forma mucho más clara. Es <strong>azúcar sintáctico</strong>: por debajo sigue habiendo prototipos. (Igual que <code>async/await</code> era azúcar sobre promesas — el mismo patrón se repite en JS.)</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">Person</span> {
+  <span class="fn">constructor</span>(firstName, lastName, age) {
+    <span class="kw">this</span>.firstName = firstName;
+    <span class="kw">this</span>.lastName = lastName;
+    <span class="kw">this</span>.age = age;
+  }
+
+  greet() {
+    <span class="kw">return</span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.firstName<span class="op">}</span>`</span>;
+  }
+}
+
+<span class="kw">const</span> sam = <span class="kw">new</span> <span class="th">Person</span>(<span class="str">'Sam'</span>, <span class="str">'Clemens'</span>, <span class="num">25</span>);
+<span class="mt">console</span>.<span class="mt">log</span>(sam.<span class="mt">greet</span>()); <span class="cm">// Hola, soy Sam</span></code></pre>
+
+    <h3>Herencia: el contraste que justifica class</h3>
+    <p>Acá se ve por qué <code>class</code> reemplazó a las constructor functions. Heredar con constructor functions requiere tres pasos manuales fáciles de olvidar:</p>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px; color:var(--red); font-weight:600; margin-bottom:4px;">Con constructor function</p>
+        <pre><code><span class="kw">function</span> <span class="fn">Author</span>(fn, ln, age, quote) {
+  <span class="fn">Person</span>.<span class="mt">call</span>(<span class="kw">this</span>, fn, ln, age);
+  <span class="kw">this</span>.quote = quote;
+}
+<span class="cm">// enganchar prototipos a mano</span>
+<span class="fn">Author</span>.prototype =
+  <span class="tp">Object</span>.<span class="mt">create</span>(<span class="fn">Person</span>.prototype);
+<span class="cm">// restaurar el constructor</span>
+<span class="fn">Author</span>.prototype.constructor = <span class="fn">Author</span>;</code></pre>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--green); font-weight:600; margin-bottom:4px;">Con class</p>
+        <pre><code><span class="kw">class</span> <span class="th">Author</span> <span class="kw">extends</span> <span class="th">Person</span> {
+  <span class="fn">constructor</span>(fn, ln, age, quote) {
+    <span class="kw">super</span>(fn, ln, age);
+    <span class="kw">this</span>.quote = quote;
+  }
+}</code></pre>
+      </div>
+    </div>
+
+    <p>El resultado es idéntico, pero <code>class</code> + <code>extends</code> + <code>super()</code> oculta toda la complejidad de la cadena de prototipos. Así queda esa cadena al heredar:</p>
+
+    <div class="chain">
+      <div class="chain-node obj">mark</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Author.prototype</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Person.prototype</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Object.prototype</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node null">null</div>
+    </div>
+    <p class="chain-caption">Si <code>mark</code> no tiene una propiedad, JS la busca subiendo: <code>Author</code> → <code>Person</code> → <code>Object</code>.</p>
+
+    <h3>Resumen de las formas</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Forma</th><th>Cómo</th><th>Cuándo usarla</th></tr></thead>
+        <tbody>
+          <tr><td>Literal <code>{}</code></td><td>Escribir el objeto entero</td><td>Objetos únicos, configuración, datos</td></tr>
+          <tr><td>Factory function</td><td>Función que devuelve un literal</td><td>Crear varios objetos similares, simple, sin <code>new</code></td></tr>
+          <tr><td>Constructor function</td><td>Función + <code>new</code>, métodos en <code>.prototype</code></td><td>Código histórico (pre-ES6)</td></tr>
+          <tr><td><code>class</code></td><td>Sintaxis moderna de POO + <code>new</code></td><td><span class="check">Forma recomendada hoy</span></td></tr>
+          <tr><td><code>Object.create</code></td><td>Crear con un prototipo explícito</td><td>Control fino del prototipo (bajo nivel)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-label">Lo que sigue</div>
+      A <code>class</code> le vamos a dedicar una clase entera: herencia, <code>super</code>, métodos estáticos, campos privados, getters y setters. Por ahora alcanza con entender que <strong>es la forma moderna y que por debajo son prototipos</strong>.
+    </div>
+  </section>
+
+
+  <!-- JSON -->
+  <section id="json">
+    <div class="section-num">Bloque 6</div>
+    <h2>JSON</h2>
+
+    <p><strong>JSON</strong> (JavaScript Object Notation) es un formato de <strong>texto</strong> para representar datos, basado en la sintaxis de los objetos literales de JS. Aunque nació de JS, hoy es el <strong>estándar de facto</strong> para intercambiar datos en la web entre cualquier lenguaje y servicio.</p>
+
+    <p>Lo central: JSON es un <strong>string</strong>. JS provee el objeto global <code>JSON</code> con dos métodos para convertir entre texto JSON y objetos JS.</p>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px; color:var(--teal); font-weight:600; margin-bottom:4px;">JSON.stringify — serializar</p>
+        <pre><code><span class="cm">// objeto JS → string JSON</span>
+<span class="kw">const</span> texto =
+  <span class="tp">JSON</span>.<span class="mt">stringify</span>(person);</code></pre>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--teal); font-weight:600; margin-bottom:4px;">JSON.parse — deserializar</p>
+        <pre><code><span class="cm">// string JSON → objeto JS</span>
+<span class="kw">const</span> obj =
+  <span class="tp">JSON</span>.<span class="mt">parse</span>(texto);</code></pre>
+      </div>
+    </div>
+
+    <pre><code><span class="kw">const</span> person = { firstName: <span class="str">'Ada'</span>, age: <span class="num">36</span>, hobbies: [<span class="str">'mate'</span>, <span class="str">'código'</span>] };
+
+<span class="kw">const</span> texto = <span class="tp">JSON</span>.<span class="mt">stringify</span>(person);
+<span class="mt">console</span>.<span class="mt">log</span>(texto);
+<span class="cm">// {"firstName":"Ada","age":36,"hobbies":["mate","código"]}</span>
+
+<span class="cm">// con indentación, para que sea legible (3er argumento = espacios)</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="tp">JSON</span>.<span class="mt">stringify</span>(person, <span class="kw">null</span>, <span class="num">2</span>));
+
+<span class="kw">const</span> obj = <span class="tp">JSON</span>.<span class="mt">parse</span>(texto);
+<span class="mt">console</span>.<span class="mt">log</span>(obj.firstName); <span class="cm">// Ada — ya es un objeto JS de nuevo</span></code></pre>
+
+    <h3>Las reglas del formato JSON</h3>
+    <ul>
+      <li>Solo contiene <strong>datos, no métodos</strong> (no hay funciones en JSON).</li>
+      <li>Las claves y los strings van <strong>siempre con comillas dobles</strong>. Las comillas simples son inválidas.</li>
+      <li>Los valores pueden ser: <code>string</code>, <code>number</code>, <code>boolean</code>, <code>null</code>, <code>array</code> u <code>objeto</code>.</li>
+      <li><strong>No</strong> se permiten comas finales (trailing commas) ni comentarios.</li>
+    </ul>
+
+    <p>Un ejemplo de JSON válido:</p>
+    <pre><code>{
+  <span class="str">"firstName"</span>: <span class="str">"Sam"</span>,
+  <span class="str">"lastName"</span>: <span class="str">"Clemens"</span>,
+  <span class="str">"age"</span>: <span class="num">74</span>,
+  <span class="str">"job"</span>: <span class="str">"writer"</span>,
+  <span class="str">"hobbies"</span>: [<span class="str">"escribir"</span>, <span class="str">"viajar"</span>],
+  <span class="str">"alias"</span>: {
+    <span class="str">"firstName"</span>: <span class="str">"Mark"</span>,
+    <span class="str">"lastName"</span>: <span class="str">"Twain"</span>
+  },
+  <span class="str">"deceased"</span>: <span class="kw">true</span>
+}</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">JSON.parse puede fallar — manejá el error</div>
+      Si el string no es JSON válido (una coma de más, comillas simples, una clave sin comillas), <code>JSON.parse</code> <strong>lanza una excepción</strong>. Por eso conviene envolverlo en <code>try/catch</code>:
+      <pre><code><span class="kw">try</span> {
+  <span class="kw">const</span> data = <span class="tp">JSON</span>.<span class="mt">parse</span>(textoRecibido);
+} <span class="kw">catch</span> (error) {
+  <span class="mt">console</span>.<span class="mt">error</span>(<span class="str">'JSON inválido:'</span>, error.message);
+}</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-label">Conecta con la clase de asincronía (y lo que viene)</div>
+      Esto es exactamente lo que pasa cuando pedís datos a una API: <code>fetch</code> te devuelve texto, y <code>response.json()</code> hace el <code>JSON.parse</code> por vos. En la próxima unidad de <strong>APIs</strong> vamos a usar JSON todo el tiempo para intercambiar datos entre el frontend y el backend, transformándolo a objetos JS cuando haga falta.
+    </div>
+  </section>
+
+
+    <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. ¿Cuándo es obligatorio usar la notación de corchetes en vez de punto?</summary>
+      <div class="a">Cuando la clave no es un identificador válido (espacios, guiones, empieza con número) o cuando la clave es dinámica (está guardada en una variable). En el resto de los casos, punto.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Qué imprime <code>{ a: 1 } === { a: 1 }</code>?</summary>
+      <div class="a"><code>false</code>. Los objetos se comparan por referencia, no por contenido: son dos objetos distintos en memoria aunque tengan las mismas propiedades.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿A qué apunta <code>this</code> dentro de un método?</summary>
+      <div class="a">Al objeto sobre el que se invocó el método. Por eso permite acceder a las demás propiedades del objeto. Y por eso una arrow function no sirve como método: no tiene <code>this</code> propio.</div>
+    </details>
+    <details class="q">
+      <summary>4. ¿Cómo recorrés las claves de un objeto? ¿Y cómo lo copiás?</summary>
+      <div class="a">Para recorrer: <code>Object.keys()</code>, <code>Object.values()</code> o <code>Object.entries()</code>. Para copiar (superficial): spread, <code>const copia = {...original}</code>. Para copia profunda, <code>structuredClone()</code>.</div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Qué es la prototype chain y en qué termina?</summary>
+      <div class="a">Es la cadena de prototipos por la que JS busca una propiedad: primero en el objeto, después en su prototipo, y así subiendo. Termina en <code>Object.prototype</code>, cuyo prototipo es <code>null</code>.</div>
+    </details>
+    <details class="q">
+      <summary>6. ¿Cuál es la diferencia entre <code>__proto__</code> y <code>prototype</code>?</summary>
+      <div class="a"><code>__proto__</code> lo tienen todos los objetos: es su prototipo real (de quién heredan). <code>prototype</code> existe solo en funciones y clases: es el objeto que se usará como prototipo de las instancias creadas con <code>new</code>.</div>
+    </details>
+    <details class="q">
+      <summary>7. ¿Qué hacen <code>JSON.stringify</code> y <code>JSON.parse</code>, y por qué conviene envolver el parse en <code>try/catch</code>?</summary>
+      <div class="a"><code>stringify</code> serializa: objeto JS &rarr; string JSON. <code>parse</code> deserializa: string JSON &rarr; objeto JS. <code>parse</code> lanza una excepción si el JSON es inválido (una coma de más, comillas simples), así que se envuelve en <code>try/catch</code> para manejar el error.</div>
+    </details>
+    </div>
+  </section>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen de la clase</h2>
+
+    <h3>Puntos clave para recordar</h3>
+    <ul>
+      <li>Un objeto agrupa datos (propiedades) y comportamiento (métodos) en pares clave-valor.</li>
+      <li>Se accede con notación punto o corchete; el corchete es necesario para claves dinámicas.</li>
+      <li>Los objetos se pasan <strong>por referencia</strong>: <code>const</code> no los congela, y se comparan por referencia, no por contenido.</li>
+      <li><code>this</code> en un método apunta al objeto sobre el que se invocó — por eso las arrow functions no sirven como métodos.</li>
+      <li>Para recorrer: <code>Object.keys()</code> / <code>values()</code> / <code>entries()</code>. Para copiar: spread <code>{...obj}</code> (superficial).</li>
+      <li>JS hereda por <strong>prototipos</strong>: cada objeto hereda de otro objeto, formando una cadena que termina en <code>null</code>.</li>
+      <li><code>__proto__</code> es el prototipo de cualquier objeto; <code>prototype</code> existe solo en funciones/clases.</li>
+      <li>Para construir objetos: literal, factory, constructor function (histórica) y <code>class</code> (moderna, recomendada).</li>
+      <li>JSON es texto: <code>JSON.stringify</code> serializa y <code>JSON.parse</code> deserializa (y puede fallar → <code>try/catch</code>).</li>
+    </ul>
+
+    <h3>Para profundizar (MDN)</h3>
+    <ul>
+      <li><em>Working with objects</em> y <em>Object prototypes</em> (incluye "shadowing properties" y métodos para manipular la cadena).</li>
+      <li>El objeto global <em>JSON</em> y el operador <em>new</em>.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-label">Lo que viene</div>
+      La próxima clase es <strong>Clases en JavaScript</strong>: la sintaxis moderna de POO en profundidad. Y después, la unidad de <strong>APIs</strong>, donde se juntan objetos, JSON y todo lo de asincronía para comunicar frontend y backend.
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

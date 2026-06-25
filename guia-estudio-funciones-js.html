@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funciones en JS — Guía de estudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #8b91a8;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --yellow: #f4c542;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --teal: #2dd4bf;
+    --note-bg: rgba(124,106,247,0.08);
+    --note-border: rgba(124,106,247,0.35);
+    --warn-bg: rgba(244,197,66,0.07);
+    --warn-border: rgba(244,197,66,0.35);
+    --tip-bg: rgba(74,222,128,0.07);
+    --tip-border: rgba(74,222,128,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 52px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 2rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 2rem 6rem;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(124,106,247,0.12);
+    border: 0.5px solid rgba(124,106,247,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .page-header .meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 68px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── CODE ── */
+  pre {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.4rem;
+    position: relative;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  /* minimal syntax coloring */
+  .kw  { color: var(--accent2); }     /* keywords */
+  .fn  { color: var(--yellow); }      /* function names */
+  .str { color: var(--green); }       /* strings */
+  .cm  { color: #555e7a; font-style: italic; } /* comments */
+  .num { color: var(--orange); }      /* numbers */
+  .mt  { color: var(--teal); }        /* methods */
+  .op  { color: var(--red); }         /* operators / arrows */
+
+  .output-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.3rem 0 0.2rem;
+  }
+  pre.output {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 15px;
+  }
+  .callout.warn {
+    border-left-color: var(--warn-border);
+    background: var(--warn-bg);
+  }
+  .callout.tip {
+    border-left-color: var(--tip-border);
+    background: var(--tip-bg);
+  }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--accent2);
+  }
+  .callout.warn .callout-label { color: var(--yellow); }
+  .callout.tip .callout-label { color: var(--green); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code, th code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 0.5px solid var(--border); margin: 3rem 0; }
+
+  /* ── inline code ── */
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+
+  /* ── AGENDA CARD ── */
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+  }
+
+  /* ── Autoevaluación (Ponete a prueba) ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.2rem 0; }
+  details.q {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  details.q summary {
+    cursor: pointer;
+    padding: 0.9rem 1.1rem;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after {
+    content: '+';
+    color: var(--accent2);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  details.q[open] summary::after { content: '\2212'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a {
+    padding: 0.9rem 1.1rem;
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  details.q .a code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  details.q .a pre { margin: 0.6rem 0 0; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Funciones JS</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#declaracion">Declaración</a>
+  <a href="#expresion">Expresión</a>
+  <a href="#hoisting">Hoisting</a>
+  <a href="#scope">Scope</a>
+  <a href="#arrow">Arrow</a>
+  <a href="#hof">High-order</a>
+  <a href="#callback">Callback</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+  <a href="#resumen">Resumen</a>
+</nav>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Funciones en JavaScript</h1>
+    <p>Clase 02.02 — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: variables, tipos, estructuras de control en JS</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+    <p>Esta guía cubre los temas esenciales que vimos. Recursividad la trabajamos en la guía siguiente.</p>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">Declaración de función y parámetros</div></div>
+      <div class="agenda-item"><div class="topic">Expresión de función + Hoisting</div></div>
+      <div class="agenda-item"><div class="topic">Scope</div></div>
+      <div class="agenda-item"><div class="topic">Arrow functions</div></div>
+      <div class="agenda-item"><div class="topic">High-order functions</div></div>
+      <div class="agenda-item"><div class="topic">Callbacks + cierre</div></div>
+    </div>
+
+    
+  </section>
+
+
+  <!-- DECLARACIÓN -->
+  <section id="declaracion">
+    <div class="section-num">Bloque 1</div>
+    <h2>Declaración de función</h2>
+
+    <p>En JS, las funciones son <strong>objetos de primera clase</strong> (<em>first-class objects</em>): se pueden asignar a variables, pasar como parámetros y retornar desde otras funciones. La diferencia con otros objetos es que pueden ser <em>invocadas</em>.</p>
+
+    <pre><code><span class="kw">function</span> <span class="fn">sayHi</span>(name) {
+  <span class="kw">return</span> <span class="str">`Hi <span class="op">${</span>name<span class="op">}</span>`</span>;
+}</code></pre>
+
+    <ul>
+      <li>Palabra clave <code>function</code>, nombre, parámetros entre <code>()</code>, cuerpo entre <code>{}</code>.</li>
+      <li><code>return</code> es opcional. Sin él, la función devuelve <code>undefined</code>.</li>
+    </ul>
+
+    <h3>Parámetros</h3>
+    <p>Los parámetros pueden tener valores por defecto. Si no se pasan, su valor es el default o <code>undefined</code>. Se pueden pasar de más (los extras se ignoran) y el orden importa.</p>
+
+    <pre><code><span class="str">'use strict'</span>;
+
+<span class="kw">function</span> <span class="fn">sayHi</span>(name, greeting = <span class="str">'Hi'</span>) {
+  <span class="kw">return</span> <span class="str">`<span class="op">${</span>greeting<span class="op">}</span> <span class="op">${</span>name<span class="op">}</span>`</span>;
+}
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHi</span>(<span class="str">'John'</span>, <span class="str">'Hello'</span>)); <span class="cm">// Hello John</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHi</span>(<span class="str">'John'</span>));          <span class="cm">// Hi John  ← usa el default</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHi</span>());                 <span class="cm">// Hi undefined</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHi</span>(<span class="str">'Hello'</span>, <span class="str">'John'</span>)); <span class="cm">// John Hello ← orden importa</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHi</span>(<span class="str">'John'</span>, <span class="str">'Hello'</span>, <span class="str">'!'</span>)); <span class="cm">// Hello John ← el extra se ignora</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Importante</div>
+      JS no lanza error si llamás la función con más o menos parámetros de los definidos. Esto sorprende a los que vienen de Java o C. Es una fuente frecuente de bugs silenciosos.
+    </div>
+  </section>
+
+
+  <!-- EXPRESIÓN -->
+  <section id="expresion">
+    <div class="section-num">Bloque 2</div>
+    <h2>Expresión de función</h2>
+
+    <p>Una expresión de función crea una función y la asigna a una variable. El nombre de la función es opcional; si existe, solo es accesible <em>dentro</em> del cuerpo de la función (útil para recursividad).</p>
+
+    <pre><code><span class="str">'use strict'</span>;
+
+<span class="cm">// con nombre (el nombre 'sayHi' solo existe adentro)</span>
+<span class="kw">const</span> greet = <span class="kw">function</span> <span class="fn">sayHi</span>(name, greeting = <span class="str">'Hi'</span>) {
+  <span class="kw">return</span> <span class="str">`<span class="op">${</span>greeting<span class="op">}</span> <span class="op">${</span>name<span class="op">}</span>`</span>;
+};
+
+<span class="cm">// anónima</span>
+<span class="kw">const</span> anonymousGreet = <span class="kw">function</span>(name, greeting = <span class="str">'Hi'</span>) {
+  <span class="kw">return</span> <span class="str">`<span class="op">${</span>greeting<span class="op">}</span> <span class="op">${</span>name<span class="op">}</span>`</span>;
+};
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">greet</span>(<span class="str">'Jane'</span>, <span class="str">'Hello'</span>));          <span class="cm">// Hello Jane</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">anonymousGreet</span>(<span class="str">'Josh'</span>, <span class="str">'Hello'</span>)); <span class="cm">// Hello Josh</span>
+<span class="cm">// sayHi('Jane', 'Hello'); ← ReferenceError: sayHi is not defined</span></code></pre>
+
+    
+  </section>
+
+
+  <!-- HOISTING -->
+  <section id="hoisting">
+    <div class="section-num">Bloque 2 (cont.)</div>
+    <h2>Hoisting</h2>
+
+    <p>Las <strong>declaraciones de función</strong> son <em>hoisted</em>: JS las mueve al inicio del scope, así que podés llamarlas antes de declararlas en el código. Las <strong>expresiones de función</strong> (y las arrow functions) <strong>no son hoisted</strong>.</p>
+
+    <pre><code><span class="str">'use strict'</span>;
+
+<span class="fn">hoisting</span>(<span class="str">'esto funciona'</span>); <span class="cm">// ✅ se puede llamar antes de declararla</span>
+<span class="cm">// noHoisting('esto falla'); ← ReferenceError</span>
+
+<span class="kw">function</span> <span class="fn">hoisting</span>(text) {
+  <span class="mt">console</span>.<span class="mt">log</span>(text);
+}
+
+<span class="kw">const</span> noHoisting = <span class="kw">function</span>(text) {
+  <span class="mt">console</span>.<span class="mt">log</span>(text);
+};</code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Importante</div>
+      Aunque el hoisting <em>permite</em> llamar funciones antes de declararlas, no significa que sea buena práctica. En proyectos reales siempre conviene declarar antes de usar.
+    </div>
+  </section>
+
+
+  <!-- SCOPE -->
+  <section id="scope">
+    <div class="section-num">Bloque 3</div>
+    <h2>Scope</h2>
+
+    <p>Cada función crea su propio scope. Las variables declaradas dentro:</p>
+    <ul>
+      <li><strong>Ocultan</strong> a las del mismo nombre del scope exterior (dentro de la función).</li>
+      <li><strong>No existen</strong> fuera de la función.</li>
+    </ul>
+    <p>Las variables del scope externo sí son accesibles desde dentro, si no hay una local con el mismo nombre.</p>
+
+    <pre><code><span class="str">'use strict'</span>;
+
+<span class="kw">let</span> x = <span class="num">1</span>;
+<span class="kw">let</span> y = <span class="str">'test'</span>;
+
+<span class="fn">withVars</span>();
+
+<span class="kw">function</span> <span class="fn">withVars</span>() {
+  <span class="kw">let</span> x = <span class="str">'a'</span>; <span class="cm">// oculta la x de afuera, solo acá adentro</span>
+  <span class="mt">console</span>.<span class="mt">log</span>(x, y); <span class="cm">// a test</span>
+}
+
+<span class="mt">console</span>.<span class="mt">log</span>(x, y); <span class="cm">// 1 test  ← la x de afuera no cambió</span></code></pre>
+
+    
+  </section>
+
+
+  <!-- ARROW FUNCTIONS -->
+  <section id="arrow">
+    <div class="section-num">Bloque 4</div>
+    <h2>Arrow functions</h2>
+
+    <p>Sintaxis más concisa para expresiones de función. Muy usadas en JS moderno y en Node.js.</p>
+
+    <h3>Sintaxis</h3>
+    <pre><code><span class="cm">// forma mínima: una sola expresión, sin llaves ni return</span>
+<span class="kw">const</span> <span class="fn">sayHi</span> = (name, greeting = <span class="str">'Hi'</span>) <span class="op">=></span> <span class="str">`<span class="op">${</span>greeting<span class="op">}</span> <span class="op">${</span>name<span class="op">}</span>`</span>;
+
+<span class="cm">// con bloque: necesita return explícito</span>
+<span class="kw">const</span> <span class="fn">greet</span> = (recipient, greeting = <span class="str">'Hi'</span>) <span class="op">=></span> {
+  <span class="kw">if</span> (<span class="kw">typeof</span> recipient === <span class="str">'string'</span>) {
+    <span class="kw">return</span> <span class="str">`<span class="op">${</span>greeting<span class="op">}</span> <span class="op">${</span>recipient<span class="op">}</span>`</span>;
+  }
+  <span class="kw">if</span> (<span class="kw">typeof</span> recipient === <span class="str">'object'</span>) {
+    <span class="kw">return</span> <span class="fn">greet</span>(<span class="str">`<span class="op">${</span>recipient.firstName<span class="op">}</span> <span class="op">${</span>recipient.lastName<span class="op">}</span>`</span>, greeting);
+  }
+};
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHi</span>(<span class="str">'John'</span>, <span class="str">'Hello'</span>));                         <span class="cm">// Hello John</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">greet</span>({ firstName: <span class="str">'Jane'</span>, lastName: <span class="str">'Doe'</span> }, <span class="str">'Hello'</span>)); <span class="cm">// Hello Jane Doe</span></code></pre>
+
+    <h3>Restricciones importantes</h3>
+
+    <div class="callout warn">
+      <div class="callout-label">⚠ Diferencia crítica con funciones normales</div>
+      Las arrow functions <strong>no tienen su propio <code>this</code></strong>. Heredan el <code>this</code> del contexto donde fueron creadas (<em>lexical this</em>). Por eso <strong>no deben usarse como métodos de objetos</strong> ni como constructores. Esto va a ser muy relevante cuando veamos objetos y clases la clase que viene.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>Declaration</th>
+            <th>Expression</th>
+            <th>Arrow</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hoisting</td>
+            <td><span class="check">✓ Sí</span></td>
+            <td><span class="cross">✗ No</span></td>
+            <td><span class="cross">✗ No</span></td>
+          </tr>
+          <tr>
+            <td><code>this</code> propio</td>
+            <td><span class="check">✓ Sí</span></td>
+            <td><span class="check">✓ Sí</span></td>
+            <td><span class="cross">✗ No (lexical)</span></td>
+          </tr>
+          <tr>
+            <td>Usable como constructor</td>
+            <td><span class="check">✓ Sí</span></td>
+            <td><span class="check">✓ Sí</span></td>
+            <td><span class="cross">✗ No</span></td>
+          </tr>
+          <tr>
+            <td>Puede ser anónima</td>
+            <td><span class="cross">✗ No</span></td>
+            <td><span class="check">✓ Sí</span></td>
+            <td><span class="check">✓ Siempre</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- HIGH-ORDER -->
+  <section id="hof">
+    <div class="section-num">Bloque 5</div>
+    <h2>Funciones de orden superior (higher-order functions)</h2>
+
+    <p>Una función de orden superior es una función que <strong>recibe otra función como parámetro</strong> y/o <strong>devuelve una función como resultado</strong>. Son uno de los patrones más importantes en JS — la propia API del lenguaje las usa constantemente.</p>
+
+    <h3>Función como parámetro — forEach</h3>
+    <p>El ejemplo más directo: <code>forEach</code> recibe una función y la ejecuta por cada elemento del array, pasándole <code>(valor, índice, array)</code>.</p>
+
+    <pre><code><span class="str">'use strict'</span>;
+
+<span class="kw">const</span> words = [<span class="str">'Hi all'</span>, <span class="str">'this are'</span>, <span class="str">'high-order functions'</span>];
+
+words.<span class="mt">forEach</span>((value, index) <span class="op">=></span>
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`Item <span class="op">${</span>index + <span class="num">1</span><span class="op">}</span>: '<span class="op">${</span>value<span class="op">}</span>'`</span>)
+);</code></pre>
+
+    <div class="output-label">Salida</div>
+    <pre class="output"><code>Item 1: 'Hi all'
+Item 2: 'this are'
+Item 3: 'high-order functions'</code></pre>
+
+    
+
+    <h3>Función como valor de retorno (closure)</h3>
+    <p>Una función puede devolver otra función. La función retornada "recuerda" las variables del scope donde fue creada — a esto se lo llama <strong>closure</strong>.</p>
+
+    <pre><code><span class="str">'use strict'</span>;
+
+<span class="kw">function</span> <span class="fn">makeGreeter</span>(greeting) {
+  <span class="kw">return</span> (name) <span class="op">=></span> <span class="str">`<span class="op">${</span>greeting<span class="op">}</span> <span class="op">${</span>name<span class="op">}</span>!`</span>; <span class="cm">// recuerda 'greeting'</span>
+}
+
+<span class="kw">const</span> sayHello = <span class="fn">makeGreeter</span>(<span class="str">'Hello'</span>);
+<span class="kw">const</span> sayHola  = <span class="fn">makeGreeter</span>(<span class="str">'Hola'</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHello</span>(<span class="str">'Jane'</span>)); <span class="cm">// Hello Jane!</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="fn">sayHola</span>(<span class="str">'Juan'</span>));  <span class="cm">// Hola Juan!</span></code></pre>
+
+    
+  </section>
+
+
+  <!-- CALLBACK -->
+  <section id="callback">
+    <div class="section-num">Bloque 6</div>
+    <h2>Callbacks</h2>
+
+    <p>Un <strong>callback</strong> es una función que se pasa como argumento a otra función para ser ejecutada más tarde — generalmente al finalizar una tarea. Es el primer mecanismo que usa JS para manejar código asincrónico (luego vienen Promises y <code>async/await</code>).</p>
+
+    <pre><code><span class="kw">function</span> <span class="fn">doSomething</span>(callback) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'Haciendo algo...'</span>);
+  <span class="fn">callback</span>(); <span class="cm">// ejecuta la función que recibió</span>
+}
+
+<span class="kw">function</span> <span class="fn">sayHello</span>() {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'¡Hola!'</span>);
+}
+
+<span class="fn">doSomething</span>(sayHello);
+<span class="cm">// Haciendo algo...</span>
+<span class="cm">// ¡Hola!</span></code></pre>
+
+    
+  </section>
+
+
+    <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. Respecto al hoisting, ¿qué diferencia hay entre una function declaration y una function expression?</summary>
+      <div class="a">Las declarations se hoistean: podés llamarlas antes de declararlas en el código. Las expressions (y las arrow functions) no: usarlas antes de la línea donde se definen lanza un <code>ReferenceError</code>.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Qué imprime?<br><code>saludar();</code><br><code>function saludar() { console.log('hola'); }</code></summary>
+      <div class="a">Imprime <code>hola</code>. Es una function declaration, así que está disponible aunque la llames antes de declararla (hoisting). Si fuera una expression asignada a <code>const</code>/<code>let</code>, daría error.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Por qué no conviene usar una arrow function como método de un objeto?</summary>
+      <div class="a">Porque las arrow functions no tienen su propio <code>this</code>: lo heredan del contexto donde se crean. Como método, <code>this</code> no apuntaría al objeto y no podrías acceder a sus propiedades. Para métodos: shorthand o <code>function</code>.</div>
+    </details>
+    <details class="q">
+      <summary>4. ¿Qué es una higher-order function? Dá un ejemplo.</summary>
+      <div class="a">Una función que recibe otra función como parámetro y/o devuelve una función. Ejemplos: <code>forEach</code>, <code>map</code>, <code>filter</code> (reciben un callback). Una función que devuelve otra función también lo es.</div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Qué es un closure?</summary>
+      <div class="a">Una función que recuerda las variables del scope donde fue creada, aunque ese scope ya haya terminado de ejecutarse. Es lo que permite que una función devuelta por otra siga accediendo a los parámetros de la función externa.</div>
+    </details>
+    <details class="q">
+      <summary>6. ¿Qué imprime? <code>['a','b'].forEach((v, i) => console.log(i, v));</code></summary>
+      <div class="a">Imprime <code>0 a</code> y <code>1 b</code>. <code>forEach</code> le pasa al callback el valor, el índice y el array (en ese orden); acá usamos los dos primeros.</div>
+    </details>
+    </div>
+  </section>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen y qué queda para la próxima</h2>
+
+    <h3>Lo que vimos hoy</h3>
+    <ul>
+      <li>Declaración de función, parámetros y valores por defecto.</li>
+      <li>Expresión de función (nombrada y anónima).</li>
+      <li>Hoisting: solo las declaraciones son hoisted.</li>
+      <li>Scope: cada función tiene el suyo.</li>
+      <li>Arrow functions: sintaxis concisa, sin <code>this</code> propio.</li>
+      <li>Higher-order functions: funciones que reciben o devuelven funciones.</li>
+      <li>Callbacks: función pasada para ejecutar después.</li>
+    </ul>
+
+    <h3>Para la clase siguiente</h3>
+    <ul>
+      <li><strong>Recursividad</strong> — se entiende mejor con práctica encima.</li>
+      <li><strong>Closures</strong> en profundidad — hoy solo se mencionó el concepto.</li>
+      <li><strong>Objetos en JS</strong> — donde todo lo de funciones cobra sentido: métodos, <code>this</code>, constructores.</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-label">Lectura recomendada (MDN)</div>
+      Para los que quieran profundizar: <em>default parameters</em>, <em>rest parameters</em>, <em>destructuring</em> y <em>closures</em> en MDN. Todos están linkeados en el material de la cátedra.
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

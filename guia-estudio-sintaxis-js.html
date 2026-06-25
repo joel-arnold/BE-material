@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sintaxis básica de JS — Guía de estudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #8b91a8;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --yellow: #f4c542;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --teal: #2dd4bf;
+    --note-bg: rgba(124,106,247,0.08);
+    --note-border: rgba(124,106,247,0.35);
+    --warn-bg: rgba(244,197,66,0.07);
+    --warn-border: rgba(244,197,66,0.35);
+    --tip-bg: rgba(74,222,128,0.07);
+    --tip-border: rgba(74,222,128,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 2rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 2rem 6rem;
+  }
+
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(124,106,247,0.12);
+    border: 0.5px solid rgba(124,106,247,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  .page-header p { color: var(--muted); font-size: 15px; }
+  .page-header .meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 68px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  pre {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.4rem;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .kw  { color: var(--accent2); }
+  .fn  { color: var(--yellow); }
+  .str { color: var(--green); }
+  .cm  { color: #555e7a; font-style: italic; }
+  .num { color: var(--orange); }
+  .mt  { color: var(--teal); }
+  .op  { color: var(--red); }
+  .tp  { color: var(--blue); }
+
+  .output-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.3rem 0 0.2rem;
+  }
+  pre.output {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  .callout {
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 15px;
+  }
+  .callout.warn { border-left-color: var(--warn-border); background: var(--warn-bg); }
+  .callout.tip  { border-left-color: var(--tip-border);  background: var(--tip-bg); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--accent2);
+  }
+  .callout.warn .callout-label { color: var(--yellow); }
+  .callout.tip  .callout-label { color: var(--green); }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0 1.4rem;
+  }
+  .two-col pre { margin: 0; }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+  }
+
+  /* ── Autoevaluación (Ponete a prueba) ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.2rem 0; }
+  details.q {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  details.q summary {
+    cursor: pointer;
+    padding: 0.9rem 1.1rem;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after {
+    content: '+';
+    color: var(--accent2);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  details.q[open] summary::after { content: '\2212'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a {
+    padding: 0.9rem 1.1rem;
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  details.q .a code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  details.q .a pre { margin: 0.6rem 0 0; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Sintaxis JS</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#variables">Variables</a>
+  <a href="#tipos">Tipos</a>
+  <a href="#arrays">Arrays</a>
+  <a href="#control">If / Switch</a>
+  <a href="#loops">Loops</a>
+  <a href="#iteraciones">Iteraciones</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+  <a href="#resumen">Resumen</a>
+</nav>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Sintaxis básica de JavaScript</h1>
+    <p>Clase 02.01 — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: ninguno (primera clase de JS)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">Variables, constantes y tipos</div></div>
+      <div class="agenda-item"><div class="topic">Arrays y métodos principales</div></div>
+      <div class="agenda-item"><div class="topic">if / else / switch</div></div>
+      <div class="agenda-item"><div class="topic">Loops: while, do…while, for</div></div>
+      <div class="agenda-item"><div class="topic">Iteraciones: for vs forEach</div></div>
+    </div>
+
+    
+  </section>
+
+
+  <!-- VARIABLES -->
+  <section id="variables">
+    <div class="section-num">Bloque 1</div>
+    <h2>Variables y constantes</h2>
+
+    <p>JS tiene tres formas de declarar variables. En código moderno (Node.js, ES6+) se usan <code>let</code> y <code>const</code>. <code>var</code> existe por compatibilidad histórica y <strong>no debe usarse en código nuevo</strong>.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Palabra clave</th><th>Scope</th><th>Reasignable</th><th>Hoisting</th><th>Usar en</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>let</code></td><td>Bloque <code>{}</code></td><td><span class="check">✓ Sí</span></td><td>No inicializado</td><td>Variables que cambian</td></tr>
+          <tr><td><code>const</code></td><td>Bloque <code>{}</code></td><td><span class="cross">✗ No</span></td><td>No inicializado</td><td>Siempre que se pueda</td></tr>
+          <tr><td><code>var</code></td><td>Función / global</td><td><span class="check">✓ Sí</span></td><td>Con <code>undefined</code></td><td>Solo código legacy</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>let — variable de bloque</h3>
+    <pre><code><span class="kw">let</span> a;              <span class="cm">// declaración sin valor → undefined</span>
+<span class="kw">let</span> b = <span class="str">'see ya...'</span>;
+
+a = <span class="str">'hello world'</span>;
+<span class="mt">console</span>.<span class="mt">log</span>(a); <span class="cm">// hello world</span>
+<span class="mt">console</span>.<span class="mt">log</span>(b); <span class="cm">// see ya...</span>
+
+b = <span class="str">'...later'</span>;   <span class="cm">// reasignación válida</span>
+<span class="mt">console</span>.<span class="mt">log</span>(b); <span class="cm">// ...later</span></code></pre>
+
+    <h3>const — referencia constante</h3>
+    <p><code>const</code> impide la <em>reasignación</em> de la variable, pero no congela el contenido del objeto al que apunta. Este punto suele sorprender a los que vienen de otros lenguajes.</p>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px; color:var(--red); font-weight:600; margin-bottom:4px;">✗ Esto falla</p>
+        <pre><code><span class="kw">const</span> a = <span class="str">'hello'</span>;
+a = <span class="str">'bye'</span>; <span class="cm">// TypeError!</span></code></pre>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--green); font-weight:600; margin-bottom:4px;">✓ Esto funciona</p>
+        <pre><code><span class="kw">const</span> obj = { name: <span class="str">'John'</span> };
+obj.name = <span class="str">'John Doe'</span>; <span class="cm">// OK</span>
+<span class="cm">// obj = {...}; → TypeError!</span></code></pre>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Importante</div>
+      <code>const</code> no hace que el objeto sea inmutable. Solo evita que la variable apunte a otro objeto. Las propiedades internas del objeto se pueden modificar libremente. La regla práctica: <strong>usar <code>const</code> siempre que sea posible, <code>let</code> cuando necesitás reasignar</strong>.
+    </div>
+
+    <h3>var — por qué no usarlo</h3>
+    <p>Tres razones concretas para evitarlo en código nuevo:</p>
+    <ul>
+      <li>Scope de función o global, no de bloque: una variable <code>var</code> declarada dentro de un <code>if</code> o un <code>for</code> existe fuera de ese bloque.</li>
+      <li>Hoisting con <code>undefined</code>: se puede usar antes de declararla sin error, devuelve <code>undefined</code> silenciosamente.</li>
+      <li>Se puede re-declarar sin error: <code>var x = 1; var x = 2;</code> es válido, lo que enmascara bugs.</li>
+    </ul>
+  </section>
+
+
+  <!-- TIPOS -->
+  <section id="tipos">
+    <div class="section-num">Bloque 1 (cont.)</div>
+    <h2>Tipos de datos</h2>
+
+    <p>JS es de <strong>tipado dinámico y débilmente tipado</strong>: las variables no tienen tipo, los valores sí. Una misma variable puede contener distintos tipos a lo largo del programa.</p>
+
+    <pre><code><span class="kw">let</span> myVariable = <span class="num">42</span>;    <span class="cm">// number</span>
+myVariable     = <span class="str">'bar'</span>; <span class="cm">// string</span>
+myVariable     = <span class="kw">true</span>;  <span class="cm">// boolean</span></code></pre>
+
+    <h3>Tipos primitivos</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Ejemplo</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td><code>undefined</code></td><td><code>let x;</code></td><td>Variable declarada sin valor</td></tr>
+          <tr><td><code>boolean</code></td><td><code>true</code>, <code>false</code></td><td></td></tr>
+          <tr><td><code>number</code></td><td><code>42</code>, <code>3.14</code>, <code>NaN</code></td><td>Enteros y decimales son el mismo tipo</td></tr>
+          <tr><td><code>string</code></td><td><code>'hola'</code>, <code>`template`</code></td><td>Template literals con <code>${}</code></td></tr>
+          <tr><td><code>bigint</code></td><td><code>9007199254740991n</code></td><td>Para enteros muy grandes</td></tr>
+          <tr><td><code>symbol</code></td><td><code>Symbol('id')</code></td><td>Identificadores únicos</td></tr>
+          <tr><td><code>null</code></td><td><code>null</code></td><td>Ausencia intencional de valor</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Bug histórico de JS</div>
+      <code>typeof null</code> devuelve <code>'object'</code>, pero <code>null</code> es un tipo primitivo. Es un error de los primeros días del lenguaje que no se puede corregir por compatibilidad. Tenerlo en mente al comparar valores.
+    </div>
+
+    <h3>Tipos no primitivos</h3>
+    <p>Los tipos no primitivos son <code>Object</code> y <code>Function</code>. La diferencia práctica más importante: los primitivos se pasan <strong>por valor</strong>, los no primitivos se pasan <strong>por referencia</strong>. Esto se verá con más detalle en la clase de objetos.</p>
+  </section>
+
+
+  <!-- ARRAYS -->
+  <section id="arrays">
+    <div class="section-num">Bloque 2</div>
+    <h2>Arrays</h2>
+
+    <p>En JS los arrays <strong>no son una estructura primitiva</strong> sino un objeto <code>Array</code>. Diferencias clave respecto a otros lenguajes:</p>
+    <ul>
+      <li>Pueden mezclar tipos en el mismo array.</li>
+      <li>Son de tamaño dinámico — no se declara el tamaño.</li>
+      <li>Acceder a una posición fuera del límite <strong>no lanza error</strong>, devuelve <code>undefined</code>.</li>
+      <li>Pueden tener posiciones vacías (sparse arrays).</li>
+      <li>Comienzan en índice 0.</li>
+    </ul>
+
+    <pre><code><span class="kw">let</span> array = [<span class="num">1</span>, <span class="kw">true</span>, <span class="str">'story'</span>]; <span class="cm">// tipos mezclados</span>
+
+<span class="mt">console</span>.<span class="mt">log</span>(array[<span class="num">0</span>]);       <span class="cm">// 1         ← acceso por índice</span>
+<span class="mt">console</span>.<span class="mt">log</span>(array.<span class="mt">at</span>(<span class="num">1</span>));    <span class="cm">// true      ← método at()</span>
+<span class="mt">console</span>.<span class="mt">log</span>(array.<span class="mt">at</span>(-<span class="num">1</span>));   <span class="cm">// 'story'   ← índice negativo = desde el final</span>
+<span class="mt">console</span>.<span class="mt">log</span>(array.<span class="mt">length</span>);   <span class="cm">// 3</span>
+<span class="mt">console</span>.<span class="mt">log</span>(array[<span class="num">10</span>]);      <span class="cm">// undefined ← no lanza error</span>
+
+array[<span class="num">5</span>] = <span class="str">'last'</span>;
+<span class="mt">console</span>.<span class="mt">log</span>(array); <span class="cm">// [1, true, 'story', vacío×2, 'last']</span></code></pre>
+
+    <h3>Métodos de manipulación</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Método</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>push(x)</code></td><td>Agrega <code>x</code> al final</td></tr>
+          <tr><td><code>pop()</code></td><td>Quita y devuelve el último elemento</td></tr>
+          <tr><td><code>unshift(x)</code></td><td>Agrega <code>x</code> al principio</td></tr>
+          <tr><td><code>shift()</code></td><td>Quita y devuelve el primer elemento</td></tr>
+          <tr><td><code>at(i)</code></td><td>Devuelve el elemento en posición <code>i</code> (soporta negativos)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Métodos basados en funciones</h3>
+    <p>Estos métodos reciben una función como parámetro. Los vemos brevemente ahora; los profundizamos en la clase de funciones.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Método</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>forEach(fn)</code></td><td>Ejecuta <code>fn</code> para cada elemento</td></tr>
+          <tr><td><code>map(fn)</code></td><td>Devuelve nuevo array transformando cada elemento</td></tr>
+          <tr><td><code>filter(fn)</code></td><td>Devuelve nuevo array con los elementos que cumplen la condición</td></tr>
+          <tr><td><code>find(fn)</code></td><td>Devuelve el primer elemento que cumple la condición</td></tr>
+          <tr><td><code>reduce(fn)</code></td><td>Reduce el array a un único valor acumulado</td></tr>
+          <tr><td><code>sort(fn)</code></td><td>Ordena el array (modifica el original)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    
+  </section>
+
+
+  <!-- IF / SWITCH -->
+  <section id="control">
+    <div class="section-num">Bloque 3</div>
+    <h2>Control de flujo: if / switch</h2>
+
+    <h3>if…else</h3>
+    <p>La sintaxis es idéntica a Java o C. Lo que cambia en JS es que la condición no tiene que ser un booleano: cualquier valor se evalúa como <strong>truthy</strong> o <strong>falsy</strong>.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Concepto clave: truthy y falsy</div>
+      Son <strong>falsy</strong>: <code>false</code>, <code>0</code>, <code>''</code> (string vacío), <code>null</code>, <code>undefined</code>, <code>NaN</code>. Todo lo demás es <strong>truthy</strong>, incluyendo <code>[]</code> (array vacío) y <code>{}</code> (objeto vacío).
+    </div>
+
+    <pre><code><span class="kw">let</span> a = <span class="num">1</span> + <span class="num">2</span>; <span class="cm">// a = 3</span>
+<span class="kw">let</span> b;         <span class="cm">// b = undefined</span>
+
+<span class="kw">if</span> (a > <span class="num">3</span>) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'a>3 es verdadero'</span>);
+} <span class="kw">else</span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'a>3 es falso'</span>);     <span class="cm">// ← se ejecuta esto</span>
+}
+
+<span class="kw">if</span> (a) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'a es truthy'</span>);      <span class="cm">// ← 3 es truthy, se ejecuta</span>
+}
+
+<span class="kw">if</span> (b) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'b es truthy'</span>);
+} <span class="kw">else</span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'b es falsy'</span>);       <span class="cm">// ← undefined es falsy</span>
+}</code></pre>
+
+    <h3>Operadores de comparación</h3>
+    <p>El punto más importante para remarcar: <strong>igualdad estricta vs no estricta</strong>.</p>
+
+    <pre><code><span class="mt">console</span>.<span class="mt">log</span>(<span class="num">1</span> <span class="op">==</span>  <span class="str">'1'</span>); <span class="cm">// true  ← convierte tipos antes de comparar</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="num">1</span> <span class="op">===</span> <span class="str">'1'</span>); <span class="cm">// false ← compara tipo Y valor</span>
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="num">1</span> <span class="op">!=</span>  <span class="str">'1'</span>); <span class="cm">// false</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="num">1</span> <span class="op">!==</span> <span class="str">'1'</span>); <span class="cm">// true</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">Regla de oro</div>
+      Usar siempre <code>===</code> y <code>!==</code>. El <code>==</code> con conversión implícita de tipos genera comportamientos difíciles de predecir y bugs silenciosos. La única excepción habitual: <code>x == null</code> para chequear tanto <code>null</code> como <code>undefined</code> en una sola condición.
+    </div>
+
+    <h3>switch</h3>
+    <p>El <code>switch</code> compara con <strong>igualdad estricta</strong> (<code>===</code>) internamente. No olvidar el <code>break</code> en cada caso: sin él, la ejecución "cae" al siguiente bloque (fallthrough).</p>
+
+    <pre><code><span class="kw">let</span> a = <span class="str">'1'</span>; <span class="cm">// string</span>
+
+<span class="kw">switch</span> (a) {
+  <span class="kw">case</span> <span class="num">1</span>:     <span class="cm">// number 1 → no coincide (distinto tipo)</span>
+    <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'a es el número 1'</span>);
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="str">'1'</span>:  <span class="cm">// string '1' → coincide</span>
+    <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">"a es el string '1'"</span>); <span class="cm">// ← se ejecuta esto</span>
+    <span class="kw">break</span>;
+  <span class="kw">default</span>:
+    <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">'sin coincidencia'</span>);
+    <span class="kw">break</span>;
+}</code></pre>
+
+    
+  </section>
+
+
+  <!-- LOOPS -->
+  <section id="loops">
+    <div class="section-num">Bloque 4</div>
+    <h2>Bucles</h2>
+
+    <p>La sintaxis de <code>while</code>, <code>do…while</code> y <code>for</code> en JS es prácticamente idéntica a Java y C. El foco acá es en las diferencias.</p>
+
+    <pre><code><span class="kw">let</span> i = <span class="num">0</span>;
+
+<span class="cm">// while: evalúa la condición ANTES de ejecutar</span>
+<span class="kw">while</span> (i < <span class="num">3</span>) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`i es <span class="op">${</span>i<span class="op">}</span>`</span>);
+  i++;
+}
+
+<span class="cm">// do...while: ejecuta AL MENOS UNA VEZ, evalúa condición al final</span>
+<span class="kw">let</span> j = <span class="num">0</span>;
+<span class="kw">do</span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`j es <span class="op">${</span>j<span class="op">}</span>, condición falsa pero ejecutó una vez`</span>);
+} <span class="kw">while</span> (j < <span class="num">0</span>); <span class="cm">// condición falsa desde el inicio</span>
+
+<span class="cm">// for: inicialización, condición y expresión final en una línea</span>
+<span class="kw">for</span> (<span class="kw">let</span> k = <span class="num">0</span>; k < <span class="num">3</span>; k++) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`k es <span class="op">${</span>k<span class="op">}</span>`</span>);
+}</code></pre>
+
+    
+  </section>
+
+
+  <!-- ITERACIONES -->
+  <section id="iteraciones">
+    <div class="section-num">Bloque 5</div>
+    <h2>Iteraciones sobre arrays: for vs forEach</h2>
+
+    <p>Para iterar sobre arrays hay dos opciones principales. <code>for</code> es una <em>sentencia</em>; <code>forEach</code> es un <em>método</em> del objeto Array que recibe una función.</p>
+
+    <pre><code><span class="kw">const</span> datos = [<span class="str">'array'</span>, <span class="num">1</span>, <span class="kw">true</span>, <span class="kw">undefined</span>, <span class="str">'story'</span>];
+
+<span class="cm">// con for clásico</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < datos.<span class="mt">length</span>; i++) {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`elemento <span class="op">${</span>i<span class="op">}</span>: <span class="op">${</span>datos[i]<span class="op">}</span> (tipo: <span class="op">${</span><span class="kw">typeof</span> datos[i]<span class="op">}</span>)`</span>);
+}
+
+<span class="cm">// con forEach — recibe (elemento, índice, array)</span>
+datos.<span class="mt">forEach</span>((element, i) <span class="op">=></span> {
+  <span class="mt">console</span>.<span class="mt">log</span>(<span class="str">`elemento <span class="op">${</span>i<span class="op">}</span>: <span class="op">${</span>element<span class="op">}</span> (tipo: <span class="op">${</span><span class="kw">typeof</span> element<span class="op">}</span>)`</span>);
+});</code></pre>
+
+    <div class="output-label">Salida (idéntica para ambos)</div>
+    <pre class="output"><code>elemento 0: array (tipo: string)
+elemento 1: 1 (tipo: number)
+elemento 2: true (tipo: boolean)
+elemento 3: undefined (tipo: undefined)
+elemento 4: story (tipo: string)</code></pre>
+
+    <h3>¿Cuándo usar cada uno?</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th><code>for</code></th><th><code>forEach</code></th></tr></thead>
+        <tbody>
+          <tr><td>Necesito el índice</td><td><span class="check">✓</span></td><td><span class="check">✓ (segundo parámetro)</span></td></tr>
+          <tr><td>Quiero salir antes (<code>break</code>)</td><td><span class="check">✓</span></td><td><span class="cross">✗ No soporta break</span></td></tr>
+          <tr><td>Código más declarativo / moderno</td><td></td><td><span class="check">✓</span></td></tr>
+          <tr><td>Iterar con <code>async/await</code></td><td><span class="check">✓</span></td><td><span class="cross">✗ No funciona bien</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Lo que sigue</div>
+      <code>forEach</code> recibe una función como parámetro — eso se llama <em>higher-order function</em> y es uno de los patrones más importantes de JS. Lo profundizamos en la clase de funciones. Por ahora alcanza con saber usarlo.
+    </div>
+  </section>
+
+
+    <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. ¿Cuál es la diferencia principal entre <code>let</code>, <code>const</code> y <code>var</code>, y cuál conviene usar por defecto?</summary>
+      <div class="a"><code>let</code> y <code>const</code> tienen scope de bloque; <code>var</code> tiene scope de función o global y se hoistea con <code>undefined</code>, por eso se evita. <code>const</code> no se puede reasignar; <code>let</code> sí. Regla práctica: usá <code>const</code> por defecto y <code>let</code> solo cuando necesites reasignar. <code>var</code>, únicamente en código viejo.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Qué imprime? <code>const obj = { n: 1 }; obj.n = 2; console.log(obj.n);</code></summary>
+      <div class="a">Imprime <code>2</code>. <code>const</code> impide reasignar la variable (apuntarla a otro objeto), pero no congela el contenido: modificar las propiedades del objeto es válido.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Qué devuelven <code>1 == '1'</code> y <code>1 === '1'</code>? ¿Por qué?</summary>
+      <div class="a"><code>1 == '1'</code> da <code>true</code> (el <code>==</code> convierte tipos antes de comparar). <code>1 === '1'</code> da <code>false</code> (el <code>===</code> compara valor Y tipo). Conviene usar siempre <code>===</code> y <code>!==</code>.</div>
+    </details>
+    <details class="q">
+      <summary>4. De estos valores, ¿cuáles son falsy?: <code>0</code>, <code>''</code>, <code>[]</code>, <code>null</code>, <code>'0'</code>, <code>undefined</code></summary>
+      <div class="a">Son falsy <code>0</code>, <code>''</code> (string vacío), <code>null</code> y <code>undefined</code>. En cambio <code>[]</code> (array vacío) y <code>'0'</code> (string con un cero) son truthy. Solo hay seis valores falsy: <code>false</code>, <code>0</code>, <code>''</code>, <code>null</code>, <code>undefined</code> y <code>NaN</code>.</div>
+    </details>
+    <details class="q">
+      <summary>5. En un array de 3 elementos, ¿qué pasa si accedo a la posición 10?</summary>
+      <div class="a">Devuelve <code>undefined</code>; no lanza error. Los arrays en JS no avisan cuando accedés fuera de rango.</div>
+    </details>
+    <details class="q">
+      <summary>6. ¿Por qué <code>forEach</code> no sirve si necesito cortar la iteración o usar <code>await</code>?</summary>
+      <div class="a"><code>forEach</code> no soporta <code>break</code>/<code>continue</code> y no espera a los <code>await</code> dentro del callback. Para cortar antes de tiempo o para iteración asincrónica secuencial, conviene un <code>for</code> clásico o <code>for...of</code>.</div>
+    </details>
+    </div>
+  </section>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen de la clase</h2>
+
+    <h3>Puntos clave para recordar</h3>
+    <ul>
+      <li>Usar <code>const</code> por defecto, <code>let</code> cuando necesitás reasignar. Nunca <code>var</code> en código nuevo.</li>
+      <li><code>const</code> impide reasignación, no hace inmutable el contenido del objeto.</li>
+      <li>JS es de tipado dinámico: las variables no tienen tipo, los valores sí.</li>
+      <li><code>typeof null === 'object'</code> es un bug histórico — <code>null</code> es primitivo.</li>
+      <li>Los arrays son objetos: tamaño dinámico, tipos mezclados, sin error por fuera de límite.</li>
+      <li>Siempre usar <code>===</code> y <code>!==</code> (comparación estricta).</li>
+      <li>En <code>if</code>, cualquier valor es truthy o falsy — no tiene que ser booleano.</li>
+      <li><code>forEach</code> no soporta <code>break</code> ni <code>async/await</code>; para esos casos usar <code>for</code>.</li>
+    </ul>
+
+    <h3>Para la clase siguiente</h3>
+    <ul>
+      <li><strong>Funciones</strong>: declarations, expressions, arrow functions, hoisting, scope, higher-order functions, callbacks.</li>
+    </ul>
+  </section>
+
+</main>
+</body>
+</html>
