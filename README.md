@@ -22,12 +22,12 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 
 ## YouTubers recomendados
 
-- [jonmircha](https://www.youtube.com/jonmircha)
 - [Gentleman Programming](https://www.youtube.com/c/GentlemanProgramming)
 - [MoureDev](https://www.youtube.com/@mouredev)
 - [La Cocina del Código](https://www.youtube.com/c/LaCocinadelC%C3%B3digo/playlists)
 - midudev — [web](https://midu.dev/) / [YouTube](https://www.youtube.com/c/midudev)
 - [Victor Robles](https://www.youtube.com/@victorroblesweb)
+- [jonmircha](https://www.youtube.com/jonmircha)
 - [DropCoding](https://www.youtube.com/@dropcoding)
 - [HolaMundo](https://www.youtube.com/@HolaMundoDev)
 - [Dorian Designs](https://www.youtube.com/channel/UCzuwt7Pi_VB8cP5q5UE4u-A)
