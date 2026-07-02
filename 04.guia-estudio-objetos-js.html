@@ -680,7 +680,7 @@ copia.a = <span class="num">99</span>;
 <span class="mt">console</span>.<span class="mt">log</span>(sam.<span class="mt">greet</span>()); <span class="cm">// Hola, soy Sam</span></code></pre>
 
     <h3>2. Constructor Function (forma histórica)</h3>
-    <p>Antes de ES6 era la forma estándar de crear objetos a partir de una plantilla. Es una función (por convención, con <strong>mayúscula inicial</strong>) que se invoca con <code>new</code>. El operador <code>new</code> crea un objeto nuevo, lo asigna a <code>this</code>, y lo devuelve automáticamente. Los métodos compartidos se ponen en <code>.prototype</code>.</p>
+    <p>Antes de ES6 era la forma estándar de crear objetos a partir de una plantilla. Es una función (por convención, con <strong>mayúscula inicial</strong>) que se invoca con <code>new</code>. El operador <code>new</code> hace varias cosas por detrás: crea un objeto vacío, le asigna como prototipo el <code>Person.prototype</code>, ejecuta la función con <code>this</code> apuntando a ese objeto nuevo, y lo devuelve. Los métodos compartidos se ponen en <code>.prototype</code>.</p>
 
     <pre><code><span class="kw">function</span> <span class="fn">Person</span>(firstName, lastName, age) {
   <span class="kw">this</span>.firstName = firstName;
@@ -759,6 +759,30 @@ copia.a = <span class="num">99</span>;
       <div class="chain-node null">null</div>
     </div>
     <p class="chain-caption">Si <code>mark</code> no tiene una propiedad, JS la busca subiendo: <code>Author</code> → <code>Person</code> → <code>Object</code>.</p>
+
+    <h3>Object.create <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">— para profundizar</span></h3>
+    <p>Es la forma de más bajo nivel: crea un objeto especificando <strong>explícitamente cuál será su prototipo</strong>, sin <code>new</code> ni funciones de por medio. Sirve para ver la herencia prototípica de forma directa.</p>
+
+    <pre><code><span class="kw">const</span> base = {
+  saludar() {
+    <span class="kw">return</span> <span class="str">`Hola, soy <span class="op">${</span><span class="kw">this</span>.nombre<span class="op">}</span>`</span>;
+  },
+};
+
+<span class="kw">const</span> ada = <span class="tp">Object</span>.<span class="mt">create</span>(base); <span class="cm">// el prototipo de ada es "base"</span>
+ada.nombre = <span class="str">'Ada'</span>;
+<span class="mt">console</span>.<span class="mt">log</span>(ada.<span class="mt">saludar</span>()); <span class="cm">// Hola, soy Ada — saludar viene del prototipo</span></code></pre>
+
+    <div class="chain">
+      <div class="chain-node obj">ada</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">base</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Object.prototype</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node null">null</div>
+    </div>
+    <p class="chain-caption">Con <code>Object.create</code> definimos el prototipo a mano: <code>ada</code> hereda <code>saludar</code> de <code>base</code>, que a su vez hereda de <code>Object.prototype</code>.</p>
 
     <h3>Resumen de las formas</h3>
     <div class="table-wrap">
