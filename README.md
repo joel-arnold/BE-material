@@ -11,3 +11,52 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 4. [04.guia-estudio-objetos-js.html](04.guia-estudio-objetos-js.html) — Objetos y JSON en JavaScript
 
 Para consultarlas, basta con abrir el archivo `.html` correspondiente en el navegador.
+
+## Recursos de la cátedra
+
+- [Canal de YouTube de la materia](https://www.youtube.com/@dsw-utn)
+- [GitHub de la materia](https://github.com/utnfrrodsw)
+- [Material oficial de backend](https://github.com/utnfrrodsw/material-be)
+- [Videos de backend](https://www.youtube.com/playlist?list=PLstUYTrWtZx0Vv18QId7UHN5h2trJwUlD)
+- [Diapositivas de Docker](https://docs.google.com/presentation/d/1yquuK300GLE8zD39pMgIM2G42VUKJMVC0hPx6196qX8/edit)
+
+## YouTubers recomendados
+
+- [jonmircha](https://www.youtube.com/jonmircha)
+- [Gentleman Programming](https://www.youtube.com/c/GentlemanProgramming)
+- [MoureDev](https://www.youtube.com/@mouredev)
+- [La Cocina del Código](https://www.youtube.com/c/LaCocinadelC%C3%B3digo/playlists)
+- midudev — [web](https://midu.dev/) / [YouTube](https://www.youtube.com/c/midudev)
+- [Victor Robles](https://www.youtube.com/@victorroblesweb)
+- [DropCoding](https://www.youtube.com/@dropcoding)
+- [HolaMundo](https://www.youtube.com/@HolaMundoDev)
+- [Dorian Designs](https://www.youtube.com/channel/UCzuwt7Pi_VB8cP5q5UE4u-A)
+- [ManzDev](https://www.youtube.com/@ManzDev)
+
+## Recursos extra de JavaScript
+
+- [¿JavaScript es un lenguaje compilado o interpretado?](https://dev.to/robiulhr/is-javascript-compiled-or-interpreted-language-l20)
+- [Consumiendo servicios API desde JavaScript](https://www.freecodecamp.org/espanol/news/consumiendo-servicios-api-desde-javascript/)
+- [API REST de países](https://restcountries.com/) — para practicar consumo de APIs
+- [Stop Using forEach!](https://danthedev.com/stop-using-foreach/)
+- [Características introducidas por ES6](https://programamos.es/unidad-5-caracteristicas-de-ecmascript-es6/)
+- [JavaScript Cheatsheet (LenguajeJS.com)]
+- [Event Loop — 33 JavaScript Concepts](https://33jsconcepts.com/concepts/event-loop)
+- [33 JavaScript Concepts (repo)](https://github.com/utnfrrodsw/33-js-concepts)
+
+## Git
+
+- [Curso Git — mouredev](https://www.youtube.com/watch?app=desktop&v=3GymExBkKjE)
+- [Curso Git — midudev](https://www.youtube.com/watch?v=niPExbK8lSw)
+- [Git cheat sheet — GitHub Education](https://education.github.com/git-cheat-sheet-education.pdf)
+
+## Herramientas
+
+- [MikroORM](https://mikro-orm.io/) — ORM de TypeScript para Node.js
+- [Aiven](https://console.aiven.io/) — bases de datos y servicios cloud administrados
+- [Render](https://render.com/) — hosting de aplicaciones y bases de datos
+- [Neon](https://neon.tech/) — Postgres serverless
+- [Cloudflare](https://www.cloudflare.com/) — CDN, DNS y servicios edge
+- [Vercel](https://vercel.com/) — hosting y despliegue de aplicaciones
+- [SendGrid](https://sendgrid.com/) — envío de emails transaccionales
+- [Brevo (ex-Sendinblue)](https://onboarding.brevo.com/account/register) — envío de emails transaccionales
