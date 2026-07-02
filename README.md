@@ -17,6 +17,7 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 - [Canal de YouTube de la materia](https://www.youtube.com/@dsw-utn)
 - [GitHub de la materia](https://github.com/utnfrrodsw)
 - [Material oficial de backend](https://github.com/utnfrrodsw/material-be)
+- [Material no oficial de backend](https://github.com/joel-arnold/BE-ejemplos)
 - [Videos de backend](https://www.youtube.com/playlist?list=PLstUYTrWtZx0Vv18QId7UHN5h2trJwUlD)
 - [Diapositivas de Docker](https://docs.google.com/presentation/d/1yquuK300GLE8zD39pMgIM2G42VUKJMVC0hPx6196qX8/edit)
 
