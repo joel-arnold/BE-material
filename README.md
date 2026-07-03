@@ -23,9 +23,9 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 
 ## YouTubers recomendados
 
+- [La Cocina del Código](https://www.youtube.com/c/LaCocinadelC%C3%B3digo/playlists)
 - [Gentleman Programming](https://www.youtube.com/c/GentlemanProgramming)
 - [MoureDev](https://www.youtube.com/@mouredev)
-- [La Cocina del Código](https://www.youtube.com/c/LaCocinadelC%C3%B3digo/playlists)
 - midudev — [web](https://midu.dev/) / [YouTube](https://www.youtube.com/c/midudev)
 - [Victor Robles](https://www.youtube.com/@victorroblesweb)
 - [jonmircha](https://www.youtube.com/jonmircha)
@@ -38,12 +38,14 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 
 - [¿JavaScript es un lenguaje compilado o interpretado?](https://dev.to/robiulhr/is-javascript-compiled-or-interpreted-language-l20)
 - [Consumiendo servicios API desde JavaScript](https://www.freecodecamp.org/espanol/news/consumiendo-servicios-api-desde-javascript/)
-- [API REST de países](https://restcountries.com/) — para practicar consumo de APIs
-- [Stop Using forEach!](https://danthedev.com/stop-using-foreach/)
 - [Características introducidas por ES6](https://programamos.es/unidad-5-caracteristicas-de-ecmascript-es6/)
-- [JavaScript Cheatsheet (LenguajeJS.com)]
-- [Event Loop — 33 JavaScript Concepts](https://33jsconcepts.com/concepts/event-loop)
+- [JavaScript Cheatsheet (LenguajeJS.com)](https://lenguajejs.com/javascript/cheatsheets/download/javascript-cheatsheet-2019.pdf)
 - [33 JavaScript Concepts (repo)](https://github.com/utnfrrodsw/33-js-concepts)
+- [Event Loop — 33 JavaScript Concepts](https://33jsconcepts.com/concepts/event-loop)
+- [Hojas de ruta para desarrolladores](https://roadmap.sh/)
+- [Documentación para desarrolladores](https://devdocs.io/)
+- [Stop Using forEach!](https://danthedev.com/stop-using-foreach/)
+- [API REST de países](https://restcountries.com/) — para practicar consumo de APIs
 
 ## Git
 
@@ -60,4 +62,4 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 - [Cloudflare](https://www.cloudflare.com/) — CDN, DNS y servicios edge
 - [Vercel](https://vercel.com/) — hosting y despliegue de aplicaciones
 - [SendGrid](https://sendgrid.com/) — envío de emails transaccionales
-- [Brevo (ex-Sendinblue)](https://onboarding.brevo.com/account/register) — envío de emails transaccionales
+- [Brevo (ex-Sendinblue)](https://www.brevo.com/es/) — envío de emails transaccionales
