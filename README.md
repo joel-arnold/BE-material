@@ -34,16 +34,17 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 - [Dorian Designs](https://www.youtube.com/channel/UCzuwt7Pi_VB8cP5q5UE4u-A)
 - [ManzDev](https://www.youtube.com/@ManzDev)
 
-## Recursos extra de JavaScript
+## Recursos extra
 
+- [Introducción al desarrollo web](https://youtu.be/ENXZoZkMHck?si=pN12hABDfbkwIrrx)
+- [Hojas de ruta para desarrolladores](https://roadmap.sh/)
+- [Documentación para desarrolladores](https://devdocs.io/)
 - [¿JavaScript es un lenguaje compilado o interpretado?](https://dev.to/robiulhr/is-javascript-compiled-or-interpreted-language-l20)
 - [Consumiendo servicios API desde JavaScript](https://www.freecodecamp.org/espanol/news/consumiendo-servicios-api-desde-javascript/)
 - [Características introducidas por ES6](https://programamos.es/unidad-5-caracteristicas-de-ecmascript-es6/)
 - [JavaScript Cheatsheet (LenguajeJS.com)](https://lenguajejs.com/javascript/cheatsheets/download/javascript-cheatsheet-2019.pdf)
 - [33 JavaScript Concepts (repo)](https://github.com/utnfrrodsw/33-js-concepts)
 - [Event Loop — 33 JavaScript Concepts](https://33jsconcepts.com/concepts/event-loop)
-- [Hojas de ruta para desarrolladores](https://roadmap.sh/)
-- [Documentación para desarrolladores](https://devdocs.io/)
 - [Stop Using forEach!](https://danthedev.com/stop-using-foreach/)
 - [API REST de países](https://restcountries.com/) — para practicar consumo de APIs
 
