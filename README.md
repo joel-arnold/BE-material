@@ -57,7 +57,7 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 ## Herramientas
 
 - [MikroORM](https://mikro-orm.io/) — ORM de TypeScript para Node.js
-- [Aiven](https://console.aiven.io/) — bases de datos y servicios cloud administrados
+- [Aiven](https://aiven.io/) — bases de datos y servicios cloud administrados
 - [Render](https://render.com/) — hosting de aplicaciones y bases de datos
 - [Neon](https://neon.tech/) — Postgres serverless
 - [Cloudflare](https://www.cloudflare.com/) — CDN, DNS y servicios edge
