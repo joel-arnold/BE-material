@@ -9,7 +9,7 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 2. [02.guia-estudio-funciones-js.html](02.guia-estudio-funciones-js.html) — Funciones en JavaScript
 3. [03.guia-estudio-async-event-loop-js.html](03.guia-estudio-async-event-loop-js.html) — Asincronía y Event Loop en JavaScript
 4. [04.guia-estudio-objetos-js.html](04.guia-estudio-objetos-js.html) — Objetos y JSON en JavaScript
-5. [05.guia-estudio-express-arquitecturas](05.guia-estudio-express-arquitecturas) — Arquitecturas en APIs de Node.js (Express, cómo estructurar un proyecto REST)
+5. [05.guia-estudio-express-arquitecturas](05.guia-estudio-express-arquitecturas.html) — Arquitecturas en APIs de Node.js (Express, cómo estructurar un proyecto REST)
 
 Para consultarlas, basta con abrir el archivo `.html` correspondiente en el navegador.
 
