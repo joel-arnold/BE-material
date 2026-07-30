@@ -11,6 +11,7 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 4. [04.guia-estudio-objetos-js.html](04.guia-estudio-objetos-js.html) — Objetos y JSON en JavaScript
 5. *(Clases en JavaScript — guía pendiente)*
 6. [06.guia-estudio-express-arquitecturas](06.guia-estudio-express-arquitecturas.html) — Arquitecturas en APIs de Node.js (Express, cómo estructurar un proyecto REST)
+7. [07.guia-estudio-typescript.html](07.guia-estudio-typescript.html) — De JavaScript a TypeScript (tipos, compilación, la API en capas tipada y validación con Zod)
 
 Para consultarlas, basta con abrir el archivo `.html` correspondiente en el navegador.
 

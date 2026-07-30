@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De JavaScript a TypeScript — Guía de estudio · DSW UTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #14171f;
+    --bg3: #1b1f2a;
+    --border: #232838;
+    --border2: #2c3245;
+    --text: #e8eaf0;
+    --muted: #98a0b3;
+    --accent: #7c6af7;
+    --accent2: #a99cff;
+    --blue: #58a6ff;
+    --green: #3fd68c;
+    --orange: #ffa657;
+    --type: #4fd1c5;
+    --nav-bg: rgba(13,15,20,0.85);
+    --tag-bg: rgba(124,106,247,0.1);
+    --tag-border: rgba(124,106,247,0.35);
+    --step-bg: rgba(124,106,247,0.14);
+    --toggle-shadow: rgba(0,0,0,0.22);
+  }
+
+  :root[data-theme='light'] {
+    --bg: #f3f6fb;
+    --bg2: #ffffff;
+    --bg3: #e8eef8;
+    --border: rgba(15,23,42,0.14);
+    --border2: rgba(15,23,42,0.24);
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0d5ea8;
+    --accent2: #0b4f8c;
+    --blue: #005ea8;
+    --green: #0f7a44;
+    --orange: #b45309;
+    --type: #0f766e;
+    --nav-bg: rgba(243,246,251,0.96);
+    --tag-bg: rgba(13,94,168,0.1);
+    --tag-border: rgba(13,94,168,0.35);
+    --step-bg: rgba(13,94,168,0.12);
+    --toggle-shadow: rgba(15,23,42,0.16);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 1.2rem; height: 52px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--accent2); margin-right: 1rem; flex-shrink: 0;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    padding: 5px 10px; border-radius: 6px; flex-shrink: 0;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+
+  /* ── ALTERNADOR DE TEMA ── */
+  .theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 200;
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--toggle-shadow);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    transform: translateY(-1px);
+  }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 96px 2rem 5rem; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 3.4rem; }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    background: var(--tag-bg);
+    border: 0.5px solid var(--tag-border);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .page-header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 2.3rem; line-height: 1.15; margin-bottom: 0.5rem;
+  }
+  .page-header p { color: var(--muted); font-size: 1.02rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; margin-top: 1.1rem; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── SECCIONES ── */
+  section { margin-bottom: 3.4rem; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.55rem; line-height: 1.25; margin-bottom: 1rem;
+  }
+  h3 {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 1.12rem; margin: 1.7rem 0 0.7rem;
+  }
+  p { margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+  ul, ol { padding-left: 1.3rem; margin-bottom: 0.9rem; }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--accent2); font-style: italic; }
+  a { color: var(--accent2); }
+
+  /* ── CÓDIGO ── */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--bg3); padding: 1px 6px; border-radius: 3px;
+    color: var(--accent2);
+  }
+  pre {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-radius: 10px; padding: 1rem 1.2rem; margin: 0.9rem 0 1.3rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    line-height: 1.6; overflow-x: auto; color: var(--text);
+  }
+  pre .k { color: var(--accent2); }           /* keyword */
+  pre .f { color: var(--blue); }              /* función / método */
+  pre .s { color: var(--green); }             /* string */
+  pre .n { color: var(--orange); }            /* número */
+  pre .t { color: var(--type); }              /* tipo */
+  pre .c { color: var(--muted); font-style: italic; } /* comentario */
+  pre .err { color: var(--orange); font-style: italic; } /* error del compilador */
+  .fname {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--muted); margin: 1.1rem 0 -2px;
+  }
+  pre.tree { color: var(--muted); }
+  pre.tree b { color: var(--text); font-weight: 500; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem 0;
+    font-size: 14px; color: var(--text);
+  }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.orange { border-left-color: var(--orange); }
+  .callout.orange .callout-label { color: var(--orange); }
+
+  /* ── AGENDA CARD ── */
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* ── PIEZAS (capas) ── */
+  .pieces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0; }
+  .piece { background: var(--bg2); border: 0.5px solid var(--border2); border-top: 2px solid var(--muted); border-radius: 8px; padding: 1rem 1.1rem; }
+  .piece-h { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .piece-d { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .piece.route { border-top-color: var(--blue); }   .piece.route .piece-h { color: var(--blue); }
+  .piece.ctrl  { border-top-color: var(--accent); } .piece.ctrl .piece-h  { color: var(--accent2); }
+  .piece.svc   { border-top-color: var(--green); }  .piece.svc .piece-h   { color: var(--green); }
+  .piece.repo  { border-top-color: var(--orange); } .piece.repo .piece-h  { color: var(--orange); }
+  .piece.mw    { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .pieces { grid-template-columns: 1fr; } .piece.mw { grid-column: auto; } }
+
+  /* ── CICLO NUMERADO ── */
+  .cycle { counter-reset: step; list-style: none; padding: 0; margin: 1.2rem 0; }
+  .cycle li { counter-increment: step; position: relative; padding: 0.7rem 0 0.7rem 2.7rem; border-bottom: 0.5px solid var(--border); font-size: 15px; color: var(--text); }
+  .cycle li:last-child { border-bottom: none; }
+  .cycle li::before { content: counter(step); position: absolute; left: 0; top: 0.55rem; width: 1.7rem; height: 1.7rem; background: var(--step-bg); border: 0.5px solid var(--accent); color: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── DOS COLUMNAS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .grid2 pre { margin: 0.4rem 0 0.6rem; }
+  .col-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); margin-top: 0.6rem; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── TABLA ── */
+  table.tbl { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 14px; }
+  table.tbl th {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border2);
+  }
+  table.tbl td { padding: 0.65rem 0.8rem; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  table.tbl td:first-child { white-space: nowrap; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .theme-toggle { right: 0.7rem; bottom: 0.7rem; font-size: 11px; }
+    table.tbl td:first-child { white-space: normal; }
+  }
+
+  /* ── autoevaluación ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.4rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 2.6rem 0.9rem 1.1rem; font-size: 14.5px; font-weight: 600; color: var(--text); list-style: none; position: relative; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  details.q[open] summary::after { content: '\2013'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  details.q .a strong { color: var(--text); }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · TypeScript</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#porque">El bug invisible</a>
+  <a href="#setup">Setup</a>
+  <a href="#tipos">Tipos</a>
+  <a href="#funciones">Funciones</a>
+  <a href="#objetos">Objetos y clases</a>
+  <a href="#api">La API en TS</a>
+  <a href="#zod">Zod</a>
+  <a href="#migrar">Migrar</a>
+  <a href="#resumen">Resumen</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+</nav>
+
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar entre modo oscuro y claro" aria-pressed="false">Modo claro</button>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>De JavaScript a TypeScript</h1>
+    <p>Tipos, compilación y validación en una API real — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: unidad de JavaScript (módulos, objetos, async/await) y la API en capas de la clase de arquitecturas</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+    <p>El objetivo no es aprender "otro lenguaje": es <strong>entender qué agrega TypeScript sobre el JavaScript que ya escribís</strong>, poder configurar un proyecto desde cero, tipar una API en capas como la que ya construiste, y saber dónde termina lo que TypeScript puede garantizar — que es exactamente donde empieza Zod.</p>
+
+    <h3>Parte 1 — el lenguaje</h3>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">El bug que JavaScript no ve</div></div>
+      <div class="agenda-item"><div class="topic">TypeScript no se ejecuta: se compila</div></div>
+      <div class="agenda-item"><div class="topic">Tipos, inferencia y <code>strict</code></div></div>
+      <div class="agenda-item"><div class="topic">Funciones tipadas</div></div>
+      <div class="agenda-item"><div class="topic">Objetos, interfaces y clases</div></div>
+    </div>
+
+    <h3>Parte 2 — el lenguaje aplicado a la API</h3>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">La API en capas, ahora en TypeScript</div></div>
+      <div class="agenda-item"><div class="topic">Zod: el tipo que sí existe en runtime</div></div>
+      <div class="agenda-item"><div class="topic">Migrar un proyecto JS que ya existe</div></div>
+      <div class="agenda-item"><div class="topic">Cierre y anticipo de persistencia</div></div>
+    </div>
+
+  </section>
+
+
+  <!-- POR QUÉ -->
+  <section id="porque">
+    <div class="section-num">Bloque 1</div>
+    <h2>El bug que JavaScript no ve</h2>
+
+    <p>Arrancamos por donde duele. Este es el service de productos de la clase de <strong>arquitecturas</strong>, tal cual quedó, en JavaScript:</p>
+
+    <div class="fname">productos.service.js — la versión que ya tenés</div>
+    <pre><span class="k">export async function</span> <span class="f">crearProducto</span>(datos) {
+  <span class="k">if</span> (!datos.nombre || datos.precio &lt;= <span class="n">0</span>) {
+    <span class="k">throw new</span> <span class="f">ValidationError</span>(<span class="s">'Datos inválidos'</span>);
+  }
+  <span class="k">return</span> repo.<span class="f">guardar</span>(datos);
+}</pre>
+
+    <p>Funciona. Ahora, tres cosas que pueden pasar un martes cualquiera:</p>
+
+    <ol class="cycle">
+      <li>Alguien escribe <code>datos.precioo</code> por error de tipeo. En JavaScript eso vale <code>undefined</code>, <code>undefined &lt;= 0</code> es <code>false</code>, la validación <strong>pasa</strong> y el producto se guarda sin precio.</li>
+      <li>Llega un body con <code>{ "precio": "15000" }</code> — el precio como <em>string</em>. <code>"15000" &lt;= 0</code> también es <code>false</code>: pasa. Tres pantallas después, <code>precio + envio</code> devuelve <code>"1500010"</code>.</li>
+      <li>El repository cambia de <code>guardar(datos)</code> a <code>guardar(datos, usuario)</code>. Hay ocho lugares que lo llaman; se actualizan siete. El octavo se descubre en producción.</li>
+    </ol>
+
+    <p>Los tres son el mismo problema con distinta ropa: <strong>en JavaScript el error existe desde que se escribe, pero recién se manifiesta cuando el código corre</strong> — y solo si esa línea llega a ejecutarse con esos datos. Escribamos ese mismo service en TypeScript:</p>
+
+    <div class="fname">productos.service.ts</div>
+    <pre><span class="k">export interface</span> <span class="t">ProductoNuevo</span> {
+  nombre: <span class="t">string</span>;
+  precio: <span class="t">number</span>;
+}
+
+<span class="k">export async function</span> <span class="f">crearProducto</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt; {
+  <span class="k">if</span> (!datos.nombre || datos.precioo &lt;= <span class="n">0</span>) {
+    <span class="c">//                     ^^^^^^^^</span>
+    <span class="err">// Error: Property 'precioo' does not exist on type 'ProductoNuevo'.</span>
+    <span class="err">//        Did you mean 'precio'?</span>
+    <span class="k">throw new</span> <span class="f">ValidationError</span>(<span class="s">'Datos inválidos'</span>);
+  }
+  <span class="k">return</span> repo.<span class="f">guardar</span>(datos);
+}</pre>
+
+    <p>El caso 1 y el caso 3 dejan de ser bugs de producción y pasan a ser <strong>subrayados rojos en el editor</strong>, antes de guardar el archivo. Ese es todo el negocio de TypeScript: correr el error para adelante en el tiempo.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      El caso 2 —el precio que llega como string desde el body— <strong>TypeScript no lo detecta</strong>. Y no es un defecto: los tipos son una promesa sobre el código que <em>vos</em> escribís, y el body lo escribe el que consume tu API. Ese hueco es real y lo tapa el bloque 7, con Zod. Tenerlo presente desde ahora evita la ilusión de que "con TypeScript ya está validado".
+    </div>
+
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      TypeScript <strong>no cambia lo que corre</strong>: lo que corre sigue siendo JavaScript. Lo que cambia es <strong>cuándo te enterás</strong> del error — al escribir en vez de al ejecutar. Es la misma idea que las capas de la clase anterior: no agrega poder, agrega orden y garantías.
+    </div>
+
+  </section>
+
+
+  <!-- SETUP -->
+  <section id="setup">
+    <div class="section-num">Bloque 2</div>
+    <h2>TypeScript no se ejecuta: se compila</h2>
+
+    <p>Antes de escribir un tipo, hay que entender el flujo, porque es la fuente número uno de confusión del primer día: <strong>Node no sabe qué es un archivo <code>.ts</code></strong>. TypeScript es un compilador que toma <code>.ts</code> y produce <code>.js</code>; lo que Node ejecuta es siempre ese <code>.js</code>.</p>
+
+    <ol class="cycle">
+      <li>Escribís <code>src/app.ts</code> con tipos.</li>
+      <li><code>tsc</code> <strong>chequea</strong> los tipos. Si hay errores, avisa.</li>
+      <li><code>tsc</code> <strong>borra</strong> los tipos y emite <code>dist/app.js</code> — JavaScript común y corriente.</li>
+      <li><code>node dist/app.js</code> corre. En tiempo de ejecución, de TypeScript no queda nada.</li>
+    </ol>
+
+    <h3>Borrado de tipos, en concreto</h3>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">src/precio.ts (lo que escribís)</div>
+        <pre><span class="k">export function</span> <span class="f">conIva</span>(precio: <span class="t">number</span>): <span class="t">number</span> {
+  <span class="k">return</span> precio * <span class="n">1.21</span>;
+}</pre>
+      </div>
+      <div>
+        <div class="col-title">dist/precio.js (lo que corre)</div>
+        <pre><span class="k">export function</span> <span class="f">conIva</span>(precio) {
+  <span class="k">return</span> precio * <span class="n">1.21</span>;
+}</pre>
+      </div>
+    </div>
+
+    <p>Idéntico, menos los tipos. Esto se llama <em>type erasure</em> (borrado de tipos) y explica de una vez tres cosas: por qué TypeScript no hace más lento el programa, por qué no puede validar lo que llega de afuera en tiempo de ejecución, y por qué cualquier archivo <code>.js</code> que ya funciona es <strong>también</strong> un archivo TypeScript válido.</p>
+
+    <h3>Armar el proyecto desde cero</h3>
+
+    <div class="fname">terminal</div>
+    <pre><span class="c"># el compilador y los tipos de Node, siempre como dependencias de desarrollo</span>
+npm install --save-dev typescript @types/node
+
+<span class="c"># genera el tsconfig.json con comentarios</span>
+npx tsc --init
+
+<span class="c"># ejecuta .ts directo en desarrollo, sin compilar a mano</span>
+npm install --save-dev tsx</pre>
+
+    <p><code>typescript</code> va en <code>devDependencies</code> porque en producción no se compila: se ejecuta el <code>dist/</code> ya compilado. <code>@types/node</code> es lo que le enseña a TypeScript qué son <code>process</code>, <code>console</code> o el módulo <code>fs</code> — el propio Node no viene tipado.</p>
+
+    <div class="fname">tsconfig.json — lo mínimo que hay que entender</div>
+    <pre>{
+  <span class="s">"compilerOptions"</span>: {
+    <span class="s">"target"</span>: <span class="s">"ES2022"</span>,        <span class="c">// a qué versión de JS compila</span>
+    <span class="s">"module"</span>: <span class="s">"NodeNext"</span>,     <span class="c">// sistema de módulos (ESM de Node)</span>
+    <span class="s">"moduleResolution"</span>: <span class="s">"NodeNext"</span>,
+    <span class="s">"rootDir"</span>: <span class="s">"./src"</span>,       <span class="c">// dónde está el código fuente .ts</span>
+    <span class="s">"outDir"</span>: <span class="s">"./dist"</span>,       <span class="c">// dónde deja el .js compilado</span>
+    <span class="s">"strict"</span>: <span class="k">true</span>,           <span class="c">// TODAS las verificaciones estrictas</span>
+    <span class="s">"esModuleInterop"</span>: <span class="k">true</span>,  <span class="c">// import express from 'express' funciona</span>
+    <span class="s">"skipLibCheck"</span>: <span class="k">true</span>      <span class="c">// no chequea adentro de node_modules</span>
+  },
+  <span class="s">"include"</span>: [<span class="s">"src/**/*"</span>]
+}</pre>
+
+    <p>De todas, la que importa es <code>"strict": true</code>. Sin ella, TypeScript acepta variables sin tipo y no controla <code>null</code>/<code>undefined</code>: queda un JavaScript con adornos. <strong>Proyecto nuevo, siempre en strict.</strong></p>
+
+    <div class="fname">package.json (fragmento)</div>
+    <pre>{
+  <span class="s">"type"</span>: <span class="s">"module"</span>,
+  <span class="s">"scripts"</span>: {
+    <span class="s">"dev"</span>: <span class="s">"tsx watch src/app.ts"</span>,   <span class="c">// desarrollo: ejecuta .ts y recarga</span>
+    <span class="s">"build"</span>: <span class="s">"tsc"</span>,                  <span class="c">// compila src/ -&gt; dist/</span>
+    <span class="s">"start"</span>: <span class="s">"node dist/app.js"</span>,    <span class="c">// producción: corre lo compilado</span>
+    <span class="s">"check"</span>: <span class="s">"tsc --noEmit"</span>         <span class="c">// solo chequea tipos, no emite nada</span>
+  }
+}</pre>
+
+    <p>Es el mismo <code>package.json</code> de la unidad de Express con dos cambios: <code>nodemon</code> lo reemplaza <code>tsx watch</code> (que además compila en memoria), y aparece un paso de <code>build</code> que antes no existía.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Con <code>"module": "NodeNext"</code>, los imports relativos llevan la extensión <strong><code>.js</code></strong> aunque el archivo que estás importando sea <code>.ts</code>: <code>import { productosRouter } from './routes/productos.routes.js'</code>. No es un error ni un typo. El import lo resuelve <strong>Node en tiempo de ejecución</strong>, cuando ese archivo ya se compiló a <code>.js</code>; TypeScript nunca reescribe la ruta. Es lo que más desconcierta el primer día.
+    </div>
+
+    <div class="callout orange">
+      <div class="callout-label">Dato</div>
+      <code>tsc --noEmit</code> chequea tipos sin generar archivos. Es el comando que corre un pipeline de integración continua, y el que conviene tener a mano cuando el editor marca todo en verde pero algo no cierra.
+    </div>
+
+
+  </section>
+
+
+  <!-- TIPOS -->
+  <section id="tipos">
+    <div class="section-num">Bloque 3</div>
+    <h2>Tipos, inferencia y <code>strict</code></h2>
+
+    <p>La sintaxis es una sola cosa: <strong>dos puntos y el tipo</strong>, después del nombre.</p>
+
+    <div class="fname">7.1.1-tiposBasicos.ts</div>
+    <pre><span class="k">let</span> nombre: <span class="t">string</span> = <span class="s">'Teclado'</span>;
+<span class="k">let</span> precio: <span class="t">number</span> = <span class="n">25000</span>;
+<span class="k">let</span> disponible: <span class="t">boolean</span> = <span class="k">true</span>;
+
+precio = <span class="s">'muy caro'</span>;
+<span class="err">// Error: Type 'string' is not assignable to type 'number'.</span></pre>
+
+    <h3>Inferencia: no anotes lo que TypeScript ya sabe</h3>
+
+    <p>Este es el primer reflejo a corregir. TypeScript <strong>deduce</strong> el tipo del valor inicial, así que anotar de más es ruido:</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">Ruidoso</div>
+        <pre><span class="k">const</span> nombre: <span class="t">string</span> = <span class="s">'Teclado'</span>;
+<span class="k">const</span> precios: <span class="t">number</span>[] = [<span class="n">100</span>, <span class="n">200</span>];</pre>
+      </div>
+      <div>
+        <div class="col-title">Idiomático</div>
+        <pre><span class="k">const</span> nombre = <span class="s">'Teclado'</span>;   <span class="c">// string</span>
+<span class="k">const</span> precios = [<span class="n">100</span>, <span class="n">200</span>]; <span class="c">// number[]</span></pre>
+      </div>
+    </div>
+
+    <p>La regla práctica: <strong>anotá en los bordes</strong> —parámetros de funciones, valores de retorno, datos que entran al sistema— y dejá que la inferencia se ocupe de las variables locales. En un editor, pasar el mouse por encima de una variable muestra el tipo inferido; ese es el modo de verificar sin anotar.</p>
+
+    <h3>Arrays y objetos</h3>
+
+    <pre><span class="k">const</span> nombres: <span class="t">string</span>[] = [<span class="s">'Teclado'</span>, <span class="s">'Mouse'</span>];
+<span class="k">const</span> matriz: <span class="t">number</span>[][] = [[<span class="n">1</span>, <span class="n">2</span>], [<span class="n">3</span>, <span class="n">4</span>]];
+
+<span class="c">// el tipo de un objeto es su forma</span>
+<span class="k">const</span> producto: { nombre: <span class="t">string</span>; precio: <span class="t">number</span> } = {
+  nombre: <span class="s">'Teclado'</span>,
+  precio: <span class="n">25000</span>,
+};</pre>
+
+    <h3>Uniones y tipos literales</h3>
+
+    <p>Acá TypeScript empieza a hacer cosas que otros lenguajes no: un valor puede ser <strong>uno de varios tipos</strong>, y hasta <strong>uno de varios valores concretos</strong>.</p>
+
+    <pre><span class="k">let</span> id: <span class="t">number</span> | <span class="t">string</span>;        <span class="c">// unión de tipos</span>
+id = <span class="n">1</span>;        <span class="c">// ok</span>
+id = <span class="s">'abc'</span>;    <span class="c">// ok</span>
+
+<span class="k">type</span> <span class="t">Estado</span> = <span class="s">'activo'</span> | <span class="s">'pausado'</span> | <span class="s">'borrado'</span>;  <span class="c">// unión de literales</span>
+
+<span class="k">let</span> estado: <span class="t">Estado</span> = <span class="s">'activo'</span>;
+estado = <span class="s">'Activo'</span>;
+<span class="err">// Error: Type '"Activo"' is not assignable to type 'Estado'.</span></pre>
+
+    <p>Las uniones de literales reemplazan a los <em>strings mágicos</em> desperdigados por el código: el editor autocompleta los tres valores posibles y cualquier otro es error de compilación. Es de las cosas que más rápido se extrañan al volver a JavaScript.</p>
+
+    <h3>Estrechar el tipo: <code>typeof</code> vuelve a aparecer</h3>
+
+    <p>Si un valor puede ser de dos tipos, TypeScript solo deja hacer lo que sirva para <em>ambos</em>. Para usar lo específico de uno, hay que <strong>estrecharlo</strong> (<em>narrowing</em>) — y se hace con el mismo <code>typeof</code> de la unidad de sintaxis básica:</p>
+
+    <pre><span class="k">function</span> <span class="f">formatearId</span>(id: <span class="t">number</span> | <span class="t">string</span>): <span class="t">string</span> {
+  <span class="k">if</span> (<span class="k">typeof</span> id === <span class="s">'string'</span>) {
+    <span class="k">return</span> id.<span class="f">toUpperCase</span>();  <span class="c">// acá TS sabe que es string</span>
+  }
+  <span class="k">return</span> <span class="s">`#`</span> + id.<span class="f">toFixed</span>(<span class="n">0</span>);   <span class="c">// y acá, que es number</span>
+}</pre>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El <code>if (typeof …)</code> no es solo una guarda en ejecución: el compilador <strong>lo lee y ajusta el tipo adentro de cada rama</strong>. Es el mismo código defensivo que ya escribías en JavaScript, pero ahora el editor lo entiende y te autocompleta los métodos correctos en cada bloque.
+    </div>
+
+    <h3><code>any</code> y <code>unknown</code>: la puerta de atrás y la puerta con llave</h3>
+
+    <pre><span class="k">let</span> a: <span class="t">any</span> = JSON.<span class="f">parse</span>(texto);
+a.<span class="f">loQueSea</span>().tampocoImporta;   <span class="c">// compila. Y explota en ejecución.</span>
+
+<span class="k">let</span> u: <span class="t">unknown</span> = JSON.<span class="f">parse</span>(texto);
+u.<span class="f">loQueSea</span>();
+<span class="err">// Error: 'u' is of type 'unknown'.</span>
+
+<span class="k">if</span> (<span class="k">typeof</span> u === <span class="s">'object'</span> &amp;&amp; u !== <span class="k">null</span> &amp;&amp; <span class="s">'nombre'</span> <span class="k">in</span> u) {
+  <span class="c">// recién acá TS deja tocarlo</span>
+}</pre>
+
+    <p><code>any</code> apaga TypeScript para ese valor: todo compila y no queda ninguna garantía. <code>unknown</code> dice lo mismo —"no sé qué es"— pero <strong>obliga a chequear antes de usar</strong>. Cuando de verdad no se sabe el tipo (un <code>JSON.parse</code>, un body, una respuesta de <code>fetch</code>), <code>unknown</code> es la opción correcta.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      <code>any</code> es contagioso: todo lo que sale de un <code>any</code> también es <code>any</code>. Un <code>any</code> puesto para "salir del paso" en el repository puede dejar sin chequear media aplicación, y encima en silencio. Está bien usarlo como deuda temporal durante una migración; no está bien que sea la solución por defecto cuando el compilador molesta.
+    </div>
+
+    <h3>Qué prende <code>strict</code>, en la práctica</h3>
+
+    <pre><span class="c">// sin strict: 'nombre' es any implícito, nadie avisa nada</span>
+<span class="k">function</span> <span class="f">saludar</span>(nombre) { <span class="k">return</span> <span class="s">'Hola '</span> + nombre; }
+<span class="err">// con strict → Error: Parameter 'nombre' implicitly has an 'any' type.</span>
+
+<span class="k">const</span> encontrado = productos.<span class="f">find</span>((p) =&gt; p.id === <span class="n">1</span>);
+<span class="f">console</span>.<span class="f">log</span>(encontrado.nombre);
+<span class="err">// con strict → Error: 'encontrado' is possibly 'undefined'.</span></pre>
+
+    <p>Ese segundo error es el que más bronca da al principio y el que más bugs evita: <code>find</code> puede no encontrar nada, y en JavaScript eso es un <code>TypeError</code> en producción. La solución no es apagar <code>strict</code>, es contemplar el caso:</p>
+
+    <pre><span class="k">if</span> (!encontrado) {
+  <span class="k">throw new</span> <span class="f">NotFoundError</span>(<span class="s">'Producto no encontrado'</span>);
+}
+<span class="f">console</span>.<span class="f">log</span>(encontrado.nombre);  <span class="c">// ahora TS sabe que existe</span></pre>
+
+
+  </section>
+
+
+  <!-- FUNCIONES -->
+  <section id="funciones">
+    <div class="section-num">Bloque 4</div>
+    <h2>Funciones tipadas</h2>
+
+    <p>En una función se tipan dos cosas: <strong>los parámetros</strong> y <strong>lo que devuelve</strong>.</p>
+
+    <div class="fname">7.1.2-funciones.ts</div>
+    <pre><span class="k">function</span> <span class="f">conIva</span>(precio: <span class="t">number</span>): <span class="t">number</span> {
+  <span class="k">return</span> precio * <span class="n">1.21</span>;
+}
+
+<span class="c">// parámetro opcional (?) y valor por defecto</span>
+<span class="k">function</span> <span class="f">formatearPrecio</span>(precio: <span class="t">number</span>, moneda: <span class="t">string</span> = <span class="s">'$'</span>): <span class="t">string</span> {
+  <span class="k">return</span> <span class="s">`</span>${moneda}${precio.<span class="f">toFixed</span>(<span class="n">2</span>)}<span class="s">`</span>;
+}
+
+<span class="c">// no devuelve nada: void</span>
+<span class="k">function</span> <span class="f">logProducto</span>(nombre: <span class="t">string</span>): <span class="t">void</span> {
+  <span class="f">console</span>.<span class="f">log</span>(<span class="s">'[producto] '</span> + nombre);
+}
+
+<span class="c">// arrow: misma idea</span>
+<span class="k">const</span> duplicar = (n: <span class="t">number</span>): <span class="t">number</span> =&gt; n * <span class="n">2</span>;</pre>
+
+    <p>El tipo de retorno se puede omitir (TypeScript lo infiere), pero en las funciones exportadas <strong>conviene escribirlo</strong>: es documentación, y si un día el cuerpo devuelve otra cosa por accidente, el error aparece en la función y no tres archivos más allá.</p>
+
+    <h3>Tipar una función que recibe otra función</h3>
+
+    <p>Acá vuelve, tipado, el ejemplo de <strong>funciones de orden superior</strong> de la unidad de funciones. El tipo de una función se escribe con la misma flecha que la arrow function: <code>(n: number) =&gt; number</code> se lee "recibe un number y devuelve un number".</p>
+
+    <pre><span class="c">// 2.7 de la unidad de funciones, ahora tipado</span>
+<span class="k">function</span> <span class="f">procesarArreglo</span>(
+  arreglo: <span class="t">number</span>[],
+  operacion: (n: <span class="t">number</span>) =&gt; <span class="t">number</span>
+): <span class="t">number</span>[] {
+  <span class="k">return</span> arreglo.<span class="f">map</span>(operacion);
+}
+
+<span class="f">procesarArreglo</span>([<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>], duplicar);           <span class="c">// [2, 4, 6]</span>
+<span class="f">procesarArreglo</span>([<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>], (n) =&gt; n * n);      <span class="c">// [1, 4, 9]</span>
+
+<span class="f">procesarArreglo</span>([<span class="n">1</span>, <span class="n">2</span>], (n) =&gt; <span class="s">'valor: '</span> + n);
+<span class="err">// Error: Type 'string' is not assignable to type 'number'.</span></pre>
+
+    <p>Y la que <strong>devuelve</strong> una función —el <em>closure</em> del ejemplo 2.8— se tipa igual, poniendo la flecha en el retorno:</p>
+
+    <pre><span class="k">function</span> <span class="f">crearMultiplicador</span>(factor: <span class="t">number</span>): (n: <span class="t">number</span>) =&gt; <span class="t">number</span> {
+  <span class="k">return</span> (numero) =&gt; numero * factor;   <span class="c">// no hace falta anotar 'numero'</span>
+}
+
+<span class="k">const</span> por5 = <span class="f">crearMultiplicador</span>(<span class="n">5</span>);
+<span class="f">por5</span>(<span class="n">7</span>);   <span class="c">// 35</span></pre>
+
+    <p>Fijarse en el detalle del callback: <code>(numero)</code> no lleva anotación y aun así está tipado. TypeScript sabe qué firma tiene que cumplir esa función porque ya la declaró el retorno — se llama <em>inferencia contextual</em>, y es la razón por la que en la práctica se escriben muchos menos tipos de los que imaginás.</p>
+
+    <h3><code>async</code> siempre devuelve <code>Promise&lt;T&gt;</code></h3>
+
+    <p>Conexión directa con la unidad de <strong>asincronía</strong>: una función <code>async</code> nunca devuelve el valor, devuelve una promesa de ese valor. El tipo lo dice explícitamente:</p>
+
+    <pre><span class="k">async function</span> <span class="f">listarProductos</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt; {
+  <span class="k">return</span> repo.<span class="f">findAll</span>();
+}
+
+<span class="k">const</span> productos = <span class="f">listarProductos</span>();
+productos.<span class="f">map</span>(...);
+<span class="err">// Error: Property 'map' does not exist on type 'Promise&lt;Producto[]&gt;'.</span>
+
+<span class="k">const</span> productos2 = <span class="k">await</span> <span class="f">listarProductos</span>();  <span class="c">// Producto[] ✔</span></pre>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El <code>await</code> olvidado es <strong>el</strong> bug clásico de la unidad de asincronía, y en JavaScript se manifiesta como un <code>undefined</code> raro dos funciones más adelante. En TypeScript es un error de compilación con nombre y apellido: <em>"no existe map en Promise"</em>. Solo por esto ya paga la migración de una API con async/await.
+    </div>
+
+  </section>
+
+
+  <!-- OBJETOS Y CLASES -->
+  <section id="objetos">
+    <div class="section-num">Bloque 5</div>
+    <h2>Objetos, interfaces y clases</h2>
+
+    <p>Repetir <code>{ nombre: string; precio: number }</code> en cada firma no escala. Para eso están las dos formas de ponerle nombre a una forma de objeto:</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">interface</div>
+        <pre><span class="k">interface</span> <span class="t">Producto</span> {
+  id: <span class="t">number</span>;
+  nombre: <span class="t">string</span>;
+  precio: <span class="t">number</span>;
+}</pre>
+      </div>
+      <div>
+        <div class="col-title">type</div>
+        <pre><span class="k">type</span> <span class="t">Producto</span> = {
+  id: <span class="t">number</span>;
+  nombre: <span class="t">string</span>;
+  precio: <span class="t">number</span>;
+};</pre>
+      </div>
+    </div>
+
+    <p>Para describir objetos hacen prácticamente lo mismo. La recomendación para la materia, para no perder tiempo en el debate: <strong><code>interface</code> para entidades y formas de objetos</strong> (un <code>Producto</code>, un <code>Usuario</code>), <strong><code>type</code> para todo lo demás</strong> — uniones, alias, tipos derivados. Lo importante no es cuál elegís: es ser consistente en todo el proyecto.</p>
+
+    <h3>Opcionales, <code>readonly</code> y tipos derivados</h3>
+
+    <pre><span class="k">interface</span> <span class="t">Producto</span> {
+  <span class="k">readonly</span> id: <span class="t">number</span>;   <span class="c">// no se puede reasignar después de creado</span>
+  nombre: <span class="t">string</span>;
+  precio: <span class="t">number</span>;
+  descripcion?: <span class="t">string</span>;  <span class="c">// opcional: string | undefined</span>
+}
+
+<span class="c">// El producto que llega en el POST es un Producto SIN id (lo pone el repo).</span>
+<span class="c">// En vez de duplicar la interface, se deriva:</span>
+<span class="k">type</span> <span class="t">ProductoNuevo</span> = <span class="t">Omit</span>&lt;<span class="t">Producto</span>, <span class="s">'id'</span>&gt;;
+
+<span class="k">const</span> nuevo: <span class="t">ProductoNuevo</span> = { nombre: <span class="s">'Mouse'</span>, precio: <span class="n">15000</span> };  <span class="c">// ✔</span></pre>
+
+    <p><code>Omit</code>, <code>Pick</code> y <code>Partial</code> son <em>utility types</em>: tipos que se construyen a partir de otros. Con estos tres alcanza para el 90% de los casos de una API — <code>Omit</code> para el alta, <code>Partial</code> para el update parcial, <code>Pick</code> para lo que se devuelve. La ventaja de derivar en vez de duplicar: si mañana <code>Producto</code> suma un campo, <code>ProductoNuevo</code> se actualiza solo.</p>
+
+    <h3>Clases en TypeScript</h3>
+
+    <p>Las clases de la unidad correspondiente siguen siendo las mismas, con dos agregados: <strong>modificadores de acceso</strong> y la posibilidad de declarar que una clase <strong>cumple</strong> una interface.</p>
+
+    <div class="fname">7.1.4-clases.ts</div>
+    <pre><span class="k">class</span> <span class="t">Producto</span> {
+  <span class="k">private</span> descuento = <span class="n">0</span>;
+
+  <span class="c">// "parameter properties": declara y asigna las propiedades de una vez</span>
+  <span class="f">constructor</span>(
+    <span class="k">public readonly</span> id: <span class="t">number</span>,
+    <span class="k">public</span> nombre: <span class="t">string</span>,
+    <span class="k">public</span> precio: <span class="t">number</span>
+  ) {}
+
+  <span class="f">precioFinal</span>(): <span class="t">number</span> {
+    <span class="k">return</span> <span class="k">this</span>.precio * (<span class="n">1</span> - <span class="k">this</span>.descuento);
+  }
+}
+
+<span class="k">const</span> p = <span class="k">new</span> <span class="f">Producto</span>(<span class="n">1</span>, <span class="s">'Teclado'</span>, <span class="n">25000</span>);
+p.descuento = <span class="n">0.5</span>;
+<span class="err">// Error: Property 'descuento' is private and only accessible within class 'Producto'.</span>
+p.id = <span class="n">99</span>;
+<span class="err">// Error: Cannot assign to 'id' because it is a read-only property.</span></pre>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      <code>private</code> de TypeScript existe solo <strong>en tiempo de compilación</strong>: se borra al compilar y en el <code>.js</code> resultante la propiedad es accesible como cualquier otra. El <code>#privado</code> de JavaScript, en cambio, es privado <strong>de verdad en ejecución</strong>. <code>private</code> protege del error propio; <code>#</code> protege el dato. Los dos son válidos — pero saber la diferencia evita una sorpresa fea.
+    </div>
+
+    <p>Y el uso que más va a aparecer de acá en adelante: una interface como <strong>contrato</strong>, y una clase que se compromete a cumplirlo.</p>
+
+    <pre><span class="k">interface</span> <span class="t">RepositorioProductos</span> {
+  <span class="f">findAll</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt;;
+  <span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt;;
+}
+
+<span class="k">class</span> <span class="t">ProductosEnMemoria</span> <span class="k">implements</span> <span class="t">RepositorioProductos</span> {
+  <span class="k">private</span> productos: <span class="t">Producto</span>[] = [];
+
+  <span class="k">async</span> <span class="f">findAll</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt; {
+    <span class="k">return</span> <span class="k">this</span>.productos;
+  }
+
+  <span class="k">async</span> <span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt; {
+    <span class="k">const</span> nuevo = { id: <span class="k">this</span>.productos.length + <span class="n">1</span>, ...datos };
+    <span class="k">this</span>.productos.<span class="f">push</span>(nuevo);
+    <span class="k">return</span> nuevo;
+  }
+}</pre>
+
+    <p>Esto es, con sintaxis, el <em>puerto</em> de la arquitectura hexagonal de la clase anterior: la interface es el puerto —"necesito algo que guarde productos"— y la clase, el adaptador. En JavaScript ese contrato existía únicamente en la cabeza del equipo; acá el compilador lo verifica, y el día que el repository pase a MikroORM, la nueva clase tiene que cumplir la misma interface o no compila.</p>
+
+
+    <div class="callout green">
+      <div class="callout-label">Lo que sigue</div>
+      Las <strong>entidades de MikroORM</strong> —la próxima unidad— son exactamente esto: clases TypeScript con propiedades tipadas, más unos <em>decoradores</em> (<code>@Entity()</code>, <code>@Property()</code>) que le cuentan al ORM cómo mapear cada propiedad a una columna. Todo lo de este bloque es la base directa de esa clase; por eso TypeScript va antes que persistencia.
+    </div>
+
+  </section>
+
+
+  <!-- LA API EN TS -->
+  <section id="api">
+    <div class="section-num">Bloque 6</div>
+    <h2>La API en capas, ahora en TypeScript</h2>
+
+    <p>Segunda parte, y todo lo anterior aplicado de una sola vez: la API de productos de la unidad de arquitecturas —routes, controllers, services, repositories— migrada a TypeScript. La estructura de carpetas no cambia; aparece <code>dist/</code> (generada, va al <code>.gitignore</code>) y un lugar donde viven los tipos del dominio.</p>
+
+    <pre class="tree"><b>src/</b>
+├─ <b>types/</b>
+│  └─ producto.ts          <span class="c">← Producto, ProductoNuevo</span>
+├─ <b>routes/</b>       productos.routes.ts
+├─ <b>controllers/</b>  productos.controller.ts
+├─ <b>services/</b>     productos.service.ts
+├─ <b>repositories/</b> productos.repository.ts
+├─ <b>shared/</b>       errors.ts, errorHandler.ts
+└─ app.ts
+<b>dist/</b>                    <span class="c">← lo compilado (no se versiona)</span>
+tsconfig.json</pre>
+
+    <p>Qué tipa cada capa:</p>
+
+    <div class="pieces">
+      <div class="piece route">
+        <div class="piece-h">Routes</div>
+        <div class="piece-d">Casi no cambian. Solo el import lleva <code>.js</code> y el <code>Router</code> ya viene tipado por <code>@types/express</code>.</div>
+      </div>
+      <div class="piece ctrl">
+        <div class="piece-h">Controllers</div>
+        <div class="piece-d">Tipan el trío de Express: <code>Request</code>, <code>Response</code>, <code>NextFunction</code>. Es donde se ve que <code>req.body</code> no está tipado.</div>
+      </div>
+      <div class="piece svc">
+        <div class="piece-h">Services</div>
+        <div class="piece-d">Reciben <code>ProductoNuevo</code> y devuelven <code>Promise&lt;Producto&gt;</code>. El contrato del negocio, explícito.</div>
+      </div>
+      <div class="piece repo">
+        <div class="piece-h">Repositories</div>
+        <div class="piece-d">Es el dueño del tipo <code>Producto</code>: el array pasa a ser <code>Producto[]</code> y las firmas devuelven promesas tipadas.</div>
+      </div>
+      <div class="piece mw">
+        <div class="piece-h">+ Middleware</div>
+        <div class="piece-d">El <code>errorHandler</code> se tipa con <code>ErrorRequestHandler</code>, que ya obliga a los cuatro parámetros en el orden correcto — el detalle que en JavaScript se equivocaba en silencio.</div>
+      </div>
+    </div>
+
+    <div class="fname">src/types/producto.ts</div>
+    <pre><span class="k">export interface</span> <span class="t">Producto</span> {
+  id: <span class="t">number</span>;
+  nombre: <span class="t">string</span>;
+  precio: <span class="t">number</span>;
+}
+
+<span class="c">// el alta llega sin id: lo asigna el repository</span>
+<span class="k">export type</span> <span class="t">ProductoNuevo</span> = <span class="t">Omit</span>&lt;<span class="t">Producto</span>, <span class="s">'id'</span>&gt;;</pre>
+
+    <div class="fname">src/repositories/productos.repository.ts</div>
+    <pre><span class="k">import type</span> { <span class="t">Producto</span>, <span class="t">ProductoNuevo</span> } <span class="k">from</span> <span class="s">'../types/producto.js'</span>;
+
+<span class="k">const</span> productos: <span class="t">Producto</span>[] = [{ id: <span class="n">1</span>, nombre: <span class="s">'Teclado'</span>, precio: <span class="n">25000</span> }];
+
+<span class="k">export async function</span> <span class="f">findAll</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt; {
+  <span class="k">return</span> productos;
+}
+
+<span class="k">export async function</span> <span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt; {
+  <span class="k">const</span> nuevo: <span class="t">Producto</span> = { id: productos.length + <span class="n">1</span>, ...datos };
+  productos.<span class="f">push</span>(nuevo);
+  <span class="k">return</span> nuevo;
+}</pre>
+
+    <p>El <code>import type</code> es una forma de importar que dice "esto es solo un tipo": desaparece por completo al compilar y nunca genera un <code>import</code> en el <code>.js</code>. Con <code>Producto</code>, que no existe en tiempo de ejecución, es lo correcto.</p>
+
+    <div class="fname">src/services/productos.service.ts</div>
+    <pre><span class="k">import</span> * <span class="k">as</span> repo <span class="k">from</span> <span class="s">'../repositories/productos.repository.js'</span>;
+<span class="k">import</span> { <span class="t">ValidationError</span> } <span class="k">from</span> <span class="s">'../shared/errors.js'</span>;
+<span class="k">import type</span> { <span class="t">Producto</span>, <span class="t">ProductoNuevo</span> } <span class="k">from</span> <span class="s">'../types/producto.js'</span>;
+
+<span class="k">export async function</span> <span class="f">listarProductos</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt; {
+  <span class="k">return</span> repo.<span class="f">findAll</span>();
+}
+
+<span class="k">export async function</span> <span class="f">crearProducto</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt; {
+  <span class="k">if</span> (!datos.nombre || datos.precio &lt;= <span class="n">0</span>) {
+    <span class="k">throw new</span> <span class="f">ValidationError</span>(<span class="s">'Datos inválidos'</span>);
+  }
+  <span class="k">return</span> repo.<span class="f">guardar</span>(datos);
+}</pre>
+
+    <div class="fname">src/controllers/productos.controller.ts</div>
+    <pre><span class="k">import type</span> { <span class="t">Request</span>, <span class="t">Response</span>, <span class="t">NextFunction</span> } <span class="k">from</span> <span class="s">'express'</span>;
+<span class="k">import</span> * <span class="k">as</span> service <span class="k">from</span> <span class="s">'../services/productos.service.js'</span>;
+
+<span class="k">export async function</span> <span class="f">listar</span>(req: <span class="t">Request</span>, res: <span class="t">Response</span>, next: <span class="t">NextFunction</span>) {
+  <span class="k">try</span> {
+    res.<span class="f">json</span>(<span class="k">await</span> service.<span class="f">listarProductos</span>());
+  } <span class="k">catch</span> (err) {
+    <span class="f">next</span>(err);
+  }
+}
+
+<span class="k">export async function</span> <span class="f">crear</span>(req: <span class="t">Request</span>, res: <span class="t">Response</span>, next: <span class="t">NextFunction</span>) {
+  <span class="k">try</span> {
+    <span class="k">const</span> producto = <span class="k">await</span> service.<span class="f">crearProducto</span>(req.body);
+    <span class="c">//                                          ^^^^^^^^ esto es 'any'</span>
+    res.<span class="f">status</span>(<span class="n">201</span>).<span class="f">json</span>(producto);
+  } <span class="k">catch</span> (err) {
+    <span class="f">next</span>(err);
+  }
+}</pre>
+
+    <p>Ese comentario es el punto más importante del bloque, y hay que detenerse ahí: <strong><code>req.body</code> es <code>any</code></strong>. Express no puede saber qué te van a mandar, así que TypeScript acepta pasárselo a <code>crearProducto()</code> sin chequear absolutamente nada. Toda la cadena está tipada y aun así el agujero del bloque 1 sigue abierto.</p>
+
+    <h3>Instalar los tipos de Express</h3>
+
+    <div class="fname">terminal</div>
+    <pre>npm install express
+npm install --save-dev @types/express</pre>
+
+    <p>Express está escrito en JavaScript, así que sus tipos vienen aparte, en un paquete <code>@types/*</code> mantenido por la comunidad (el proyecto <em>DefinitelyTyped</em>). Regla general: si al importar una librería el editor dice <em>"Could not find a declaration file for module …"</em>, la respuesta casi siempre es <code>npm i -D @types/</code>esa-librería.</p>
+
+    <h3>Lo que se gana, en concreto</h3>
+
+    <ul>
+      <li>Agregar <code>stock: number</code> a <code>Producto</code> hace que el compilador marque <strong>uno por uno los lugares que quedaron incompletos</strong> —acá, el array del repository— y no compile hasta que estén todos. La refactorización deja de ser una búsqueda de texto con la esperanza de no haberse olvidado ninguno.</li>
+      <li>El editor autocompleta <code>res.status(…).json(…)</code> y las propiedades del producto: menos idas y vueltas a la documentación.</li>
+      <li>El contrato entre capas es <strong>verificable</strong>: si el service devuelve otra cosa, el controller no compila.</li>
+      <li>Cuando en la próxima unidad el repository pase a MikroORM, la firma <code>Promise&lt;Producto&gt;</code> ya está: el service no se toca.</li>
+    </ul>
+
+
+  </section>
+
+
+  <!-- ZOD -->
+  <section id="zod">
+    <div class="section-num">Bloque 7</div>
+    <h2>Zod: el tipo que sí existe en runtime</h2>
+
+    <p>Recapitulemos el problema con precisión, porque es una distinción que se usa todos los días y casi nunca se explica:</p>
+
+    <table class="tbl">
+      <tr><th></th><th>TypeScript</th><th>Zod</th></tr>
+      <tr><td>Cuándo actúa</td><td>Al compilar</td><td>Al ejecutar</td></tr>
+      <tr><td>Qué controla</td><td>El código que <strong>vos</strong> escribís</td><td>Los datos que <strong>te mandan</strong></td></tr>
+      <tr><td>Después de compilar</td><td>Desaparece</td><td>Sigue ahí: es código JavaScript</td></tr>
+      <tr><td>Sirve para</td><td>Que las capas encajen entre sí</td><td>Bodies, params, variables de entorno, respuestas de otras APIs</td></tr>
+    </table>
+
+    <p><strong>Zod</strong> es una librería de validación de esquemas. Se escribe un esquema —una descripción de la forma esperada— y Zod chequea los datos en tiempo de ejecución. Hasta ahí es lo que hacía el <code>if</code> a mano de la clase de arquitecturas. Lo que lo vuelve interesante en TypeScript es lo que viene después.</p>
+
+    <div class="fname">terminal</div>
+    <pre>npm install zod</pre>
+
+    <p>Ojo: <code>zod</code> va en <code>dependencies</code>, no en <code>devDependencies</code>. Es la diferencia entre una herramienta de desarrollo y una que corre en producción.</p>
+
+    <div class="fname">src/schemas/producto.schema.ts</div>
+    <pre><span class="k">import</span> { z } <span class="k">from</span> <span class="s">'zod'</span>;
+
+<span class="k">export const</span> productoNuevoSchema = z.<span class="f">object</span>({
+  nombre: z.<span class="f">string</span>().<span class="f">min</span>(<span class="n">1</span>, <span class="s">'El nombre es obligatorio'</span>),
+  precio: z.<span class="f">number</span>().<span class="f">positive</span>(<span class="s">'El precio debe ser mayor a 0'</span>),
+});
+
+<span class="c">// ── la línea que justifica toda la clase ──</span>
+<span class="k">export type</span> <span class="t">ProductoNuevo</span> = z.<span class="f">infer</span>&lt;<span class="k">typeof</span> productoNuevoSchema&gt;;
+<span class="c">// ProductoNuevo === { nombre: string; precio: number }</span></pre>
+
+    <p>Leamos <code>z.infer</code> despacio, porque es la idea central del bloque: el esquema es un <strong>valor</strong> de JavaScript (existe en ejecución, valida datos reales) y <code>z.infer</code> <strong>extrae de ese valor el tipo de TypeScript</strong>. No hay que escribir la interface por un lado y la validación por el otro: se escribe una sola vez, y el tipo se deriva.</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">Sin Zod: dos verdades</div>
+        <pre><span class="c">// tipos.ts</span>
+<span class="k">interface</span> <span class="t">ProductoNuevo</span> {
+  nombre: <span class="t">string</span>;
+  precio: <span class="t">number</span>;
+}
+
+<span class="c">// service.ts — validación aparte</span>
+<span class="k">if</span> (!datos.nombre || datos.precio &lt;= <span class="n">0</span>) {
+  <span class="k">throw new</span> <span class="f">ValidationError</span>(...);
+}
+<span class="c">// ¿te acordás de tocar las dos</span>
+<span class="c">// cuando cambie el modelo?</span></pre>
+      </div>
+      <div>
+        <div class="col-title">Con Zod: una sola</div>
+        <pre><span class="c">// producto.schema.ts</span>
+<span class="k">export const</span> productoNuevoSchema =
+  z.<span class="f">object</span>({
+    nombre: z.<span class="f">string</span>().<span class="f">min</span>(<span class="n">1</span>),
+    precio: z.<span class="f">number</span>().<span class="f">positive</span>(),
+  });
+
+<span class="k">export type</span> <span class="t">ProductoNuevo</span> =
+  z.<span class="f">infer</span>&lt;<span class="k">typeof</span> productoNuevoSchema&gt;;
+<span class="c">// el tipo no puede desincronizarse</span></pre>
+      </div>
+    </div>
+
+    <h3>Validar el body: <code>safeParse</code></h3>
+
+    <pre><span class="k">const</span> resultado = productoNuevoSchema.<span class="f">safeParse</span>(req.body);
+
+<span class="k">if</span> (!resultado.success) {
+  <span class="c">// resultado.error tiene el detalle campo por campo</span>
+  <span class="k">return</span> res.<span class="f">status</span>(<span class="n">400</span>).<span class="f">json</span>({ errores: resultado.error.issues });
+}
+
+<span class="c">// dentro de este bloque, resultado.data es ProductoNuevo — tipado y validado</span>
+<span class="k">const</span> producto = <span class="k">await</span> service.<span class="f">crearProducto</span>(resultado.data);</pre>
+
+    <p>Dos formas de usarlo: <code>parse()</code> lanza una excepción si falla (cómoda si ya hay un <code>errorHandler</code> centralizado que la traduzca) y <code>safeParse()</code> devuelve un objeto con <code>success</code>. Fijarse en el detalle: adentro del <code>if (!resultado.success)</code> TypeScript sabe que hay un <code>error</code>, y afuera sabe que hay un <code>data</code> tipado. Es una <strong>unión discriminada</strong>, el mismo <em>narrowing</em> del bloque 3 en un caso real.</p>
+
+    <h3>Y ahora, como middleware</h3>
+
+    <p>Validar dentro de cada controller repite código en cada endpoint. La clase de arquitecturas ya dio la respuesta para lo que se repite: <strong>middleware</strong>.</p>
+
+    <div class="fname">src/shared/validar.ts</div>
+    <pre><span class="k">import type</span> { <span class="t">Request</span>, <span class="t">Response</span>, <span class="t">NextFunction</span> } <span class="k">from</span> <span class="s">'express'</span>;
+<span class="k">import type</span> { <span class="t">ZodTypeAny</span> } <span class="k">from</span> <span class="s">'zod'</span>;
+
+<span class="c">// Recibe un esquema y devuelve un middleware: una función de orden superior,</span>
+<span class="c">// como las de la unidad de funciones — pero tipada.</span>
+<span class="k">export function</span> <span class="f">validar</span>(schema: <span class="t">ZodTypeAny</span>) {
+  <span class="k">return</span> (req: <span class="t">Request</span>, res: <span class="t">Response</span>, next: <span class="t">NextFunction</span>) =&gt; {
+    <span class="k">const</span> resultado = schema.<span class="f">safeParse</span>(req.body);
+
+    <span class="k">if</span> (!resultado.success) {
+      <span class="k">return</span> res.<span class="f">status</span>(<span class="n">400</span>).<span class="f">json</span>({
+        error: <span class="s">'Datos inválidos'</span>,
+        detalle: resultado.error.issues.<span class="f">map</span>((i) =&gt; ({
+          campo: i.path.<span class="f">join</span>(<span class="s">'.'</span>),
+          mensaje: i.message,
+        })),
+      });
+    }
+
+    req.body = resultado.data;  <span class="c">// body limpio y validado para el controller</span>
+    <span class="f">next</span>();
+  };
+}</pre>
+
+    <div class="fname">src/routes/productos.routes.ts</div>
+    <pre><span class="k">import</span> { Router } <span class="k">from</span> <span class="s">'express'</span>;
+<span class="k">import</span> { listar, crear } <span class="k">from</span> <span class="s">'../controllers/productos.controller.js'</span>;
+<span class="k">import</span> { validar } <span class="k">from</span> <span class="s">'../shared/validar.js'</span>;
+<span class="k">import</span> { productoNuevoSchema } <span class="k">from</span> <span class="s">'../schemas/producto.schema.js'</span>;
+
+<span class="k">export const</span> productosRouter = <span class="f">Router</span>();
+
+productosRouter.<span class="f">get</span>(<span class="s">'/'</span>, listar);
+productosRouter.<span class="f">post</span>(<span class="s">'/'</span>, <span class="f">validar</span>(productoNuevoSchema), crear);
+<span class="c">//                        ^^^^^^^ se valida antes de llegar al controller</span></pre>
+
+    <p>Con eso, el request con <code>"precio": "15000"</code> —el del bloque 1— muere en el middleware con un <strong>400</strong> y un mensaje que dice exactamente qué campo está mal. El controller solo recibe bodies que ya cumplen el esquema, y el service vuelve a ocuparse únicamente de <strong>reglas de negocio</strong> (que el nombre no esté repetido, que el descuento no supere el máximo), no de formato.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La división de trabajo, en una línea: <strong>TypeScript chequea lo que vos escribís; Zod chequea lo que te mandan.</strong> Los dos hacen falta y ninguno reemplaza al otro. Y con <code>z.infer</code>, el esquema de validación y el tipo son <strong>la misma fuente de verdad</strong> — no dos declaraciones que hay que acordarse de mantener sincronizadas.
+    </div>
+
+    <div class="callout orange">
+      <div class="callout-label">Dato</div>
+      El mismo esquema sirve para todo lo que entra desde afuera: los <code>params</code> y el <code>query</code> de una ruta, las variables de entorno al arrancar la app (que llegan siempre como <code>string</code>), y las respuestas de APIs de terceros. Validar el <code>process.env</code> con Zod al inicio es una práctica muy común, y evita el clásico "andaba en mi máquina" por una variable que en el servidor no estaba.
+    </div>
+
+  </section>
+
+
+  <!-- MIGRAR -->
+  <section id="migrar">
+    <div class="section-num">Bloque 8</div>
+    <h2>Migrar un proyecto JS que ya existe</h2>
+
+    <p>Lo más probable es que no arranques de cero: el TP ya está escrito en JavaScript. La buena noticia es que <strong>la migración es gradual</strong> — no hace falta parar todo y convertir el proyecto entero.</p>
+
+    <ol class="cycle">
+      <li>Instalar TypeScript y crear el <code>tsconfig.json</code> con <code>"allowJs": true</code>: <code>.js</code> y <code>.ts</code> conviven en el mismo proyecto.</li>
+      <li>Renombrar <strong>de a un archivo</strong> <code>.js</code> → <code>.ts</code>, empezando por las hojas del árbol (el repository, los helpers) y subiendo hacia el controller.</li>
+      <li>Arreglar los errores de ese archivo. Si alguno es muy trabado, <code>any</code> temporal y un <code>// TODO</code>: es deuda, pero acotada y visible.</li>
+      <li>Cuando ya casi todo es <code>.ts</code>, prender <code>"strict": true</code> y hacer la última pasada.</li>
+      <li>Sacar <code>allowJs</code> y borrar los <code>any</code> que quedaron.</li>
+    </ol>
+
+    <div class="fname">tsconfig.json durante la migración</div>
+    <pre>{
+  <span class="s">"compilerOptions"</span>: {
+    <span class="s">"allowJs"</span>: <span class="k">true</span>,     <span class="c">// deja compilar los .js que todavía no migraste</span>
+    <span class="s">"checkJs"</span>: <span class="k">false</span>,    <span class="c">// ...sin exigirles tipos (todavía)</span>
+    <span class="s">"strict"</span>: <span class="k">false</span>      <span class="c">// se prende al final, no al principio</span>
+  }
+}</pre>
+
+    <p>Un atajo útil antes de renombrar nada: poner <code>"checkJs": true</code> y agregar comentarios <strong>JSDoc</strong> a los archivos <code>.js</code>. TypeScript los lee y chequea el archivo sin cambiarle la extensión — sirve para ver cuánto rompería la migración antes de encararla.</p>
+
+    <pre><span class="c">/** @param {number} precio */</span>
+<span class="k">export function</span> <span class="f">conIva</span>(precio) {
+  <span class="k">return</span> precio * <span class="n">1.21</span>;
+}
+
+<span class="f">conIva</span>(<span class="s">'25000'</span>);
+<span class="err">// con checkJs → Error: Argument of type 'string' is not assignable to</span>
+<span class="err">//               parameter of type 'number'. (en un archivo .js)</span></pre>
+
+    <h3>Los cuatro errores del primer día</h3>
+
+    <table class="tbl">
+      <tr><th>Mensaje</th><th>Qué pasa</th><th>Qué hacer</th></tr>
+      <tr>
+        <td>Parameter implicitly has an 'any' type</td>
+        <td>Un parámetro sin anotar, con <code>strict</code> prendido.</td>
+        <td>Anotarlo. Es el error más frecuente al migrar y también el más fácil.</td>
+      </tr>
+      <tr>
+        <td>Object is possibly 'undefined'</td>
+        <td>Un <code>find</code>, un <code>[0]</code> o un campo opcional que puede no venir.</td>
+        <td>Contemplar el caso con un <code>if</code>. No apagar <code>strictNullChecks</code>.</td>
+      </tr>
+      <tr>
+        <td>Could not find a declaration file for module 'x'</td>
+        <td>La librería está en JavaScript y no trae tipos.</td>
+        <td><code>npm i -D @types/x</code>. Si no existe, declarar el módulo o usar <code>any</code>.</td>
+      </tr>
+      <tr>
+        <td>Relative import paths need explicit file extensions</td>
+        <td>Falta el <code>.js</code> en un import relativo, con <code>NodeNext</code>.</td>
+        <td>Agregarlo: <code>'./productos.service.js'</code>, aunque el archivo sea <code>.ts</code>.</td>
+      </tr>
+    </table>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      La tentación del primer día es resolver todo con <code>any</code> o con <code>as</code> (aserciones de tipo). Ambos <strong>le dicen al compilador "confiá en mí"</strong>, y si uno se equivoca, el error vuelve a runtime — que es exactamente de lo que se estaba escapando. Usalos cuando de verdad sepas algo que el compilador no puede saber, no para que el rojo desaparezca.
+    </div>
+
+
+  </section>
+
+
+  <!-- RESUMEN -->
+
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. ¿Por qué Node no puede ejecutar directamente un archivo <code>.ts</code>?</summary>
+      <div class="a">Porque TypeScript <strong>no es un lenguaje que Node entienda</strong>: es un compilador. <code>tsc</code> chequea los tipos, los borra y emite JavaScript común en <code>dist/</code>; eso es lo que corre con <code>node dist/app.js</code>. En desarrollo <code>tsx</code> hace ese paso en memoria y da la ilusión de que ejecuta el <code>.ts</code>, pero por debajo lo compila igual.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Qué significa que los tipos se <em>borran</em> al compilar, y qué consecuencia práctica tiene?</summary>
+      <div class="a">Que en el <code>.js</code> generado no queda ni una anotación: es el mismo código sin los tipos (<em>type erasure</em>). Consecuencias: TypeScript <strong>no hace más lento</strong> el programa, cualquier <code>.js</code> que funciona es TypeScript válido, y —la importante— <strong>no puede validar en ejecución</strong> lo que llega de afuera. Por eso hace falta Zod.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Cuál es la diferencia entre <code>any</code> y <code>unknown</code>?</summary>
+      <div class="a">Los dos dicen "no sé qué tipo es", pero <code>any</code> <strong>apaga el chequeo</strong> (podés hacer cualquier cosa con ese valor y compila igual, incluso si explota en ejecución) y además se contagia a todo lo que sale de ahí. <code>unknown</code> <strong>obliga a verificar</strong> antes de usar el valor, normalmente con <code>typeof</code>. Para datos que vienen de afuera (<code>JSON.parse</code>, <code>fetch</code>), la opción correcta es <code>unknown</code>.</div>
+    </details>
+    <details class="q">
+      <summary>4. Si el archivo se llama <code>productos.service.ts</code>, ¿por qué se importa como <code>'./productos.service.js'</code>?</summary>
+      <div class="a">Porque con <code>"module": "NodeNext"</code> el import lo resuelve <strong>Node en tiempo de ejecución</strong>, cuando ese archivo ya se compiló a <code>.js</code>. TypeScript nunca reescribe la ruta del import. No es un error ni un typo: es la extensión del archivo que va a existir cuando el código corra.</div>
+    </details>
+    <details class="q">
+      <summary>5. La API quedó tipada de punta a punta. ¿Por qué un POST con <code>{ "precio": "15000" }</code> puede pasar igual, y qué lo evita?</summary>
+      <div class="a">Porque <code>req.body</code> es <code>any</code>: Express no puede saber qué te van a mandar, así que TypeScript acepta pasárselo al service sin chequear nada. Los tipos son una promesa sobre <strong>el código que escribís vos</strong>, no sobre los datos que te mandan. Lo que lo evita es validar en ejecución con <strong>Zod</strong>, idealmente como middleware antes del controller.</div>
+    </details>
+    <details class="q">
+      <summary>6. ¿Qué hace <code>z.infer</code> y qué problema resuelve?</summary>
+      <div class="a">Extrae el <strong>tipo de TypeScript a partir del esquema de Zod</strong>: <code>type ProductoNuevo = z.infer&lt;typeof productoNuevoSchema&gt;</code>. Resuelve el problema de tener dos verdades —la <code>interface</code> por un lado y la validación por otro— que hay que acordarse de mantener sincronizadas. Con <code>z.infer</code> escribís el esquema una sola vez y el tipo se deriva solo.</div>
+    </details>
+    <details class="q">
+      <summary>7. ¿Qué error te da TypeScript si te olvidás un <code>await</code>, y por qué?</summary>
+      <div class="a">Algo como <em>"Property 'map' does not exist on type 'Promise&lt;Producto[]&gt;'"</em>. Una función <code>async</code> no devuelve el valor sino una <strong>promesa</strong> de ese valor, y eso queda escrito en su tipo de retorno. En JavaScript el <code>await</code> olvidado se manifiesta como un <code>undefined</code> raro dos funciones más adelante; en TypeScript es un error de compilación en la línea exacta.</div>
+    </details>
+    <details class="q">
+      <summary>8. ¿Cómo migrarías a TypeScript un proyecto JavaScript que ya está en marcha?</summary>
+      <div class="a">Gradualmente: <code>allowJs: true</code> para que <code>.js</code> y <code>.ts</code> convivan, renombrar <strong>de a un archivo</strong> empezando por las hojas (el repository, los helpers) y subiendo hacia el controller, <code>any</code> temporal con un <code>// TODO</code> donde algo se trabe, y recién al final prender <code>"strict": true</code> y sacar <code>allowJs</code>. No hace falta frenar el desarrollo para convertir todo de una.</div>
+    </details>
+    </div>
+  </section>
+
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen</h2>
+
+    <ul>
+      <li>TypeScript es <strong>JavaScript más un sistema de tipos</strong> que se chequea al compilar y se borra al emitir: lo que corre es siempre JavaScript.</li>
+      <li>El flujo es <code>.ts</code> → <code>tsc</code> → <code>dist/*.js</code> → <code>node</code>. En desarrollo, <code>tsx</code> ejecuta el <code>.ts</code> directo; en producción se corre lo compilado.</li>
+      <li><code>"strict": true</code> desde el primer día: sin él, TypeScript no controla ni los <code>any</code> implícitos ni <code>null</code>/<code>undefined</code>.</li>
+      <li><strong>Anotar en los bordes</strong> —parámetros, retornos, datos que entran— y dejar que la inferencia haga el resto.</li>
+      <li><code>any</code> apaga el chequeo y se contagia; <code>unknown</code> obliga a verificar antes de usar. Para lo que viene de afuera, <code>unknown</code>.</li>
+      <li>Las funciones se tipan por firma, incluidos los callbacks (<code>(n: number) =&gt; number</code>); <code>async</code> siempre devuelve <code>Promise&lt;T&gt;</code>, y el <code>await</code> olvidado pasa a ser error de compilación.</li>
+      <li><code>interface</code> para entidades, <code>type</code> para uniones y derivados. <code>Omit</code>, <code>Pick</code> y <code>Partial</code> evitan duplicar formas de objetos.</li>
+      <li>En la API, el tipo del dominio <strong>viaja por las capas</strong>: en cualquier refactorización el compilador marca qué quedó incompleto y no compila hasta que esté resuelto.</li>
+      <li><code>req.body</code> es <code>any</code>: TypeScript no valida lo que entra. <strong>Zod</strong> valida en ejecución y, con <code>z.infer</code>, el esquema y el tipo son la misma fuente de verdad.</li>
+      <li>Migrar es gradual: <code>allowJs</code>, un archivo por vez desde las hojas hacia arriba, y <code>strict</code> al final.</li>
+    </ul>
+
+    <h3>Para profundizar</h3>
+    <ul>
+      <li><em>TypeScript Handbook</em> (documentación oficial) — en especial "TypeScript for JavaScript Programmers" y "Everyday Types".</li>
+      <li><em>TypeScript Playground</em> — permite escribir TS y ver al instante el JavaScript compilado al lado: la mejor forma de entender el borrado de tipos.</li>
+      <li><em>tsconfig reference</em> (documentación oficial) — qué hace cada opción, una por una.</li>
+      <li><em>Zod</em>, documentación oficial — la sección de <em>Type inference</em> y los <em>refinements</em> para reglas más finas.</li>
+      <li><em>Total TypeScript</em> (Matt Pocock) — ejercicios cortos y gratuitos, muy buenos para consolidar después de esta unidad.</li>
+    </ul>
+  </section>
+
+</main>
+
+
+<script>
+(() => {
+  const storageKey = 'dsw-theme-preference';
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+
+  if (!toggle) return;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Modo oscuro';
+      toggle.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Modo claro';
+    toggle.setAttribute('aria-pressed', 'false');
+  };
+
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(storageKey);
+  } catch (_) {
+    savedTheme = null;
+  }
+
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    applyTheme(nextTheme);
+
+    try {
+      localStorage.setItem(storageKey, nextTheme);
+    } catch (_) {
+      /* la persistencia puede fallar en modo privado: se ignora */
+    }
+  });
+})();
+</script>
+</body>
+</html>
