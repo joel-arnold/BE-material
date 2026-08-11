@@ -12,6 +12,7 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 5. *(Clases en JavaScript — guía pendiente)*
 6. [06.guia-estudio-express-arquitecturas](06.guia-estudio-express-arquitecturas.html) — Arquitecturas en APIs de Node.js (Express, cómo estructurar un proyecto REST)
 7. [07.guia-estudio-typescript.html](07.guia-estudio-typescript.html) — De JavaScript a TypeScript (tipos, compilación, la API en capas tipada y validación con Zod)
+8. [08.guia-estudio-persistencia-mikroorm.html](08.guia-estudio-persistencia-mikroorm.html) — Persistencia con MikroORM y MySQL (entidades, EntityManager, relaciones y migraciones)
 
 Para consultarlas, basta con abrir el archivo `.html` correspondiente en el navegador.
 

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persistencia: MikroORM y MySQL — Guía de estudio · DSW UTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #14171f;
+    --bg3: #1b1f2a;
+    --border: #232838;
+    --border2: #2c3245;
+    --text: #e8eaf0;
+    --muted: #98a0b3;
+    --accent: #7c6af7;
+    --accent2: #a99cff;
+    --blue: #58a6ff;
+    --green: #3fd68c;
+    --orange: #ffa657;
+    --type: #4fd1c5;
+    --nav-bg: rgba(13,15,20,0.85);
+    --tag-bg: rgba(124,106,247,0.1);
+    --tag-border: rgba(124,106,247,0.35);
+    --step-bg: rgba(124,106,247,0.14);
+    --toggle-shadow: rgba(0,0,0,0.22);
+  }
+
+  :root[data-theme='light'] {
+    --bg: #f3f6fb;
+    --bg2: #ffffff;
+    --bg3: #e8eef8;
+    --border: rgba(15,23,42,0.14);
+    --border2: rgba(15,23,42,0.24);
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0d5ea8;
+    --accent2: #0b4f8c;
+    --blue: #005ea8;
+    --green: #0f7a44;
+    --orange: #b45309;
+    --type: #0f766e;
+    --nav-bg: rgba(243,246,251,0.96);
+    --tag-bg: rgba(13,94,168,0.1);
+    --tag-border: rgba(13,94,168,0.35);
+    --step-bg: rgba(13,94,168,0.12);
+    --toggle-shadow: rgba(15,23,42,0.16);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 1.2rem; height: 52px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--accent2); margin-right: 1rem; flex-shrink: 0;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    padding: 5px 10px; border-radius: 6px; flex-shrink: 0;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+
+  /* ── ALTERNADOR DE TEMA ── */
+  .theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 200;
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--toggle-shadow);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    transform: translateY(-1px);
+  }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 96px 2rem 5rem; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 3.4rem; }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    background: var(--tag-bg);
+    border: 0.5px solid var(--tag-border);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .page-header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 2.3rem; line-height: 1.15; margin-bottom: 0.5rem;
+  }
+  .page-header p { color: var(--muted); font-size: 1.02rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; margin-top: 1.1rem; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── SECCIONES ── */
+  section { margin-bottom: 3.4rem; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.55rem; line-height: 1.25; margin-bottom: 1rem;
+  }
+  h3 {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 1.12rem; margin: 1.7rem 0 0.7rem;
+  }
+  p { margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+  ul, ol { padding-left: 1.3rem; margin-bottom: 0.9rem; }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--accent2); font-style: italic; }
+  a { color: var(--accent2); }
+
+  /* ── CÓDIGO ── */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--bg3); padding: 1px 6px; border-radius: 3px;
+    color: var(--accent2);
+  }
+  pre {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-radius: 10px; padding: 1rem 1.2rem; margin: 0.9rem 0 1.3rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    line-height: 1.6; overflow-x: auto; color: var(--text);
+  }
+  pre .k { color: var(--accent2); }           /* keyword */
+  pre .f { color: var(--blue); }              /* función / método */
+  pre .s { color: var(--green); }             /* string */
+  pre .n { color: var(--orange); }            /* número */
+  pre .t { color: var(--type); }              /* tipo */
+  pre .c { color: var(--muted); font-style: italic; } /* comentario */
+  pre .err { color: var(--orange); font-style: italic; } /* error del compilador */
+  .fname {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--muted); margin: 1.1rem 0 -2px;
+  }
+  pre.tree { color: var(--muted); }
+  pre.tree b { color: var(--text); font-weight: 500; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem 0;
+    font-size: 14px; color: var(--text);
+  }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.orange { border-left-color: var(--orange); }
+  .callout.orange .callout-label { color: var(--orange); }
+
+  /* ── AGENDA CARD ── */
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* ── PIEZAS (capas) ── */
+  .pieces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0; }
+  .piece { background: var(--bg2); border: 0.5px solid var(--border2); border-top: 2px solid var(--muted); border-radius: 8px; padding: 1rem 1.1rem; }
+  .piece-h { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .piece-d { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .piece.route { border-top-color: var(--blue); }   .piece.route .piece-h { color: var(--blue); }
+  .piece.ctrl  { border-top-color: var(--accent); } .piece.ctrl .piece-h  { color: var(--accent2); }
+  .piece.svc   { border-top-color: var(--green); }  .piece.svc .piece-h   { color: var(--green); }
+  .piece.repo  { border-top-color: var(--orange); } .piece.repo .piece-h  { color: var(--orange); }
+  .piece.mw    { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .pieces { grid-template-columns: 1fr; } .piece.mw { grid-column: auto; } }
+
+  /* ── CICLO NUMERADO ── */
+  .cycle { counter-reset: step; list-style: none; padding: 0; margin: 1.2rem 0; }
+  .cycle li { counter-increment: step; position: relative; padding: 0.7rem 0 0.7rem 2.7rem; border-bottom: 0.5px solid var(--border); font-size: 15px; color: var(--text); }
+  .cycle li:last-child { border-bottom: none; }
+  .cycle li::before { content: counter(step); position: absolute; left: 0; top: 0.55rem; width: 1.7rem; height: 1.7rem; background: var(--step-bg); border: 0.5px solid var(--accent); color: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── DOS COLUMNAS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .grid2 pre { margin: 0.4rem 0 0.6rem; }
+  .col-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); margin-top: 0.6rem; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── TABLA ── */
+  table.tbl { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 14px; }
+  table.tbl th {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border2);
+  }
+  table.tbl td { padding: 0.65rem 0.8rem; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  table.tbl td:first-child { white-space: nowrap; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .theme-toggle { right: 0.7rem; bottom: 0.7rem; font-size: 11px; }
+    table.tbl td:first-child { white-space: normal; }
+  }
+
+  /* ── autoevaluación ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.4rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 2.6rem 0.9rem 1.1rem; font-size: 14.5px; font-weight: 600; color: var(--text); list-style: none; position: relative; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  details.q[open] summary::after { content: '\2013'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  details.q .a strong { color: var(--text); }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Persistencia</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#porque">El array que se borra</a>
+  <a href="#orm">Qué es un ORM</a>
+  <a href="#setup">Setup</a>
+  <a href="#entidades">Entidades</a>
+  <a href="#em">EntityManager</a>
+  <a href="#api">La API</a>
+  <a href="#relaciones">Relaciones</a>
+  <a href="#migraciones">Migraciones</a>
+  <a href="#resumen">Resumen</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+</nav>
+
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar entre modo oscuro y claro" aria-pressed="false">Modo claro</button>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Persistencia: MikroORM y MySQL</h1>
+    <p>Del array en memoria a una base de datos real — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: la API en capas con validación (unidad 6) y TypeScript, en especial clases e interfaces (unidad 7)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+
+    <p>Esta guía cierra un arco que empezó dos unidades atrás. En <strong>arquitecturas</strong> separamos la API en capas con el argumento de que "si algún día cambia la persistencia, se toca un solo archivo". En <strong>TypeScript</strong> escribimos esa promesa como tipos que el compilador verifica. Hoy se cobra: el repository pasa de un array a MySQL y <strong>el service no se toca</strong>.</p>
+
+    <p>El objetivo no es aprender la API de una librería, sino entender el <em>modelo mental</em> de un ORM: qué hace por vos, qué sigue siendo tu responsabilidad, y qué costos esconde la comodidad.</p>
+
+    <h3>Primera parte — el ORM solo</h3>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">El array que se borra al reiniciar</div></div>
+      <div class="agenda-item"><div class="topic">Qué hace un ORM y qué no</div></div>
+      <div class="agenda-item"><div class="topic">Setup: conectar el proyecto</div></div>
+      <div class="agenda-item"><div class="topic">Entidades: de la clase a la tabla</div></div>
+      <div class="agenda-item"><div class="topic">El EntityManager: por qué no hay <code>save()</code></div></div>
+    </div>
+
+    <h3>Segunda parte — el ORM en la API</h3>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">La API en capas, ahora contra MySQL</div></div>
+      <div class="agenda-item"><div class="topic">Relaciones, <code>populate</code> y el N+1</div></div>
+      <div class="agenda-item"><div class="topic">Migraciones</div></div>
+      <div class="agenda-item"><div class="topic">Cierre y anticipo de autenticación</div></div>
+    </div>
+
+
+  </section>
+
+
+  <!-- POR QUÉ -->
+  <section id="porque">
+    <div class="section-num">Bloque 1</div>
+    <h2>El array que se borra al reiniciar</h2>
+
+    <p>Arrancamos con el repository que venís usando desde la unidad de arquitecturas, tal cual quedó después de TypeScript y Zod:</p>
+
+    <div class="fname">7.3 — productos.repository.ts</div>
+    <pre><span class="k">const</span> productos: <span class="t">Producto</span>[] = [{ id: <span class="n">1</span>, nombre: <span class="s">'Teclado'</span>, precio: <span class="n">25000</span> }];
+
+<span class="k">export async function</span> <span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt; {
+  <span class="k">const</span> nuevo: <span class="t">Producto</span> = { id: productos.length + <span class="n">1</span>, ...datos };
+  productos.<span class="f">push</span>(nuevo);
+  <span class="k">return</span> nuevo;
+}</pre>
+
+    <p>Funciona, está tipado, valida lo que entra. Y tiene un problema que no se arregla con más TypeScript: <strong>ese array vive en la memoria del proceso de Node</strong>. Se termina el proceso, se termina el array.</p>
+
+    <p>La prueba dura treinta segundos: creá tres productos con el <code>.http</code>, pará el servidor con <code>Ctrl+C</code>, levantalo de nuevo y hacé el <code>GET</code>. Vuelve el teclado solo. Eso es todo lo que significa que los datos <em>no persistan</em>.</p>
+
+    <p>Y no es solo el reinicio. El mismo array explica tres problemas más, que en un TP no se ven y en producción sí:</p>
+
+    <ol class="cycle">
+      <li><strong>No se puede escalar.</strong> Dos instancias de la API para aguantar más tráfico son dos arrays distintos: lo que se crea en una no existe en la otra.</li>
+      <li><strong>No se puede consultar de verdad.</strong> "Los productos de más de $20.000 ordenados por precio, de a 20 por página" es un <code>filter().sort().slice()</code> sobre <em>toda</em> la colección en memoria. Con 500.000 productos, no entra.</li>
+      <li><strong>No hay integridad.</strong> Nada impide dos productos con el mismo nombre, o un producto apuntando a una categoría que no existe.</li>
+    </ol>
+
+    <p>La respuesta a los cuatro problemas es la misma y tiene cincuenta años: una <strong>base de datos</strong>. Lo que falta decidir es cómo hablarle desde Node.</p>
+
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El array nunca estuvo mal: fue la decisión correcta para aprender las capas sin mezclar temas. Lo que cambia hoy es <strong>un solo archivo</strong> —el repository— y esa es justamente la tesis de la unidad de arquitecturas puesta a prueba. Vale decirlo así de explícito: hoy se cobra la deuda de esa clase.
+    </div>
+  </section>
+
+
+  <!-- QUÉ ES UN ORM -->
+  <section id="orm">
+    <div class="section-num">Bloque 2</div>
+    <h2>Qué hace un ORM y qué no</h2>
+
+    <p>Hay dos formas de hablarle a MySQL desde Node. La primera es el <strong>driver</strong> pelado (<code>mysql2</code>): mandar strings de SQL y recibir filas.</p>
+
+    <div class="fname">con el driver, a mano</div>
+    <pre><span class="k">const</span> [filas] = <span class="k">await</span> conexion.<span class="f">query</span>(
+  <span class="s">'SELECT id, nombre, precio FROM producto WHERE precio &gt; ?'</span>,
+  [<span class="n">20000</span>],
+);
+
+<span class="c">// filas es un array de objetos planos, sin tipo:</span>
+<span class="c">// [ { id: 1, nombre: 'Teclado', precio: 25000 } ]</span>
+
+<span class="c">// y para guardar, el mapeo al revés, campo por campo:</span>
+<span class="k">await</span> conexion.<span class="f">query</span>(
+  <span class="s">'INSERT INTO producto (nombre, precio) VALUES (?, ?)'</span>,
+  [producto.nombre, producto.precio],
+);</pre>
+
+    <p>Funciona perfecto y es lo que usa el ORM abajo. Pero deja tres trabajos repetitivos en manos de quien escribe: armar el SQL, convertir filas en objetos y objetos en filas, y acordarse de que el <code>SELECT</code> devuelve <code>any</code>.</p>
+
+    <p>La segunda forma es un <strong>ORM</strong> (<em>Object-Relational Mapper</em>): una capa que traduce entre el mundo de objetos de TypeScript y el mundo de tablas de SQL.</p>
+
+    <div class="fname">con el ORM</div>
+    <pre><span class="k">const</span> caros = <span class="k">await</span> em.<span class="f">find</span>(<span class="t">Producto</span>, { precio: { $gt: <span class="n">20000</span> } });
+<span class="c">// caros es Producto[] — instancias de la clase, tipadas</span></pre>
+
+    <h3>Las dos familias de ORM</h3>
+
+    <p>Conviene nombrarlas porque el vocabulario aparece en cualquier documentación:</p>
+
+    <table class="tbl">
+      <tr><th></th><th>Active Record</th><th>Data Mapper</th></tr>
+      <tr><td>Quién guarda</td><td>La entidad: <code>producto.save()</code></td><td>Un objeto aparte: el <em>EntityManager</em></td></tr>
+      <tr><td>La entidad sabe…</td><td>…de la base de datos</td><td>…solo de su dominio</td></tr>
+      <tr><td>Ejemplos</td><td>Sequelize, Eloquent (PHP)</td><td><strong>MikroORM</strong>, TypeORM (modo DM), Doctrine</td></tr>
+    </table>
+
+    <p><strong>MikroORM es Data Mapper</strong>, y esa es la razón por la que la entidad va a ser una clase común que no hereda de nada. Es también el motivo de que no exista <code>producto.save()</code> — lo que sorprende a todo el mundo el primer día y se explica en el bloque 5.</p>
+
+    <h3>Qué NO hace un ORM</h3>
+
+    <p>Esta parte importa tanto como la anterior, y es la que suele faltar:</p>
+
+    <ul>
+      <li><strong>No te exime de saber SQL.</strong> Cuando una consulta tarde, la vas a leer en SQL. El ORM genera consultas; entender lo que generó es tu trabajo.</li>
+      <li><strong>No diseña el modelo por vos.</strong> Qué tablas, qué claves, qué índices: eso sigue siendo diseño de base de datos, y el ORM ejecuta lo que le pidas aunque esté mal.</li>
+      <li><strong>No hace la aplicación más rápida.</strong> Suele hacerla más <em>lenta</em> que el SQL escrito a mano. Lo que gana es tiempo de desarrollo y consistencia.</li>
+      <li><strong>No valida lo que entra por HTTP.</strong> Eso sigue siendo Zod, en el borde.</li>
+    </ul>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      La comodidad de un ORM es real y su costo también: es una capa de abstracción más, y las abstracciones <strong>filtran</strong>. Cuando algo anda raro —una consulta lenta, un dato que no se guardó, una relación vacía— hay que poder bajar un nivel y mirar el SQL. Por eso todos los ejemplos de la unidad corren con <code>debug: true</code>.
+    </div>
+
+
+  </section>
+
+
+  <!-- SETUP -->
+  <section id="setup">
+    <div class="section-num">Bloque 3</div>
+    <h2>Setup: conectar el proyecto</h2>
+
+    <p>Cuatro paquetes, y vale saber qué hace cada uno en vez de copiarlos de un tirón:</p>
+
+    <div class="fname">terminal</div>
+    <pre>npm install @mikro-orm/core @mikro-orm/mysql @mikro-orm/decorators @mikro-orm/reflection</pre>
+
+    <table class="tbl">
+      <tr><th>Paquete</th><th>Para qué</th></tr>
+      <tr><td><code>core</code></td><td>El motor: EntityManager, unit of work, identity map.</td></tr>
+      <tr><td><code>mysql</code></td><td>El driver del motor concreto. Cambiarlo por <code>@mikro-orm/postgresql</code> es casi todo lo que hace falta para migrar de base.</td></tr>
+      <tr><td><code>decorators</code></td><td><code>@Entity()</code>, <code>@Property()</code> y compañía.</td></tr>
+      <tr><td><code>reflection</code></td><td>Lee los tipos de TypeScript desde los archivos <code>.ts</code>. Explicado abajo.</td></tr>
+    </table>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Desde <strong>MikroORM 7</strong> los decoradores <strong>no están en <code>@mikro-orm/core</code></strong>: viven en un paquete aparte. Casi todo el material que van a encontrar buscando está escrito para la v6, donde sí se importaban del core. Si un ejemplo de internet no compila, esto es lo primero para revisar.
+      <br><br>
+      <code>import { Entity, Property } from '@mikro-orm/decorators/es';</code>
+      <br><br>
+      El subpath <code>/es</code> son los decoradores <strong>estándar del lenguaje</strong>, los que TypeScript 5 usa por defecto. El otro, <code>/legacy</code>, son los experimentales de siempre (los de <code>experimentalDecorators</code>).
+    </div>
+
+    <h3>El archivo de configuración</h3>
+
+    <div class="fname">src/mikro-orm.config.ts</div>
+    <pre><span class="k">import</span> { defineConfig } <span class="k">from</span> <span class="s">'@mikro-orm/mysql'</span>;
+<span class="k">import</span> { <span class="t">TsMorphMetadataProvider</span> } <span class="k">from</span> <span class="s">'@mikro-orm/reflection'</span>;
+<span class="k">import</span> { <span class="t">Producto</span> } <span class="k">from</span> <span class="s">'./entities/producto.entity.js'</span>;
+
+<span class="k">export default</span> <span class="f">defineConfig</span>({
+  entities: [<span class="t">Producto</span>],
+
+  dbName: <span class="s">'dsw_persistencia'</span>,
+  host: <span class="s">'localhost'</span>,
+  port: <span class="n">3306</span>,
+  user: <span class="s">'root'</span>,
+  password: <span class="s">'root'</span>,
+
+  metadataProvider: <span class="t">TsMorphMetadataProvider</span>,
+
+  debug: <span class="k">true</span>,   <span class="c">// imprime cada consulta SQL: no lo apaguen en esta unidad</span>
+});</pre>
+
+    <h3>El detalle que hace perder la primera media hora</h3>
+
+    <p>El ORM necesita saber que <code>nombre</code> es <code>string</code> y <code>precio</code> es <code>number</code>. Pero los tipos de TypeScript <strong>se borran al compilar</strong> — eso lo vimos en la unidad anterior. Entonces, ¿de dónde los saca?</p>
+
+    <ol class="cycle">
+      <li>Con <code>emitDecoratorMetadata</code>, una opción de TypeScript que deja los tipos como metadata en el JavaScript emitido. Pero eso <strong>lo emite <code>tsc</code></strong>, y nosotros en desarrollo corremos con <strong>tsx</strong>, que compila con esbuild y no lo soporta.</li>
+      <li>Con <code>TsMorphMetadataProvider</code>, que <strong>lee los archivos <code>.ts</code></strong> y saca los tipos de ahí. Funciona con tsx y permite escribir <code>@Property()</code> sin repetir el tipo.</li>
+    </ol>
+
+    <p>Usamos la segunda. Si te salteás ese <code>metadataProvider</code>, el error es este:</p>
+
+    <pre><span class="err">Error: Please provide either 'type' or 'entity' attribute in Producto.id.</span>
+<span class="err">If you are using decorators, ensure you have 'emitDecoratorMetadata'</span>
+<span class="err">enabled in your tsconfig.json.</span></pre>
+
+    <p>El mensaje sugiere prender <code>emitDecoratorMetadata</code>, y con tsx <strong>eso no alcanza</strong>: es un caso donde el error te manda para el lado equivocado. La otra salida, si no se quiere el paquete extra, es declarar el tipo en cada decorador: <code>@Property({ type: 'string' })</code>.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      <code>TsMorphMetadataProvider</code> lee los <code>.ts</code>, así que en <strong>producción</strong> —donde corre el <code>dist/</code> compilado y los <code>.ts</code> no están— hay que generar la caché de metadata durante el build (<code>mikro-orm cache:generate --combined</code>) o usar tipos explícitos. En desarrollo no se nota, y por eso agarra desprevenido justo el día del deploy. Vuelve en la unidad 11.
+    </div>
+
+
+  </section>
+
+
+  <!-- ENTIDADES -->
+  <section id="entidades">
+    <div class="section-num">Bloque 4</div>
+    <h2>Entidades: de la clase a la tabla</h2>
+
+    <p>Acá se cobra lo que quedó plantado en la unidad de TypeScript. Una entidad es <strong>la clase del ejemplo 7.1.4 con anotaciones</strong>:</p>
+
+    <div class="fname">src/entities/producto.entity.ts</div>
+    <pre><span class="k">import</span> { <span class="t">Entity</span>, <span class="t">PrimaryKey</span>, <span class="t">Property</span> } <span class="k">from</span> <span class="s">'@mikro-orm/decorators/es'</span>;
+<span class="k">import type</span> { <span class="t">Opt</span> } <span class="k">from</span> <span class="s">'@mikro-orm/core'</span>;
+
+<span class="k">@Entity</span>()
+<span class="k">export class</span> <span class="t">Producto</span> {
+  <span class="k">@PrimaryKey</span>()
+  id!: <span class="t">number</span>;
+
+  <span class="k">@Property</span>({ length: <span class="n">100</span> })
+  nombre!: <span class="t">string</span>;
+
+  <span class="k">@Property</span>()
+  precio!: <span class="t">number</span>;
+
+  <span class="k">@Property</span>({ nullable: <span class="k">true</span> })
+  descripcion?: <span class="t">string</span>;
+
+  <span class="k">@Property</span>()
+  creadoEn: <span class="t">Opt</span>&lt;<span class="t">Date</span>&gt; = <span class="k">new</span> <span class="f">Date</span>();
+}</pre>
+
+    <p>Cuatro cosas para mirar, en este orden:</p>
+
+    <ul>
+      <li><strong>La clase no hereda de nada.</strong> Es una clase de TypeScript común. Eso es Data Mapper: la entidad no sabe guardarse a sí misma.</li>
+      <li><strong>El <code>!</code> es de TypeScript, no del ORM.</strong> Significa "confiá en mí, esto se va a inicializar aunque no lo asigne en el constructor". Quien lo asigna es el ORM al traer la fila de la base.</li>
+      <li><strong><code>nullable: true</code> y el <code>?</code> tienen que decir lo mismo.</strong> Si la columna admite NULL pero el tipo dice que siempre hay un string, el modelo miente y el compilador te va a dejar hacerlo.</li>
+      <li><strong><code>Opt</code></strong> marca una propiedad que no hay que pasar al crear porque ya tiene valor. Sin eso, <code>em.create()</code> exige <code>creadoEn</code>.</li>
+    </ul>
+
+    <h3>En qué se convierte</h3>
+
+    <p>La pregunta que ordena todo esto es "¿y esto qué tabla genera?". Se responde sin ejecutar nada, con <code>getCreateSchemaSQL()</code>:</p>
+
+    <pre><span class="k">create table</span> `producto` (
+  `id` <span class="t">int unsigned</span> <span class="k">not null auto_increment primary key</span>,
+  `nombre` <span class="t">varchar</span>(<span class="n">100</span>) <span class="k">not null</span>,
+  `precio` <span class="t">int</span> <span class="k">not null</span>,
+  `descripcion` <span class="t">varchar</span>(<span class="n">255</span>) <span class="k">null</span>,
+  `creado_en` <span class="t">datetime</span> <span class="k">not null</span>
+) <span class="k">default character set</span> utf8mb4 <span class="k">engine</span> = InnoDB;</pre>
+
+    <p>Tres detalles para no pasar por alto:</p>
+
+    <ol class="cycle">
+      <li><code>creadoEn</code> pasó a <code>creado_en</code>. El ORM traduce camelCase a snake_case por convención, y es configurable. Es un buen momento para decir que <strong>SQL y JavaScript tienen convenciones de nombres distintas</strong> y que el mapeo también es eso.</li>
+      <li><code>nombre</code> quedó <code>varchar(100)</code> porque se lo pedimos. Sin <code>length</code>, el default es 255.</li>
+      <li><code>precio</code> quedó <code>int</code>. <strong>Nadie lo decidió</strong>: es el default para <code>number</code>. Para plata es una mala idea —no hay centavos— y se arregla con <code>@Property({ columnType: 'decimal(10,2)' })</code>.</li>
+    </ol>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El punto 3 es la moraleja de todo el bloque: <strong>el ORM elige por vos cuando vos no elegís</strong>. Y elige razonablemente, no siempre bien. Que un precio se guarde como entero es exactamente el tipo de bug que aparece seis meses después, cuando alguien carga $1.999,50 y se guarda 1999.
+    </div>
+
+    <h3>Del modelo a la base, en desarrollo</h3>
+
+    <p>Con las entidades escritas, hay tres formas de crear las tablas. Conviene nombrarlas juntas para que quede claro cuál es cuál:</p>
+
+    <table class="tbl">
+      <tr><th>Método</th><th>Qué hace</th><th>Cuándo</th></tr>
+      <tr><td><code>schema.create()</code></td><td>Crea las tablas de cero.</td><td>Base vacía.</td></tr>
+      <tr><td><code>schema.update()</code></td><td>Compara el modelo con la base y aplica las diferencias.</td><td>Desarrollo, mientras el modelo cambia todos los días.</td></tr>
+      <tr><td><code>schema.refresh()</code></td><td><em>Drop</em> y <em>create</em>: deja la base igual al modelo, borrando todo.</td><td>Ejemplos y pruebas. Nunca con datos que importen.</td></tr>
+    </table>
+
+    <p>Las tres son de desarrollo. Para producción están las <strong>migraciones</strong>, en el bloque 8.</p>
+
+
+  </section>
+
+
+  <!-- ENTITY MANAGER -->
+  <section id="em">
+    <div class="section-num">Bloque 5</div>
+    <h2>El EntityManager: por qué no hay <code>save()</code></h2>
+
+    <p>Este es el bloque conceptual de la unidad. Todo lo demás es sintaxis; esto es el modelo mental.</p>
+
+    <p>La primera sorpresa aparece al querer guardar algo:</p>
+
+    <div class="fname">el update completo, en MikroORM</div>
+    <pre><span class="k">const</span> producto = <span class="k">await</span> em.<span class="f">findOneOrFail</span>(<span class="t">Producto</span>, <span class="n">1</span>);
+
+producto.precio = <span class="n">27000</span>;   <span class="c">// ← esto es todo el "update"</span>
+
+<span class="k">await</span> em.<span class="f">flush</span>();          <span class="c">// ← acá recién viaja el SQL</span></pre>
+
+    <p>No hay <code>producto.save()</code> ni <code>em.update(producto)</code>. Se le asigna a la propiedad como a cualquier objeto de JavaScript, y en algún momento se hace <code>flush()</code>. Eso desconcierta el primer día y es la consecuencia directa de dos patrones.</p>
+
+    <h3>Unit of Work: anotar todo y mandarlo junto</h3>
+
+    <p>El EntityManager no ejecuta a medida que le hablás: <strong>anota</strong>. Recién en el <code>flush()</code> compara el estado actual de todo lo que tiene contra el estado en que lo leyó, calcula qué cambió y lo manda, en orden, dentro de <strong>una transacción</strong>.</p>
+
+    <pre>productos[<span class="n">0</span>].precio = <span class="n">26000</span>;                              <span class="c">// UPDATE</span>
+em.<span class="f">create</span>(<span class="t">Producto</span>, { nombre: <span class="s">'Webcam'</span>, precio: <span class="n">45000</span> }); <span class="c">// INSERT</span>
+em.<span class="f">remove</span>(productos[<span class="n">2</span>]);                                <span class="c">// DELETE</span>
+
+<span class="k">await</span> em.<span class="f">flush</span>();  <span class="c">// las tres cosas, una transacción, o todas o ninguna</span></pre>
+
+    <p>Dos consecuencias que valen oro y que no son obvias:</p>
+
+    <ul>
+      <li>El <code>UPDATE</code> que genera lleva <strong>solo los campos que cambiaron</strong>, porque el ORM sabe cómo estaba la fila cuando la leyó.</li>
+      <li>La <strong>atomicidad sale gratis</strong>: si el DELETE falla, el INSERT y el UPDATE tampoco se aplican. Con el driver a mano, esa transacción la abrís y la cerrás vos.</li>
+    </ul>
+
+    <h3>Identity Map: una fila, un objeto</h3>
+
+    <pre><span class="k">const</span> a = <span class="k">await</span> em.<span class="f">findOne</span>(<span class="t">Producto</span>, <span class="n">1</span>);  <span class="c">// ← genera un SELECT</span>
+<span class="k">const</span> b = <span class="k">await</span> em.<span class="f">findOne</span>(<span class="t">Producto</span>, <span class="n">1</span>);  <span class="c">// ← NO genera nada</span>
+
+a === b;              <span class="c">// true — es el mismo objeto</span>
+
+a.precio = <span class="n">99999</span>;
+b.precio;             <span class="c">// 99999</span></pre>
+
+    <p>Dentro de un mismo EntityManager, la fila 1 es <strong>un</strong> objeto. No es solo ahorrarse una consulta: es una garantía de consistencia. Si dos partes del código piden el producto 1 y una lo modifica, la otra ve el cambio, porque son la misma instancia. Sin identity map serían dos copias que al guardarse se pisan.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Conectar con la unidad de objetos: esto es <strong>paso por compartición</strong> (el ejemplo 4.10) aplicado a escala de aplicación. Dos variables que apuntan al mismo objeto no son dos objetos. El identity map es esa misma idea, sostenida a propósito por el ORM para todo lo que se leyó de la base.
+    </div>
+
+    <h3>Y por eso, <code>fork()</code></h3>
+
+    <p>Si el identity map es tan útil, ¿por qué no tener uno solo para toda la aplicación? Porque un EntityManager que viva lo que vive el servidor se va llenando de entidades viejas: <strong>una fuga de memoria</strong> y, peor, datos desactualizados servidos como frescos.</p>
+
+    <p>Por eso cada <em>unidad de trabajo</em> usa su propio <code>fork()</code>, con su identity map vacío. En una API HTTP, una unidad de trabajo es <strong>un request</strong> — y de eso se ocupa el bloque siguiente.</p>
+
+    <table class="tbl">
+      <tr><th>Operación</th><th>Cuándo viaja el SQL</th></tr>
+      <tr><td><code>em.create()</code></td><td>Marca para insertar. En el <code>flush()</code>.</td></tr>
+      <tr><td><code>em.find()</code> / <code>findOne()</code></td><td>Ya mismo. Es la única que consulta en el momento.</td></tr>
+      <tr><td>Asignar a una propiedad</td><td>Marca para actualizar. En el <code>flush()</code>.</td></tr>
+      <tr><td><code>em.remove()</code></td><td>Marca para borrar. En el <code>flush()</code>.</td></tr>
+    </table>
+
+
+
+    <div class="callout green">
+      <div class="callout-label">Lo que sigue</div>
+      Con esto alcanza para el ORM solo. Lo que falta es meterlo en la API de la unidad 6 sin romper las capas — y ahí aparece el middleware que, si se olvida, hace que dos usuarios vean los datos del otro.
+    </div>
+  </section>
+
+
+  <!-- LA API -->
+  <section id="api">
+    <div class="section-num">Bloque 6</div>
+    <h2>La API en capas, ahora contra MySQL</h2>
+
+    <p>Volvemos al proyecto de la unidad anterior —el 7.3, con Zod— y le cambiamos la persistencia. La estructura de carpetas casi no se mueve:</p>
+
+    <pre class="tree"><b>src/</b>
+├─ <b>entities/</b>     producto.entity.ts     <span class="c">← nuevo: la clase mapeada</span>
+├─ <b>schemas/</b>      producto.schema.ts     <span class="c">← sigue: valida el body</span>
+├─ <b>routes/</b>       productos.routes.ts    <span class="c">← sin cambios</span>
+├─ <b>controllers/</b>  productos.controller.ts <span class="c">← sin cambios</span>
+├─ <b>services/</b>     productos.service.ts   <span class="c">← una línea (el import)</span>
+├─ <b>repositories/</b> productos.repository.ts <span class="c">← TODO el cambio</span>
+├─ <b>shared/</b>       errors.ts, errorHandler.ts, validar.ts
+├─ mikro-orm.config.ts                        <span class="c">← nuevo</span>
+├─ db.ts                                      <span class="c">← nuevo: inicializa el ORM</span>
+└─ app.ts</pre>
+
+    <div class="pieces">
+      <div class="piece route">
+        <div class="piece-h">Routes</div>
+        <div class="piece-d">Sin cambios. Ni se enteran de que hay una base.</div>
+      </div>
+      <div class="piece ctrl">
+        <div class="piece-h">Controllers</div>
+        <div class="piece-d">Sin cambios. Las entidades se serializan a JSON solas.</div>
+      </div>
+      <div class="piece svc">
+        <div class="piece-h">Services</div>
+        <div class="piece-d">Una línea: de dónde importa el tipo <code>Producto</code>. El cuerpo es idéntico.</div>
+      </div>
+      <div class="piece repo">
+        <div class="piece-h">Repositories</div>
+        <div class="piece-d">Array → EntityManager. Acá vive el cambio entero de la unidad.</div>
+      </div>
+      <div class="piece mw">
+        <div class="piece-h">+ Middleware</div>
+        <div class="piece-d"><code>RequestContext</code>: un fork del EntityManager por request. El que no se puede olvidar.</div>
+      </div>
+    </div>
+
+    <h3>El repository, en las dos versiones</h3>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">7.3 — el array</div>
+        <pre><span class="k">const</span> productos: <span class="t">Producto</span>[] = [];
+
+<span class="k">export async function</span>
+<span class="f">findAll</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt; {
+  <span class="k">return</span> productos;
+}
+
+<span class="k">export async function</span>
+<span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>) {
+  <span class="k">const</span> nuevo = {
+    id: productos.length + <span class="n">1</span>,
+    ...datos,
+  };
+  productos.<span class="f">push</span>(nuevo);
+  <span class="k">return</span> nuevo;
+}</pre>
+      </div>
+      <div>
+        <div class="col-title">8.2 — MySQL</div>
+        <pre><span class="k">import</span> { orm } <span class="k">from</span> <span class="s">'../db.js'</span>;
+
+<span class="k">export async function</span>
+<span class="f">findAll</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt; {
+  <span class="k">return</span> orm.em.<span class="f">findAll</span>(<span class="t">Producto</span>);
+}
+
+<span class="k">export async function</span>
+<span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>) {
+  <span class="k">const</span> producto =
+    orm.em.<span class="f">create</span>(<span class="t">Producto</span>, datos);
+  <span class="k">await</span> orm.em.<span class="f">flush</span>();
+  <span class="k">return</span> producto;
+}</pre>
+      </div>
+    </div>
+
+    <p>Las <strong>firmas son iguales</strong>. Por eso el service no se toca:</p>
+
+    <div class="fname">productos.service.ts — idéntico al de 7.3</div>
+    <pre><span class="k">export async function</span> <span class="f">crearProducto</span>(datos: <span class="t">ProductoNuevo</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt; {
+  <span class="k">const</span> existente = <span class="k">await</span> repo.<span class="f">findByNombre</span>(datos.nombre);
+
+  <span class="k">if</span> (existente) {
+    <span class="k">throw new</span> <span class="f">ValidationError</span>(<span class="s">`Ya existe un producto llamado "</span>${datos.nombre}<span class="s">"`</span>);
+  }
+
+  <span class="k">return</span> repo.<span class="f">guardar</span>(datos);
+}</pre>
+
+    <h3>El middleware que no se puede olvidar</h3>
+
+    <div class="fname">src/app.ts</div>
+    <pre><span class="k">import</span> { <span class="t">RequestContext</span> } <span class="k">from</span> <span class="s">'@mikro-orm/core'</span>;
+
+app.<span class="f">use</span>((req, res, next) =&gt; {
+  <span class="t">RequestContext</span>.<span class="f">create</span>(orm.em, next);
+});</pre>
+
+    <p>Crea un fork del EntityManager para cada request. A partir de ahí, <code>orm.em</code> dentro del repository devuelve el fork <em>de ese</em> request: por eso el repository puede usarlo sin recibirlo por parámetro.</p>
+
+    <p>Es el <code>em.fork()</code> del bloque 5 llevado a HTTP. Qué pasa si falta —vale probarlo comentando esas líneas y mandando dos requests—:</p>
+
+    <ul>
+      <li>Todos los requests comparten un identity map que <strong>nunca se vacía</strong>: fuga de memoria que crece con el uptime.</li>
+      <li>Entidades de un usuario visibles en el request de otro, y flushes que guardan cambios a medio hacer de otra parte.</li>
+      <li>Con requests concurrentes, MikroORM directamente corta: <em>"Using global EntityManager instance methods for context specific actions is disallowed"</em>.</li>
+    </ul>
+
+    <h3>Si la entidad ya tipa, ¿para qué Zod?</h3>
+
+    <p>La pregunta aparece sola. La respuesta es que cada control actúa en un momento distinto:</p>
+
+    <table class="tbl">
+      <tr><th>Control</th><th>Dónde</th><th>Qué garantiza</th></tr>
+      <tr><td>Zod</td><td>Middleware, antes del controller</td><td>El formato de lo que <strong>entra</strong></td></tr>
+      <tr><td>Service</td><td>Capa de negocio</td><td>Reglas que dependen del estado (nombre repetido)</td></tr>
+      <tr><td>Entidad + MySQL</td><td>La base</td><td>Que lo <strong>guardado</strong> sea válido, pase lo que pase</td></tr>
+    </table>
+
+    <p>Sin Zod, un <code>{"precio": "60000"}</code> llegaría hasta el driver y el error sería un <strong>500</strong> feo en vez de un <strong>400</strong> que dice qué campo está mal.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Dato</div>
+      El <code>unique</code> de la columna atrapa un caso que el service <strong>no puede</strong>: dos requests simultáneos con el mismo nombre pasan los dos el <code>SELECT</code> de la validación —todavía no hay ninguno— y uno de los dos <code>INSERT</code> tiene que fallar. Por eso el <code>errorHandler</code> suma <code>UniqueConstraintViolationException</code> y responde 409. La validación en la aplicación da buenos mensajes; la restricción en la base es la que de verdad garantiza el dato.
+    </div>
+
+
+  </section>
+
+
+  <!-- RELACIONES -->
+  <section id="relaciones">
+    <div class="section-num">Bloque 7</div>
+    <h2>Relaciones, <code>populate</code> y el N+1</h2>
+
+    <p>Un modelo con una sola entidad no muestra para qué sirve una base relacional. Agregamos <strong>categorías</strong>: un producto pertenece a una categoría, una categoría tiene muchos productos.</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">Lado dueño (muchos)</div>
+        <pre><span class="k">@Entity</span>()
+<span class="k">export class</span> <span class="t">Producto</span> {
+  <span class="c">// ...</span>
+
+  <span class="k">@ManyToOne</span>(() =&gt; <span class="t">Categoria</span>)
+  categoria!: <span class="t">Categoria</span>;
+}</pre>
+      </div>
+      <div>
+        <div class="col-title">Lado inverso (uno)</div>
+        <pre><span class="k">@Entity</span>()
+<span class="k">export class</span> <span class="t">Categoria</span> {
+  <span class="c">// ...</span>
+
+  <span class="k">@OneToMany</span>(() =&gt; <span class="t">Producto</span>,
+    (p) =&gt; p.categoria)
+  productos =
+    <span class="k">new</span> <span class="t">Collection</span>&lt;<span class="t">Producto</span>&gt;(<span class="k">this</span>);
+}</pre>
+      </div>
+    </div>
+
+    <p>La relación se declara dos veces, pero en la base <strong>existe una sola vez</strong>:</p>
+
+    <table class="tbl">
+      <tr><th></th><th>Genera</th><th>Regla</th></tr>
+      <tr><td><code>@ManyToOne</code></td><td>La columna <code>categoria_id</code>, su FK y su índice</td><td>La clave foránea va siempre del lado <em>muchos</em></td></tr>
+      <tr><td><code>@OneToMany</code></td><td>Nada</td><td>Solo necesita decir cuál propiedad del otro lado es la dueña</td></tr>
+    </table>
+
+    <p>Y en el código se asignan <strong>objetos, no ids</strong>:</p>
+
+    <pre><span class="k">const</span> perifericos = em.<span class="f">create</span>(<span class="t">Categoria</span>, { nombre: <span class="s">'Periféricos'</span> });
+em.<span class="f">create</span>(<span class="t">Producto</span>, { nombre: <span class="s">'Teclado'</span>, precio: <span class="n">25000</span>, categoria: perifericos });
+
+<span class="k">await</span> em.<span class="f">flush</span>();
+<span class="c">// el ORM ordena solo: primero la categoría, después el producto que la referencia</span></pre>
+
+    <h3>Las colecciones no vienen cargadas</h3>
+
+    <p><code>Collection</code> no es un array: es un array que <strong>sabe si está cargado</strong>. Por defecto no lo está, para que pedir una categoría no arrastre todos sus productos sin que nadie lo pida.</p>
+
+    <pre><span class="k">const</span> categoria = <span class="k">await</span> em.<span class="f">findOneOrFail</span>(<span class="t">Categoria</span>, <span class="n">1</span>);
+
+categoria.productos.<span class="f">isInitialized</span>();   <span class="c">// false</span>
+categoria.productos.<span class="f">getItems</span>();        <span class="c">// vacío — ¡y no es que no haya!</span>
+
+<span class="k">await</span> categoria.productos.<span class="f">init</span>();      <span class="c">// ahora sí sale el SELECT</span></pre>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Recorrer una colección sin inicializar devuelve <strong>vacío sin avisar</strong>. Es el bug clásico de la unidad: la lista sale vacía en el JSON de la respuesta y los datos están en la base. Si un alumno dice "no me trae los productos", esto es lo primero para mirar.
+    </div>
+
+    <h3>El N+1</h3>
+
+    <p>Es el error de performance más común con cualquier ORM, en cualquier lenguaje, y es <strong>invisible hasta que la tabla crece</strong>:</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">N+1 consultas</div>
+        <pre><span class="k">const</span> cats = <span class="k">await</span> em.<span class="f">findAll</span>(<span class="t">Categoria</span>);
+<span class="c">// ↑ 1 consulta</span>
+
+<span class="k">for</span> (<span class="k">const</span> c <span class="k">of</span> cats) {
+  <span class="k">await</span> c.productos.<span class="f">init</span>();
+  <span class="c">// ↑ +1 por cada categoría</span>
+  <span class="f">console</span>.<span class="f">log</span>(c.productos.length);
+}</pre>
+      </div>
+      <div>
+        <div class="col-title">2 consultas, siempre</div>
+        <pre><span class="k">const</span> cats = <span class="k">await</span> em.<span class="f">findAll</span>(
+  <span class="t">Categoria</span>,
+  { populate: [<span class="s">'productos'</span>] },
+);
+
+<span class="k">for</span> (<span class="k">const</span> c <span class="k">of</span> cats) {
+  <span class="f">console</span>.<span class="f">log</span>(c.productos.length);
+}</pre>
+      </div>
+    </div>
+
+    <p>Con 3 categorías son 4 consultas contra 2, y no se nota. Con 300 son <strong>301 contra 2</strong>, y el endpoint tarda diez segundos. El resultado es idéntico; lo único que cambia es cuántas veces se fue hasta la base.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La regla práctica, corta: <strong>si el endpoint devuelve la relación, <code>populate</code>; si no, no la cargues</strong>. Y con <code>debug: true</code> prendido mientras se desarrolla, el N+1 se ve a simple vista — veinte consultas idénticas seguidas en la consola son inconfundibles.
+    </div>
+
+    <h3>Muchos a muchos, en dos minutos</h3>
+
+    <p>Un producto puede tener varias etiquetas y una etiqueta está en varios productos. En SQL eso no entra en una columna: hace falta una <strong>tabla intermedia</strong>. Con <code>@ManyToMany</code>, el ORM la crea y la mantiene, y <strong>no hay ninguna clase que la represente</strong>.</p>
+
+    <pre><span class="k">@ManyToMany</span>(() =&gt; <span class="t">Etiqueta</span>, (e) =&gt; e.productos, { owner: <span class="k">true</span> })
+etiquetas = <span class="k">new</span> <span class="t">Collection</span>&lt;<span class="t">Etiqueta</span>&gt;(<span class="k">this</span>);
+
+<span class="c">// producto_etiquetas(producto_id, etiqueta_id), con PK compuesta</span>
+teclado.etiquetas.<span class="f">add</span>(oferta);
+<span class="k">await</span> em.<span class="f">flush</span>();</pre>
+
+    <p>Eso alcanza <strong>mientras la relación no tenga datos propios</strong>. Si hace falta guardar la cantidad de un producto en un pedido, o cuándo se asignó la etiqueta, la tabla intermedia deja de ser intermedia: pasa a ser una entidad más, con sus dos <code>@ManyToOne</code>.</p>
+
+
+  </section>
+
+
+  <!-- MIGRACIONES -->
+  <section id="migraciones">
+    <div class="section-num">Bloque 8</div>
+    <h2>Migraciones</h2>
+
+    <p>Hasta acá el esquema se sincronizaba con <code>schema.update()</code>. Es cómodo mientras se desarrolla y no sirve para producción. El caso que lo demuestra es concreto:</p>
+
+    <p>Se agrega <code>stock: number</code> a la entidad. La tabla <code>producto</code> ya existe <strong>con datos adentro</strong>. Un <code>alter table producto add stock int not null</code> a secas <strong>falla</strong>: MySQL no sabe qué stock ponerle a las filas que ya están. ¿Cero? ¿NULL? ¿El promedio? Es una decisión de negocio, y ninguna herramienta puede tomarla por vos.</p>
+
+    <p>Una <strong>migración</strong> es esa decisión, escrita como código y versionada en git:</p>
+
+    <div class="fname">src/migrations/Migration20260805093000.ts</div>
+    <pre><span class="k">export class</span> <span class="t">Migration20260805093000</span> <span class="k">extends</span> <span class="t">Migration</span> {
+
+  <span class="k">override</span> <span class="f">up</span>(): <span class="t">void</span> | <span class="t">Promise</span>&lt;<span class="t">void</span>&gt; {
+    <span class="k">this</span>.<span class="f">addSql</span>(<span class="s">'alter table `producto` add `stock` int not null default 0;'</span>);
+  }
+
+  <span class="k">override</span> <span class="f">down</span>(): <span class="t">void</span> | <span class="t">Promise</span>&lt;<span class="t">void</span>&gt; {
+    <span class="k">this</span>.<span class="f">addSql</span>(<span class="s">'alter table `producto` drop column `stock`;'</span>);
+  }
+
+}</pre>
+
+    <p>Ese <code>default 0</code> es la decisión: "los productos que ya existían arrancan sin stock".</p>
+
+    <h3>El flujo</h3>
+
+    <ol class="cycle">
+      <li>Se cambia la entidad.</li>
+      <li><code>npm run orm -- migration:create</code>: la CLI compara el modelo contra la base y <strong>escribe el archivo</strong>.</li>
+      <li><strong>Se lee el archivo generado.</strong> No es opcional: la CLI acierta el 90% de las veces, y el 10% restante es justo el que borra datos.</li>
+      <li>Se commitea <strong>junto con el cambio de la entidad</strong>, en el mismo commit.</li>
+      <li><code>migration:up</code> en cada ambiente: la máquina de cada uno, el servidor de pruebas, producción.</li>
+    </ol>
+
+    <h3>La tabla de control</h3>
+
+    <p>La primera vez que se corre <code>migration:up</code>, el ORM crea <code>mikro_orm_migrations</code>: una fila por migración aplicada, con su fecha. Es el <em>hasta acá llegué</em> de <strong>esa</strong> base. Por eso una misma migración puede estar aplicada en tu máquina y pendiente en producción, y por eso <code>migration:up</code> se puede correr dos veces sin miedo: la segunda no hace nada.</p>
+
+    <table class="tbl">
+      <tr><th></th><th><code>schema.update()</code></th><th>Migraciones</th></tr>
+      <tr><td>Registro de qué se aplicó</td><td>No</td><td>Sí, en una tabla</td></tr>
+      <tr><td>Se puede revisar antes</td><td>No</td><td>Sí: es un archivo en el pull request</td></tr>
+      <tr><td>Se puede volver atrás</td><td>No</td><td>Sí, con el <code>down()</code></td></tr>
+      <tr><td>Qué pasa con los datos</td><td>No sabe</td><td>Lo decidís vos</td></tr>
+      <tr><td>Ambientes iguales</td><td>Por casualidad</td><td>Por construcción</td></tr>
+    </table>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      <strong>MySQL hace commit implícito en cada DDL.</strong> Aunque las migraciones corran con <code>transactional: true</code>, si una migración tiene tres <code>alter table</code> y el segundo falla, el primero <strong>queda aplicado</strong>. En la práctica: una migración por cambio conceptual, cortita, en vez de una gigante con quince pasos. PostgreSQL sí soporta DDL transaccional, y es una de las diferencias reales entre los dos motores.
+    </div>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Una migración que ya se aplicó <strong>no se edita nunca</strong>. Si salió mal, se crea una nueva que lo corrija. Editar una que ya corrió deja la base de los demás en un estado que no coincide con lo que dice el archivo, y eso se descubre siempre en el peor momento.
+    </div>
+
+
+  </section>
+
+
+  <!-- RESUMEN -->
+
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. El TP funciona igual con un array en memoria. ¿Qué gana una base de datos, además de que los datos no se borren al reiniciar?</summary>
+      <div class="a">Tres cosas más. <strong>Escala</strong>: dos instancias de la API para aguantar más tráfico son dos arrays distintos, y lo que se crea en una no existe en la otra. <strong>Consulta</strong>: filtrar y ordenar sobre un array es recorrerlo entero en memoria, y con 500.000 productos no entra. <strong>Integridad</strong>: nada impide dos productos con el mismo nombre o uno apuntando a una categoría que no existe. La base resuelve las cuatro.</div>
+    </details>
+    <details class="q">
+      <summary>2. En MikroORM no existe <code>producto.save()</code>. ¿Cómo actualizás un producto, entonces?</summary>
+      <div class="a">Le asignás a la propiedad como a cualquier objeto y después hacés <code>flush()</code>:<pre>const producto = await em.findOneOrFail(Producto, 1);
+producto.precio = 27000;
+await em.flush();</pre>El EntityManager no ejecuta a medida que le hablás: <strong>anota</strong>. En el <code>flush()</code> compara el estado actual contra el que leyó, calcula qué cambió y lo manda todo junto en una transacción. Como sabe cómo estaba la fila, el <code>UPDATE</code> lleva solo los campos que cambiaron. Eso es el patrón <em>unit of work</em>, y es la razón de que no haya <code>save()</code>: la entidad no sabe guardarse, de eso se ocupa el EntityManager.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Qué garantiza el <em>identity map</em>, y por qué entonces hace falta un <code>fork()</code> por cada request?</summary>
+      <div class="a">Garantiza que, dentro de un mismo EntityManager, <strong>una fila sea un solo objeto</strong>: buscar dos veces el producto 1 devuelve la misma instancia y la segunda búsqueda no genera consulta. Es consistencia, no solo ahorro: si una parte del código lo modifica, la otra ve el cambio. Pero un EntityManager que viviera todo lo que vive el servidor se iría llenando de entidades viejas — fuga de memoria y datos desactualizados servidos como frescos. Por eso cada unidad de trabajo usa su propio fork, con el identity map vacío. En una API, una unidad de trabajo es un request.</div>
+    </details>
+    <details class="q">
+      <summary>4. ¿Qué pasa si te olvidás del middleware <code>RequestContext</code>?</summary>
+      <div class="a">Todos los requests comparten el mismo EntityManager, así que comparten un identity map que <strong>nunca se vacía</strong>: es una fuga de memoria que crece con el uptime del servidor. Peor todavía, podés ver entidades de otro usuario en tu request, y un <code>flush()</code> puede terminar guardando cambios a medio hacer de otra parte. Con requests concurrentes MikroORM directamente corta con <em>«Using global EntityManager instance methods for context specific actions is disallowed»</em>. El middleware es una línea y es el <code>em.fork()</code> llevado a HTTP.</div>
+    </details>
+    <details class="q">
+      <summary>5. Si la entidad ya declara que <code>precio</code> es <code>number</code>, ¿para qué sigue haciendo falta Zod?</summary>
+      <div class="a">Porque controlan cosas distintas en momentos distintos. La <strong>entidad</strong> describe cómo se <em>guarda</em> el producto (columna, tipo SQL, largo, índices) y actúa cuando el dato ya entró al sistema. <strong>Zod</strong> describe qué se <em>acepta</em> en el body y actúa en el borde, antes de que entre. Sin Zod, un <code>{"precio": "60000"}</code> llegaría hasta el driver de MySQL y el error sería un <strong>500</strong> en vez de un <strong>400</strong> que dice qué campo está mal. Y encima queda un tercer control: el <code>unique</code> de la columna, que atrapa lo que el service no puede — dos requests simultáneos con el mismo nombre pasan los dos la validación, y uno de los dos INSERT tiene que fallar.</div>
+    </details>
+    <details class="q">
+      <summary>6. Tenés un endpoint que lista categorías con sus productos y en la consola aparecen 301 consultas. ¿Qué pasó?</summary>
+      <div class="a">Es el <strong>N+1</strong>: una consulta para traer las categorías y una más por cada categoría, porque estás navegando la relación adentro de un bucle (<code>await c.productos.init()</code>). Se arregla pidiendo de entrada lo que vas a usar:<pre>await em.findAll(Categoria, { populate: ['productos'] });</pre>Eso son 2 consultas fijas, haya 3 categorías o 300. La regla práctica: si el endpoint devuelve la relación, <code>populate</code>; si no, no la cargues. Con <code>debug: true</code> se ve a simple vista mientras desarrollás.</div>
+    </details>
+    <details class="q">
+      <summary>7. Pedís una categoría, recorrés <code>categoria.productos</code> y sale vacío, pero en la base los productos están. ¿Qué pasó?</summary>
+      <div class="a">La colección no estaba inicializada. <code>Collection</code> no es un array: es un array que sabe si está cargado, y por defecto <strong>no lo está</strong>, para que pedir una categoría no arrastre todos sus productos sin que nadie lo pida. Recorrerla sin cargar devuelve vacío <em>sin avisar</em>. Se resuelve con <code>populate</code> al buscar, o con <code>await categoria.productos.init()</code>.</div>
+    </details>
+    <details class="q">
+      <summary>8. ¿Por qué <code>schema.update()</code> no va a producción, si deja la base igual al modelo?</summary>
+      <div class="a">Porque no sabe qué hacer con los datos que ya están. El caso típico: agregás <code>stock: number</code> y la tabla ya tiene filas; un <code>add stock int not null</code> a secas falla, porque MySQL no sabe qué stock ponerle a lo que ya existe. Poner <code>default 0</code> es una <strong>decisión de negocio</strong> que ninguna herramienta puede tomar por vos. Además <code>update()</code> no deja registro de qué se aplicó, no se puede revisar en un pull request ni volver atrás. Las migraciones son ese cambio escrito como código y versionado: llegan en el <code>git pull</code>, se aplican en orden en cada ambiente y quedan anotadas en la tabla <code>mikro_orm_migrations</code>.</div>
+    </details>
+    </div>
+  </section>
+
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen</h2>
+
+    <ul>
+      <li>Un array en memoria se pierde al reiniciar, no escala a más de un proceso, no se consulta de verdad y no garantiza integridad. Las cuatro cosas las resuelve una <strong>base de datos</strong>.</li>
+      <li>Un <strong>ORM</strong> traduce entre objetos y tablas. No reemplaza saber SQL, no diseña el modelo y no valida lo que entra por HTTP.</li>
+      <li>MikroORM es <strong>Data Mapper</strong>: la entidad es una clase común que no sabe guardarse; de eso se ocupa el <strong>EntityManager</strong>.</li>
+      <li>La <strong>entidad</strong> es la clase de TypeScript con decoradores. Cuando no elegís el tipo de columna, el ORM elige por vos — y para plata, <code>int</code> no es lo que querés.</li>
+      <li><strong>No hay <code>save()</code></strong>: se modifica el objeto y se hace <code>flush()</code>. El unit of work junta todos los cambios y los manda en una transacción, con <code>UPDATE</code> de solo los campos que cambiaron.</li>
+      <li>El <strong>identity map</strong> garantiza que, dentro de un EntityManager, una fila sea un objeto. Por eso cada unidad de trabajo necesita su <code>fork()</code>.</li>
+      <li>En una API, una unidad de trabajo es <strong>un request</strong>: eso es <code>RequestContext</code>, y olvidarlo mezcla datos entre usuarios.</li>
+      <li>Cambió <strong>un solo archivo</strong>, el repository. El service quedó idéntico: es la promesa de la unidad de arquitecturas, cumplida.</li>
+      <li>En las relaciones, la <strong>FK va del lado <em>muchos</em></strong> y las colecciones <strong>no vienen cargadas</strong>. Navegar una relación dentro de un bucle es el <strong>N+1</strong>; la respuesta es <code>populate</code>.</li>
+      <li>En producción, el esquema se cambia con <strong>migraciones</strong> versionadas, no con <code>schema.update()</code>: dejan registro, se revisan, se vuelven atrás y deciden qué pasa con los datos que ya están.</li>
+    </ul>
+
+    <h3>Lo que sigue</h3>
+
+    <p>Con una base de datos andando, aparece la entidad que faltaba: <strong>usuarios</strong>. La próxima unidad es autenticación y autorización — hashear contraseñas con bcrypt, emitir un JWT al hacer login y un middleware que proteja las rutas. Y ahí también se muda por fin lo que hoy quedó feo a propósito: <strong>las credenciales de la base salen del código y se van a un <code>.env</code></strong>, junto con el secret del JWT.</p>
+
+    <h3>Para profundizar</h3>
+    <ul>
+      <li><em>MikroORM — documentación oficial</em>, en especial las guías de <em>Identity Map</em>, <em>Unit of Work</em> y <em>Relationships</em>. Ojo con la versión: mucho material de la web es de la v6.</li>
+      <li><em>Patterns of Enterprise Application Architecture</em> (Martin Fowler) — de ahí salen los nombres <em>Data Mapper</em>, <em>Unit of Work</em>, <em>Identity Map</em> y <em>Active Record</em>. Los capítulos son cortos.</li>
+      <li><em>Use The Index, Luke!</em> — por qué una consulta tarda y qué hace un índice. Es lo que el ORM no te va a enseñar.</li>
+      <li>La documentación de MySQL sobre <strong>tipos de datos</strong>: la diferencia entre <code>int</code>, <code>decimal</code> y <code>float</code> para guardar plata.</li>
+    </ul>
+  </section>
+
+</main>
+
+
+<script>
+(() => {
+  const storageKey = 'dsw-theme-preference';
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+
+  if (!toggle) return;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Modo oscuro';
+      toggle.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Modo claro';
+    toggle.setAttribute('aria-pressed', 'false');
+  };
+
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(storageKey);
+  } catch (_) {
+    savedTheme = null;
+  }
+
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    applyTheme(nextTheme);
+
+    try {
+      localStorage.setItem(storageKey, nextTheme);
+    } catch (_) {
+      /* la persistencia puede fallar en modo privado: se ignora */
+    }
+  });
+})();
+</script>
+</body>
+</html>
