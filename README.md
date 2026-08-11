@@ -13,6 +13,7 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 6. [06.guia-estudio-express-arquitecturas](06.guia-estudio-express-arquitecturas.html) — Arquitecturas en APIs de Node.js (Express, cómo estructurar un proyecto REST)
 7. [07.guia-estudio-typescript.html](07.guia-estudio-typescript.html) — De JavaScript a TypeScript (tipos, compilación, la API en capas tipada y validación con Zod)
 8. [08.guia-estudio-persistencia-mikroorm.html](08.guia-estudio-persistencia-mikroorm.html) — Persistencia con MikroORM y MySQL (entidades, EntityManager, relaciones y migraciones)
+9. [09.guia-estudio-autenticacion.html](09.guia-estudio-autenticacion.html) — Autenticación y autorización (contraseñas con bcrypt, JWT, middleware de auth, permisos, variables de entorno y CORS)
 
 Para consultarlas, basta con abrir el archivo `.html` correspondiente en el navegador.
 
@@ -61,6 +62,9 @@ Para consultarlas, basta con abrir el archivo `.html` correspondiente en el nave
 ## Herramientas
 
 - [MikroORM](https://mikro-orm.io/) — ORM de TypeScript para Node.js
+- [jwt.io](https://jwt.io/) — pegar un JWT y ver sus tres partes; sirve para entender la firma
+- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) — guías de referencia de seguridad, en especial *Password Storage* y *Authentication*
+- [CORS — MDN](https://developer.mozilla.org/es/docs/Web/HTTP/CORS) — qué requests disparan preflight y qué headers hacen falta
 - [Aiven](https://aiven.io/) — bases de datos y servicios cloud administrados
 - [Render](https://render.com/) — hosting de aplicaciones y bases de datos
 - [Neon](https://neon.tech/) — Postgres serverless

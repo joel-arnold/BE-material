@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autenticación y autorización — Guía de estudio · DSW UTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #14171f;
+    --bg3: #1b1f2a;
+    --border: #232838;
+    --border2: #2c3245;
+    --text: #e8eaf0;
+    --muted: #98a0b3;
+    --accent: #7c6af7;
+    --accent2: #a99cff;
+    --blue: #58a6ff;
+    --green: #3fd68c;
+    --orange: #ffa657;
+    --type: #4fd1c5;
+    --nav-bg: rgba(13,15,20,0.85);
+    --tag-bg: rgba(124,106,247,0.1);
+    --tag-border: rgba(124,106,247,0.35);
+    --step-bg: rgba(124,106,247,0.14);
+    --toggle-shadow: rgba(0,0,0,0.22);
+  }
+
+  :root[data-theme='light'] {
+    --bg: #f3f6fb;
+    --bg2: #ffffff;
+    --bg3: #e8eef8;
+    --border: rgba(15,23,42,0.14);
+    --border2: rgba(15,23,42,0.24);
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0d5ea8;
+    --accent2: #0b4f8c;
+    --blue: #005ea8;
+    --green: #0f7a44;
+    --orange: #b45309;
+    --type: #0f766e;
+    --nav-bg: rgba(243,246,251,0.96);
+    --tag-bg: rgba(13,94,168,0.1);
+    --tag-border: rgba(13,94,168,0.35);
+    --step-bg: rgba(13,94,168,0.12);
+    --toggle-shadow: rgba(15,23,42,0.16);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 1.2rem; height: 52px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--accent2); margin-right: 1rem; flex-shrink: 0;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    padding: 5px 10px; border-radius: 6px; flex-shrink: 0;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+
+  /* ── ALTERNADOR DE TEMA ── */
+  .theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 200;
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--toggle-shadow);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    transform: translateY(-1px);
+  }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 96px 2rem 5rem; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 3.4rem; }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    background: var(--tag-bg);
+    border: 0.5px solid var(--tag-border);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .page-header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 2.3rem; line-height: 1.15; margin-bottom: 0.5rem;
+  }
+  .page-header p { color: var(--muted); font-size: 1.02rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; margin-top: 1.1rem; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── SECCIONES ── */
+  section { margin-bottom: 3.4rem; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.55rem; line-height: 1.25; margin-bottom: 1rem;
+  }
+  h3 {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 1.12rem; margin: 1.7rem 0 0.7rem;
+  }
+  p { margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+  ul, ol { padding-left: 1.3rem; margin-bottom: 0.9rem; }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--accent2); font-style: italic; }
+  a { color: var(--accent2); }
+
+  /* ── CÓDIGO ── */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--bg3); padding: 1px 6px; border-radius: 3px;
+    color: var(--accent2);
+  }
+  pre {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-radius: 10px; padding: 1rem 1.2rem; margin: 0.9rem 0 1.3rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    line-height: 1.6; overflow-x: auto; color: var(--text);
+  }
+  pre .k { color: var(--accent2); }           /* keyword */
+  pre .f { color: var(--blue); }              /* función / método */
+  pre .s { color: var(--green); }             /* string */
+  pre .n { color: var(--orange); }            /* número */
+  pre .t { color: var(--type); }              /* tipo */
+  pre .c { color: var(--muted); font-style: italic; } /* comentario */
+  pre .err { color: var(--orange); font-style: italic; } /* error del compilador */
+  .fname {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--muted); margin: 1.1rem 0 -2px;
+  }
+  pre.tree { color: var(--muted); }
+  pre.tree b { color: var(--text); font-weight: 500; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem 0;
+    font-size: 14px; color: var(--text);
+  }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.orange { border-left-color: var(--orange); }
+  .callout.orange .callout-label { color: var(--orange); }
+
+  /* ── AGENDA CARD ── */
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* ── PIEZAS (capas) ── */
+  .pieces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0; }
+  .piece { background: var(--bg2); border: 0.5px solid var(--border2); border-top: 2px solid var(--muted); border-radius: 8px; padding: 1rem 1.1rem; }
+  .piece-h { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .piece-d { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .piece.route { border-top-color: var(--blue); }   .piece.route .piece-h { color: var(--blue); }
+  .piece.ctrl  { border-top-color: var(--accent); } .piece.ctrl .piece-h  { color: var(--accent2); }
+  .piece.svc   { border-top-color: var(--green); }  .piece.svc .piece-h   { color: var(--green); }
+  .piece.repo  { border-top-color: var(--orange); } .piece.repo .piece-h  { color: var(--orange); }
+  .piece.mw    { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .pieces { grid-template-columns: 1fr; } .piece.mw { grid-column: auto; } }
+
+  /* ── CICLO NUMERADO ── */
+  .cycle { counter-reset: step; list-style: none; padding: 0; margin: 1.2rem 0; }
+  .cycle li { counter-increment: step; position: relative; padding: 0.7rem 0 0.7rem 2.7rem; border-bottom: 0.5px solid var(--border); font-size: 15px; color: var(--text); }
+  .cycle li:last-child { border-bottom: none; }
+  .cycle li::before { content: counter(step); position: absolute; left: 0; top: 0.55rem; width: 1.7rem; height: 1.7rem; background: var(--step-bg); border: 0.5px solid var(--accent); color: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── DOS COLUMNAS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .grid2 pre { margin: 0.4rem 0 0.6rem; }
+  .col-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); margin-top: 0.6rem; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── TABLA ── */
+  table.tbl { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 14px; }
+  table.tbl th {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border2);
+  }
+  table.tbl td { padding: 0.65rem 0.8rem; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  table.tbl td:first-child { white-space: nowrap; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .theme-toggle { right: 0.7rem; bottom: 0.7rem; font-size: 11px; }
+    table.tbl td:first-child { white-space: normal; }
+  }
+
+  /* ── autoevaluación ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.4rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 2.6rem 0.9rem 1.1rem; font-size: 14.5px; font-weight: 600; color: var(--text); list-style: none; position: relative; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  details.q[open] summary::after { content: '\2013'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  details.q .a strong { color: var(--text); }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Autenticación</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#apertura">La API abierta</a>
+  <a href="#entorno">Variables de entorno</a>
+  <a href="#contrasenas">Contraseñas</a>
+  <a href="#login">El login</a>
+  <a href="#jwt">JWT</a>
+  <a href="#middleware">Middleware de auth</a>
+  <a href="#autorizacion">Autorización</a>
+  <a href="#cors">CORS</a>
+  <a href="#resumen">Resumen</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+</nav>
+
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar entre modo oscuro y claro" aria-pressed="false">Modo claro</button>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Autenticación y autorización</h1>
+    <p>Quién sos, y qué podés hacer — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: la API con MikroORM y MySQL (unidad 8), middlewares de Express (unidad 6) y TypeScript (unidad 7)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+
+    <p>La API que venimos construyendo desde la unidad 6 tiene un agujero del tamaño de un colectivo: <strong>cualquiera puede hacer cualquier cosa</strong>. No hay usuarios, no hay dueños y no hay puertas. En esta unidad se las ponemos.</p>
+
+    <p>El tema tiene una trampa: se puede aprender entero como una receta —instalar bcrypt, instalar jsonwebtoken, copiar el middleware— sin entender nada. Esta guía está armada al revés: cada pieza aparece como <em>respuesta a un problema</em> que se plantea antes. Si al terminar sabés <strong>por qué</strong> el payload de un JWT no puede tener datos privados, la leíste bien aunque no te acuerdes de la firma de <code>jwt.sign()</code>.</p>
+
+    <h3>Primera parte — la puerta</h3>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">La API está abierta: autenticar vs. autorizar</div></div>
+      <div class="agenda-item"><div class="topic">Variables de entorno y el <code>.env</code></div></div>
+      <div class="agenda-item"><div class="topic">Contraseñas: hash, salt y cost factor</div></div>
+      <div class="agenda-item"><div class="topic">El login, y por qué no alcanza</div></div>
+      <div class="agenda-item"><div class="topic">JWT: qué es y qué no es</div></div>
+    </div>
+
+    <h3>Segunda parte — la API protegida</h3>
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">El middleware de autenticación</div></div>
+      <div class="agenda-item"><div class="topic">Autorización: por rol y por dueño</div></div>
+      <div class="agenda-item"><div class="topic">CORS: el error que va a aparecer en el front</div></div>
+    </div>
+
+
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Este es el primer tema de la materia donde <strong>equivocarse tiene consecuencias afuera</strong>. Un ORM mal usado hace una consulta de más; una contraseña mal guardada le abre el mail a mil personas. No es para asustar: es para que se entienda por qué acá se insiste con detalles que en otras unidades pasarían por alto.
+    </div>
+  </section>
+
+
+  <!-- APERTURA -->
+  <section id="apertura">
+    <div class="section-num">Bloque 1</div>
+    <h2>La API está abierta</h2>
+
+    <p>Abrí el <code>.http</code> del ejemplo 8.2 y borrá un producto. Sin credenciales, sin nada. Ahora la pregunta: <em>¿quién borró ese producto?</em></p>
+
+    <p>No hay respuesta posible. La API no tiene idea de quién le está hablando, y no la va a tener nunca mientras no se lo pidas.</p>
+
+    <p>Eso son dos problemas distintos, y conviene separarlos desde el principio porque después todo el tema se ordena solo:</p>
+
+    <div class="pieces">
+      <div class="piece route">
+        <div class="piece-h">Autenticación</div>
+        <div class="piece-d"><strong>¿Quién sos?</strong><br>Probar la identidad. Una sola pregunta, una sola respuesta posible. Falla con <strong>401</strong>.</div>
+      </div>
+      <div class="piece svc">
+        <div class="piece-h">Autorización</div>
+        <div class="piece-d"><strong>¿Podés hacer esto?</strong><br>Decidir permisos. Una pregunta distinta por cada regla del sistema. Falla con <strong>403</strong>.</div>
+      </div>
+    </div>
+
+    <p>La analogía que funciona: <strong>entrar a un edificio</strong>. En la puerta te piden el documento y comparan la cara — eso es autenticarse, y pasa una sola vez. Adentro, tu tarjeta abre algunos pisos y otros no: eso es autorización, y se evalúa en cada puerta.</p>
+
+    <table class="tbl">
+      <tr><th></th><th>401 Unauthorized</th><th>403 Forbidden</th></tr>
+      <tr><td>Qué significa</td><td>No sé quién sos</td><td>Sé quién sos, y no podés</td></tr>
+      <tr><td>Por qué pasa</td><td>Falta el token, venció, la firma no cierra</td><td>Sos usuario común y esto es de admin</td></tr>
+      <tr><td>Qué hace el cliente</td><td>Ir a loguearse</td><td>Nada. Loguearse de nuevo no cambia nada</td></tr>
+    </table>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      El nombre del <strong>401</strong> en el estándar HTTP es <em>Unauthorized</em>, y significa <strong>no autenticado</strong>. El de autorización es el 403. El nombre quedó mal desde 1997 y ya no se cambia. Anotalo una vez y listo: lo vas a leer mil veces en la documentación y te va a chocar cada vez.
+    </div>
+
+
+  </section>
+
+
+  <!-- VARIABLES DE ENTORNO -->
+  <section id="entorno">
+    <div class="section-num">Bloque 2</div>
+    <h2>Variables de entorno: sacar los secretos del código</h2>
+
+    <p>Este bloque va antes que todo lo demás por una razón práctica: en unas pocas páginas vas a generar un <strong>secret</strong>, y no tiene que terminar escrito en un archivo <code>.ts</code>. Además cierra una deuda que la unidad 8 dejó abierta a propósito.</p>
+
+    <div class="fname">8.2 — mikro-orm.config.ts, tal cual quedó</div>
+    <pre>  dbName: <span class="s">'dsw_persistencia'</span>,
+  host: <span class="s">'localhost'</span>,
+  user: <span class="s">'root'</span>,
+  password: <span class="s">'root'</span>,   <span class="c">// ← esto está mal, y lo sabíamos</span></pre>
+
+    <p>Tres razones para sacarlo del código, en orden de gravedad:</p>
+
+    <ol class="cycle">
+      <li><strong>Secretos.</strong> Un secret en un repo público es publicar la llave de tu casa. Y borrarlo en el commit siguiente <em>no alcanza</em>: queda en el historial de git para siempre.</li>
+      <li><strong>Ambientes.</strong> El mismo código tiene que correr contra tu MySQL local y contra la base de producción. Lo único que cambia es la configuración.</li>
+      <li><strong>Equipo.</strong> Cada uno tiene su MySQL con su contraseña. Sin <code>.env</code>, esa línea se cambia en cada <code>pull</code> y se commitea sin querer una vez por semana.</li>
+    </ol>
+
+    <h3>Cómo se ve</h3>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">.env — NO se versiona</div>
+        <pre>DB_PASSWORD=miClaveReal123
+JWT_SECRET=8f3a1c9e4b7d...</pre>
+      </div>
+      <div>
+        <div class="col-title">.env.example — SÍ se versiona</div>
+        <pre>DB_PASSWORD=root
+JWT_SECRET=cambiame-por-uno-al-azar</pre>
+      </div>
+    </div>
+
+    <p>El <code>.env.example</code> es lo que le dice al que clona el repo <em>qué variables necesita</em>. Sin él, el proyecto no arranca en otra máquina y nadie sabe por qué.</p>
+
+    <div class="fname">.gitignore — la línea que evita el accidente</div>
+    <pre><span class="c"># dotenv environment variable files</span>
+.env
+.env.*
+!.env.example</pre>
+
+    <h3>Validar la configuración al arrancar</h3>
+
+    <p>Este es el paso que casi nadie da. <code>process.env</code> es un objeto de <code>string | undefined</code>. Sin validar, un <code>PORT</code> mal escrito aparece como <code>NaN</code> tres capas más abajo, y un <code>JWT_SECRET</code> faltante recién cuando alguien intenta loguearse.</p>
+
+    <div class="fname">9.3 — config/env.ts</div>
+    <pre><span class="k">import</span> { config } <span class="k">from</span> <span class="s">'dotenv'</span>;
+<span class="k">import</span> { z } <span class="k">from</span> <span class="s">'zod'</span>;
+
+<span class="f">config</span>({ quiet: <span class="k">true</span> });   <span class="c">// lee el .env y lo mete en process.env</span>
+
+<span class="k">const</span> envSchema = z.<span class="f">object</span>({
+  PORT: z.coerce.<span class="f">number</span>().<span class="f">default</span>(<span class="n">3000</span>),
+  DB_PASSWORD: z.<span class="f">string</span>().<span class="f">default</span>(<span class="s">''</span>),
+
+  <span class="c">// El único sin default: si falta, la API NO arranca.</span>
+  JWT_SECRET: z.<span class="f">string</span>().<span class="f">min</span>(<span class="n">32</span>, <span class="s">'Al menos 32 caracteres'</span>),
+});
+
+<span class="k">const</span> resultado = envSchema.<span class="f">safeParse</span>(process.env);
+
+<span class="k">if</span> (!resultado.success) {
+  console.<span class="f">error</span>(<span class="s">'✖ Falta configuración o está mal'</span>);
+  process.<span class="f">exit</span>(<span class="n">1</span>);
+}
+
+<span class="k">export const</span> env = resultado.data;   <span class="c">// tipado: env.PORT es number</span></pre>
+
+    <p>Es <strong>el mismo Zod de la unidad 7</strong>, usado para otra cosa. Y la idea de fondo es idéntica: la configuración también es una entrada que viene de afuera, así que también se valida en el borde.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      <strong>Fallar ruidosamente y temprano.</strong> Una API que levanta con la configuración incompleta y explota en el primer login es mucho peor de depurar que una que directamente no levanta y dice qué falta. Probalo: borrá la línea del <code>JWT_SECRET</code> de tu <code>.env</code>, arrancá el 9.3 y mirá el mensaje.
+    </div>
+
+
+  </section>
+
+
+  <!-- CONTRASEÑAS -->
+  <section id="contrasenas">
+    <div class="section-num">Bloque 3</div>
+    <h2>Contraseñas: qué se guarda en esa columna</h2>
+
+    <p>Ahora sí, la primera pieza de autenticación. La pregunta es una sola y es concreta: <strong>¿qué se guarda en la columna de la contraseña?</strong></p>
+
+    <p>El ejemplo 9.1.1 recorre tres ideas malas antes de llegar a la buena. Conviene leerlas en ese orden: cada una falla por un motivo distinto y los tres motivos importan.</p>
+
+    <h3>Idea 1 — guardarla tal cual</h3>
+
+    <pre>{ email: <span class="s">'ana@dsw.com'</span>, password: <span class="s">'messi10'</span> }</pre>
+
+    <p>Cualquiera que vea esa fila sabe la contraseña: el que administra la base, el que hace un backup, el que se filtra un dump. Y hay un daño que no es de tu sistema: <strong>la gente reusa contraseñas</strong>. Filtrar tu tabla le abre el mail a todos ellos.</p>
+
+    <h3>Idea 2 — cifrarla</h3>
+
+    <p>Suena mejor: el que mira la base ve un chorizo ilegible. Pero cifrar es una operación de <strong>ida y vuelta</strong>, y la clave para descifrar está en el mismo servidor que la base.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Para contraseñas no querés cifrado: querés algo que <strong>ni vos puedas deshacer</strong>. La prueba la tenés a la vista todos los días y nunca la miraste: los sistemas serios ofrecen <em>"restablecer contraseña"</em> y nunca <em>"recordar mi contraseña"</em>. No la tienen. Si algún sitio te manda tu contraseña vieja por mail, la está guardando mal.
+    </div>
+
+    <h3>Idea 3 — hashear con un hash rápido</h3>
+
+    <p>Un hash sí es de una sola dirección. Vamos bien. Pero SHA-256 tiene dos problemas:</p>
+
+    <pre><span class="f">sha256</span>(<span class="s">'messi10'</span>) <span class="c">// 87739c6d8a84a660f7d0f137dcd1ab00...</span>
+<span class="f">sha256</span>(<span class="s">'messi10'</span>) <span class="c">// 87739c6d8a84a660f7d0f137dcd1ab00...  ← idéntico</span></pre>
+
+    <p><strong>Es determinístico:</strong> dos usuarios con la misma contraseña tienen el mismo hash. Se puede mirar la tabla y deducir "estos catorce tienen todos la misma, debe ser 123456".</p>
+
+    <p>Y el grave: <strong>es rápido</strong>. Está diseñado para serlo. El ejemplo 9.1.1 termina rompiendo un hash por diccionario:</p>
+
+    <pre><span class="k">for</span> (<span class="k">const</span> candidato <span class="k">of</span> diccionario) {
+  <span class="k">if</span> (<span class="f">sha256</span>(candidato) === objetivo) { <span class="c">// ¡encontrada!</span> }
+}
+
+<span class="c">// encontrada: "messi10" en 3 intentos</span>
+<span class="c">// tiempo: 0.154 ms</span></pre>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Acá el hash <strong>no se rompió</strong>. Nadie invirtió SHA-256 — eso sigue siendo imposible. Lo que se hizo fue <em>probar candidatos</em>, que es infinitamente más barato de lo que parece. Una placa de video común hace miles de millones de SHA-256 por segundo, y las listas de contraseñas filtradas tienen cientos de millones de entradas.
+    </div>
+
+    <h3>bcrypt: las dos cosas que faltaban</h3>
+
+    <div class="fname">9.1.2 — el mismo password, dos hashes distintos</div>
+    <pre><span class="k">const</span> hash1 = <span class="k">await</span> bcrypt.<span class="f">hash</span>(<span class="s">'messi10'</span>, <span class="n">10</span>);
+<span class="k">const</span> hash2 = <span class="k">await</span> bcrypt.<span class="f">hash</span>(<span class="s">'messi10'</span>, <span class="n">10</span>);
+
+hash1 === hash2;  <span class="c">// false</span></pre>
+
+    <p>Lo que cambió es que bcrypt genera un <strong>salt aleatorio</strong> por hash. Y la pregunta que aparece sola —"¿dónde guardo el salt?"— tiene una respuesta que sorprende: <strong>en ningún lado, viene adentro</strong>.</p>
+
+    <pre>$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+ │  │  └─────── salt (22) ────────┘└──────── hash (31) ───────┘
+ │  └─ cost factor: 10
+ └──── versión del algoritmo: 2b</pre>
+
+    <p>Sesenta caracteres, cuatro partes, <strong>una sola columna</strong> — un <code>varchar(60)</code>. Y que el salt sea público no lo rompe: su trabajo es que dos usuarios con la misma contraseña no compartan hash, no ser secreto.</p>
+
+    <h3>El cost factor</h3>
+
+    <p>La segunda pieza: bcrypt es <strong>lento a propósito</strong>, y regulable. Cada +1 duplica el trabajo.</p>
+
+    <table class="tbl">
+      <tr><th>Cost</th><th>Tiempo por hash</th></tr>
+      <tr><td><code>4</code></td><td>~2 ms</td></tr>
+      <tr><td><code>8</code></td><td>~21 ms</td></tr>
+      <tr><td><code>10</code></td><td>~84 ms</td></tr>
+      <tr><td><code>12</code></td><td>~346 ms</td></tr>
+    </table>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      "Lento" suena a error de diseño y es justo al revés. El costo lo pagás <strong>una vez por login</strong>, donde 100 ms no los nota nadie; el atacante lo paga en <strong>cada intento</strong>. Un diccionario de diez millones de entradas pasa de segundos a semanas. La asimetría es todo el truco.
+    </div>
+
+    <h3>Verificar</h3>
+
+    <pre><span class="k">await</span> bcrypt.<span class="f">compare</span>(<span class="s">'messi10'</span>, hashGuardado);  <span class="c">// true</span></pre>
+
+    <p><code>compare()</code> vuelve a hashear el candidato <em>usando el salt que viene dentro del hash guardado</em> y compara los resultados. Nunca desencripta nada. Y no hay atajo: comparar con <code>===</code> contra un hash nuevo siempre da <code>false</code>, porque el salt es otro.</p>
+
+
+
+  </section>
+
+
+  <!-- LOGIN -->
+  <section id="login">
+    <div class="section-num">Bloque 4</div>
+    <h2>El login, y por qué no alcanza</h2>
+
+    <p>Con hash y <code>compare</code> ya se puede escribir el login. Es corto:</p>
+
+    <div class="fname">9.3 — services/auth.service.ts, la idea</div>
+    <pre><span class="k">const</span> usuario = <span class="k">await</span> repo.<span class="f">findByEmail</span>(datos.email);
+<span class="k">const</span> coincide = <span class="k">await</span> bcrypt.<span class="f">compare</span>(datos.password, usuario.passwordHash);
+
+<span class="k">if</span> (!usuario || !coincide) {
+  <span class="k">throw new</span> <span class="f">UnauthorizedError</span>(<span class="s">'Credenciales inválidas'</span>);
+}</pre>
+
+    <h3>El mensaje de error</h3>
+
+    <p>Ese <code>if</code> junta dos casos que la versión ingenua separa:</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">Ingenuo</div>
+        <pre><span class="k">if</span> (!usuario)
+  <span class="k">return</span> <span class="s">'No existe ese email'</span>;
+
+<span class="k">if</span> (!coincide)
+  <span class="k">return</span> <span class="s">'Contraseña incorrecta'</span>;</pre>
+      </div>
+      <div>
+        <div class="col-title">Correcto</div>
+        <pre><span class="k">if</span> (!usuario || !coincide)
+  <span class="k">return</span> <span class="s">'Credenciales inválidas'</span>;</pre>
+      </div>
+    </div>
+
+    <p>La diferencia entre los dos mensajes es información gratis: permite averiguar <strong>qué emails están registrados</strong> sin saber ninguna contraseña. Se llama <em>enumeración de usuarios</em>, y en un sitio donde estar registrado dice algo de vos, importa bastante.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Unificar el mensaje no alcanza: si el usuario no existe y devolvemos ya mismo, <strong>la respuesta llega mucho más rápido</strong> porque no corrió bcrypt. El tiempo filtra lo mismo que el mensaje. Por eso el ejemplo 9.1.3 compara igual, contra un hash descartable, para que las dos ramas tarden parecido. Es un detalle chiquito que muestra bien cómo se piensa en seguridad: no alcanza con tapar la puerta si la ventana dice lo mismo.
+    </div>
+
+    <h3>Y ahora el problema de verdad</h3>
+
+    <p>El login anda. Verificamos la contraseña de Ana. Llega el request siguiente y…</p>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      <strong>HTTP no tiene memoria.</strong> Cada request llega solo, sin ninguna relación con el anterior. El servidor autenticó a Ana hace dos segundos y en el request siguiente no tiene la menor idea de quién es. Eso no es una limitación que haya que arreglar: es el diseño de HTTP, y es lo que permite que una API escale a varias instancias.
+    </div>
+
+    <p>Entonces, ¿cómo hace el servidor para acordarse? Hay dos familias de respuestas, y conviene nombrar las dos aunque usemos una:</p>
+
+    <table class="tbl">
+      <tr><th></th><th>Sesión en el servidor</th><th>Token (JWT)</th></tr>
+      <tr><td>Quién guarda el estado</td><td>El servidor, en memoria o en una tabla</td><td>Nadie: viaja en el token</td></tr>
+      <tr><td>Qué manda el cliente</td><td>Un id de sesión</td><td>El token entero</td></tr>
+      <tr><td>Cerrar sesión</td><td>Borrar una fila. Inmediato</td><td>No se puede: hay que esperar que venza</td></tr>
+      <tr><td>Varias instancias de la API</td><td>Hay que compartir las sesiones</td><td>Sale gratis</td></tr>
+    </table>
+
+    <p>Ninguna es "la correcta". Las sesiones son más simples de razonar y permiten un logout de verdad; los tokens escalan sin infraestructura extra y sirven igual para un front web, una app móvil y otra API. <strong>En la cátedra usamos JWT</strong>, que es lo que vas a encontrar en el 90% del material y lo que va a consumir el front de la materia.</p>
+
+  </section>
+
+
+  <!-- JWT -->
+  <section id="jwt">
+    <div class="section-num">Bloque 5</div>
+    <h2>JWT: qué es, y sobre todo qué no es</h2>
+
+    <p>Este es el bloque conceptual de la unidad. Todo lo demás es plomería; esto es el modelo mental.</p>
+
+    <div class="fname">9.2.1 — emitir un token</div>
+    <pre><span class="k">const</span> token = jwt.<span class="f">sign</span>(
+  { sub: <span class="s">'1'</span>, email: <span class="s">'ana@dsw.com'</span>, rol: <span class="s">'usuario'</span> },
+  SECRET,
+  { expiresIn: <span class="s">'1h'</span> },
+);
+
+<span class="c">// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOi...</span></pre>
+
+    <p>Ese chorizo tiene <strong>tres partes separadas por punto</strong>. Y las dos primeras se abren con una línea:</p>
+
+    <pre><span class="k">const</span> [header, payload, firma] = token.<span class="f">split</span>(<span class="s">'.'</span>);
+
+<span class="t">JSON</span>.<span class="f">parse</span>(<span class="t">Buffer</span>.<span class="f">from</span>(payload, <span class="s">'base64url'</span>).<span class="f">toString</span>());
+<span class="c">// { sub: '1', email: 'ana@dsw.com', rol: 'usuario', iat: ..., exp: ... }</span></pre>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Acabamos de leer el payload <strong>sin el secret</strong>. Base64 no es encriptación: es una forma de escribir bytes con caracteres seguros para una URL, y se deshace sin ninguna clave. Cualquiera con el token lo lee: el usuario, una extensión del navegador, cualquiera que abra jwt.io.
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      Un JWT <strong>no es secreto. Es auténtico.</strong> Son dos propiedades distintas y confundirlas es el error más caro de la unidad. Se puede <em>leer</em>; no se puede <em>falsificar</em>. Consecuencia directa y no negociable: en el payload va el id del usuario y el rol —cosas que él ya sabe de sí mismo— y <strong>nunca</strong> la contraseña, su hash, el DNI ni nada privado.
+    </div>
+
+    <h3>Entonces me edito el payload y me pongo admin</h3>
+
+    <p>Es la primera pregunta que aparece, y el ejemplo 9.2.2 lo intenta:</p>
+
+    <pre><span class="k">const</span> payloadTrucho = { ...payloadOriginal, rol: <span class="s">'admin'</span> };
+<span class="k">const</span> tokenTrucho = <span class="s">`${header}.${nuevoPayload}.${firmaOriginal}`</span>;
+
+jwt.<span class="f">decode</span>(tokenTrucho);   <span class="c">// { rol: 'admin' }  ← dice admin</span>
+jwt.<span class="f">verify</span>(tokenTrucho, SECRET);
+<span class="err">// JsonWebTokenError: invalid signature</span></pre>
+
+    <p>La tercera parte es la <strong>firma</strong>, y no es JSON:</p>
+
+    <pre>firma = <span class="f">HMAC-SHA256</span>( header + <span class="s">'.'</span> + payload, SECRET )</pre>
+
+    <p>Un hash de las dos primeras partes, mezclado con el secret. Cambiar una letra del payload invalida la firma, y recalcularla <strong>requiere el secret</strong>. Editar el payload es trivial; hacer que la firma cierre, no.</p>
+
+    <p>El ejemplo prueba tres ataques y los tres fallan por el mismo motivo:</p>
+
+    <ol class="cycle">
+      <li><strong>Editar el payload</strong> y dejar la firma vieja → <code>invalid signature</code>.</li>
+      <li><strong>Firmar uno nuevo</strong> con un secret inventado → <code>invalid signature</code>.</li>
+      <li><strong>Poner <code>alg: none</code></strong> en el header, para que no valide nada → <code>jwt signature is required</code>.</li>
+    </ol>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El tercero es un clásico histórico: en 2015 varias librerías lo aceptaban. La moraleja vale mucho más que el caso — <strong>nunca dejes que el dato que estás validando decida cómo se valida</strong>. Por eso en el código de la materia el <code>verify</code> lleva <code>{ algorithms: ['HS256'] }</code>: el algoritmo lo fija el servidor, no el token.
+    </div>
+
+    <h3><code>decode</code> nunca, <code>verify</code> siempre</h3>
+
+    <table class="tbl">
+      <tr><th></th><th>Chequea la firma</th><th>Chequea <code>exp</code></th><th>Necesita el secret</th></tr>
+      <tr><td><code>jwt.decode()</code></td><td>No</td><td>No</td><td>No</td></tr>
+      <tr><td><code>jwt.verify()</code></td><td>Sí</td><td>Sí</td><td>Sí</td></tr>
+    </table>
+
+    <p>En el servidor, cualquier decisión se toma con <code>verify()</code>. <code>decode()</code> sirve del lado del cliente, para mostrar el nombre del usuario en la barra sin volver a pedirlo — ahí no se está autorizando nada.</p>
+
+    <h3>El secret</h3>
+
+    <p>Todo el esquema se apoya en una sola pieza secreta. Cuatro reglas:</p>
+
+    <ul>
+      <li><strong>Largo y aleatorio</strong>, 32 bytes o más. Se genera con <code>randomBytes(32).toString('hex')</code>, no se inventa.</li>
+      <li><strong>Fuera del código</strong>, en el <code>.env</code> del bloque 2. Ahora se ve para qué era.</li>
+      <li><strong>Distinto</strong> en desarrollo y en producción.</li>
+      <li>Si se filtra, cualquiera emite tokens válidos para cualquier usuario. Cambiarlo invalida <em>todos</em> los tokens vigentes — que es justo lo que querés en ese caso.</li>
+    </ul>
+
+    <h3>Lo que la firma no resuelve</h3>
+
+    <p>Un token copiado del navegador de otra persona <strong>funciona igual de bien</strong>: es válido, la firma cierra y no venció. La firma prueba que lo emitió el servidor, no que lo esté usando su dueño. De ahí las tres precauciones reales: <strong>HTTPS siempre</strong>, <strong>expiración corta</strong> y no dejarlo donde cualquier script de la página lo pueda leer.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      La contra grande del enfoque: los JWT son <strong>autocontenidos</strong>. El servidor no guarda nada, así que <strong>no tiene dónde tachar un token</strong>. El "cerrar sesión" borra el token del cliente, pero una copia hecha antes sigue sirviendo hasta el <code>exp</code>. No es un bug de la implementación: es el precio de no tener estado.
+    </div>
+
+
+
+    <div class="callout green">
+      <div class="callout-label">Lo que sigue</div>
+      Con esto ya tenemos las dos piezas: contraseñas guardadas bien y un token que el servidor puede verificar. Falta lo más fácil y lo que más se rompe en el TP: <strong>meterlas en la API</strong> sin dejar ninguna puerta abierta.
+    </div>
+  </section>
+
+
+  <!-- MIDDLEWARE -->
+  <section id="middleware">
+    <div class="section-num">Bloque 6</div>
+    <h2>El middleware de autenticación</h2>
+
+    <p>Volvemos al proyecto de la unidad 8 y le agregamos la puerta. La estructura casi no se mueve:</p>
+
+    <pre class="tree"><b>src/</b>
+├─ <b>config/</b>       env.ts                  <span class="c">← nuevo: el .env validado</span>
+├─ <b>entities/</b>     usuario.entity.ts       <span class="c">← nuevo</span>
+│                producto.entity.ts      <span class="c">← + creadoPor</span>
+├─ <b>middlewares/</b>  autenticar.ts           <span class="c">← nuevo: ¿quién sos?</span>
+│                autorizar.ts            <span class="c">← nuevo: ¿podés?</span>
+├─ <b>services/</b>     auth.service.ts         <span class="c">← nuevo: registro y login</span>
+├─ <b>shared/</b>       jwt.ts                  <span class="c">← nuevo: emitir y verificar</span>
+├─ <b>types/</b>        express.d.ts            <span class="c">← nuevo: req.usuario</span>
+└─ app.ts                                <span class="c">← + cors</span></pre>
+
+    <p>La entidad nueva no tiene sorpresas, salvo una columna:</p>
+
+    <div class="fname">entities/usuario.entity.ts</div>
+    <pre><span class="k">@Property</span>({ length: <span class="n">60</span>, hidden: <span class="k">true</span> })
+passwordHash!: <span class="t">string</span>;</pre>
+
+    <ul>
+      <li>Se llama <code>passwordHash</code> y <strong>no <code>password</code></strong>. El nombre es documentación: el que lea la entidad tiene que ver de una que ahí no hay una contraseña.</li>
+      <li><code>length: 60</code> porque eso mide un hash de bcrypt. Los sesenta caracteres del bloque 3.</li>
+      <li><code>hidden: true</code> hace que MikroORM la saque al serializar a JSON. Sin eso, un <code>res.json(usuario)</code> manda el hash por la red.</li>
+    </ul>
+
+    <h3>El middleware, entero</h3>
+
+    <div class="fname">middlewares/autenticar.ts</div>
+    <pre><span class="k">export function</span> <span class="f">autenticar</span>(req: <span class="t">Request</span>, res: <span class="t">Response</span>, next: <span class="t">NextFunction</span>) {
+  <span class="k">try</span> {
+    <span class="k">const</span> header = req.headers.authorization;
+
+    <span class="k">if</span> (!header?.<span class="f">startsWith</span>(<span class="s">'Bearer '</span>)) {
+      <span class="k">throw new</span> <span class="f">UnauthorizedError</span>(<span class="s">'Falta el token de autenticación'</span>);
+    }
+
+    req.usuario = <span class="f">verificarToken</span>(header.<span class="f">slice</span>(<span class="s">'Bearer '</span>.length));
+
+    <span class="f">next</span>();
+  } <span class="k">catch</span> {
+    <span class="f">next</span>(<span class="k">new</span> <span class="f">UnauthorizedError</span>(<span class="s">'Token inválido o expirado'</span>));
+  }
+}</pre>
+
+    <p>Eso es todo. Es un middleware de Express común y silvestre —la mecánica ya la conocen del <code>validar</code> de la unidad 7 y del <code>RequestContext</code> de la 8— y hace tres cosas: saca el token del header, lo verifica, lo deja en <code>req.usuario</code>.</p>
+
+    <p><strong>Bearer</strong> significa "portador": el token vale por tenerlo, como un boleto de colectivo. No importa quién lo presente — que es exactamente la contra del bloque anterior, dicha desde el estándar.</p>
+
+    <h3><code>req.usuario</code> sin <code>any</code></h3>
+
+    <p><code>Request</code> es un tipo de Express y no tiene esa propiedad. La salida fácil es <code>(req as any).usuario</code>, y es una mentira que se paga después. La correcta es <strong>declaration merging</strong>:</p>
+
+    <div class="fname">types/express.d.ts</div>
+    <pre><span class="k">declare global</span> {
+  <span class="k">namespace</span> <span class="t">Express</span> {
+    <span class="k">interface</span> <span class="t">Request</span> {
+      usuario?: <span class="t">PayloadToken</span>;
+    }
+  }
+}</pre>
+
+    <p>TypeScript permite reabrir una interface declarada en otro paquete y sumarle campos. Es una de las cosas más útiles del lenguaje y no la vimos en la unidad 7; este es el caso donde se necesita.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El <code>?</code> no es un detalle de sintaxis. En una ruta pública el middleware no corrió y <code>req.usuario</code> es <code>undefined</code>. El tipo lo dice y el compilador <strong>obliga</strong> a contemplarlo en cada controller. Si lo declaráramos obligatorio, el tipo estaría mintiendo — que es justo lo que la unidad 7 pide no hacer.
+    </div>
+
+    <h3>Las rutas son el mapa de permisos</h3>
+
+    <div class="fname">routes/productos.routes.ts</div>
+    <pre>productosRouter.<span class="f">get</span>(<span class="s">'/'</span>, listar);                                <span class="c">// pública</span>
+productosRouter.<span class="f">post</span>(<span class="s">'/'</span>, autenticar, <span class="f">validar</span>(schema), crear);   <span class="c">// autenticada</span>
+productosRouter.<span class="f">delete</span>(<span class="s">'/:id'</span>, autenticar, eliminar);           <span class="c">// + autorizada</span></pre>
+
+    <p>Leyendo tres líneas se sabe quién puede hacer qué. Esa legibilidad es el argumento para poner la autenticación acá y no adentro de cada controller: <strong>un permiso olvidado se ve como una línea que falta</strong>.</p>
+
+    <p>Y el <code>get</code> público está a propósito: <strong>no todo tiene que estar protegido</strong>. El catálogo se ve sin cuenta, como en cualquier tienda.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      El orden importa: <code>autenticar</code> va <strong>antes</strong> que <code>validar</code>. Si un anónimo manda un body inválido, la respuesta correcta es 401 y no 400 — no tiene por qué enterarse del formato de una ruta que no puede usar. Es el mismo criterio del mensaje unificado del login: no regalar información.
+    </div>
+
+  </section>
+
+
+  <!-- AUTORIZACIÓN -->
+  <section id="autorizacion">
+    <div class="section-num">Bloque 7</div>
+    <h2>Autorización: por rol y por dueño</h2>
+
+    <p>Volvemos a la distinción del bloque 1, ahora con código. Autenticar es <strong>una</strong> pregunta; autorizar son <strong>muchas</strong>, una por cada regla del sistema. Por eso no hay <em>un</em> middleware de autorización: hay una fábrica que produce el que hace falta.</p>
+
+    <div class="fname">middlewares/autorizar.ts</div>
+    <pre><span class="k">export function</span> <span class="f">requiereRol</span>(...rolesPermitidos: <span class="t">Rol</span>[]) {
+  <span class="k">return</span> (req: <span class="t">Request</span>, res: <span class="t">Response</span>, next: <span class="t">NextFunction</span>) => {
+    <span class="k">if</span> (!rolesPermitidos.<span class="f">includes</span>(req.usuario.rol)) {
+      <span class="f">next</span>(<span class="k">new</span> <span class="f">ForbiddenError</span>(<span class="s">'No tenés permiso para esta operación'</span>));
+      <span class="k">return</span>;
+    }
+
+    <span class="f">next</span>();
+  };
+}</pre>
+
+    <p><code>requiereRol('admin')</code> no <em>es</em> el middleware: <strong>devuelve</strong> el middleware. Es una función de orden superior, el mismo patrón que <code>validar(schema)</code> de la unidad 7. Es la segunda vez que aparece, y con dos casos ya se ve el patrón: cuando un middleware necesita un parámetro, se envuelve en una función que lo devuelve.</p>
+
+    <pre>authRouter.<span class="f">get</span>(<span class="s">'/usuarios'</span>, autenticar, <span class="f">requiereRol</span>(<span class="s">'admin'</span>), listarUsuarios);</pre>
+
+    <h3>La regla que no entra en un middleware</h3>
+
+    <p>Ahora la otra: <em>"podés borrar este producto si lo creaste vos"</em>. Y acá aparece el punto conceptual del bloque, el que más se lleva puesto en el TP:</p>
+
+    <div class="pieces">
+      <div class="piece ctrl">
+        <div class="piece-h">Depende solo del token</div>
+        <div class="piece-d">"Tenés que ser admin." Se contesta con lo que trae el request, sin tocar la base. → <strong>middleware</strong></div>
+      </div>
+      <div class="piece repo">
+        <div class="piece-h">Depende del recurso</div>
+        <div class="piece-d">"Este producto es tuyo." No se puede contestar sin ir a buscarlo. → <strong>service</strong></div>
+      </div>
+    </div>
+
+    <p>Si la segunda la pusiéramos en un middleware, ese middleware consultaría la base y el service la consultaría de nuevo: <strong>dos veces la misma query</strong>, y una regla de negocio escrita en la capa equivocada.</p>
+
+    <div class="fname">services/productos.service.ts</div>
+    <pre><span class="k">export async function</span> <span class="f">eliminarProducto</span>(id: <span class="t">number</span>, quienPide: <span class="t">PayloadToken</span>) {
+  <span class="k">const</span> producto = <span class="k">await</span> repo.<span class="f">findByIdOrFail</span>(id);        <span class="c">// 1. ¿existe? → 404</span>
+
+  <span class="k">const</span> esAdmin = quienPide.rol === <span class="s">'admin'</span>;
+  <span class="k">const</span> esDueno = producto.creadoPor.id === <span class="f">Number</span>(quienPide.sub);
+
+  <span class="k">if</span> (!esAdmin &amp;&amp; !esDueno) {                            <span class="c">// 2. ¿podés? → 403</span>
+    <span class="k">throw new</span> <span class="f">ForbiddenError</span>(<span class="s">'Solo podés borrar los productos que creaste'</span>);
+  }
+
+  <span class="k">await</span> repo.<span class="f">eliminar</span>(producto);                        <span class="c">// 3. borrar</span>
+}</pre>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      La regla para decidir dónde va cada chequeo: <strong>si para contestar hay que ir a la base, es del service.</strong> Todo lo demás, middleware.
+    </div>
+
+    <h3>Lo que decide permisos no se le pregunta al cliente</h3>
+
+    <p>Tres decisiones del código del 9.3 que son en realidad la misma decisión:</p>
+
+    <ol class="cycle">
+      <li>El <strong>dueño</strong> del producto sale del <code>sub</code> del token, no del body. Si viniera del body, cualquiera crearía productos a nombre de otro.</li>
+      <li>El <strong>rol</strong> no se acepta en el registro: todo registro público crea un usuario común. Si se aceptara, cualquiera se registraría como admin.</li>
+      <li>El <strong>algoritmo</strong> de verificación no se lee del header del token: lo fija el servidor con <code>{ algorithms: ['HS256'] }</code>.</li>
+    </ol>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Hay una fuga chiquita en el orden 404-después-403: pedir un producto inexistente da 404 y pedir uno ajeno da 403, así que cualquiera puede averiguar <strong>qué ids existen</strong> aunque no pueda tocarlos. Acá no importa (los productos se listan públicamente). Cuando importa —historias clínicas, facturas— la respuesta correcta es devolver <strong>404 también en el caso del 403</strong>: "si no es tuyo, para vos no existe". La decisión es de producto; lo importante es tomarla a conciencia y no que salga sola del orden de los <code>if</code>.
+    </div>
+
+
+  </section>
+
+
+  <!-- CORS -->
+  <section id="cors">
+    <div class="section-num">Bloque 8</div>
+    <h2>CORS: el error que va a aparecer en el front</h2>
+
+    <p>Cierre de la unidad con el tema que no es de autenticación pero aparece siempre junto con ella: el momento en que el front intenta llamar a esta API y no puede.</p>
+
+    <p>Directo: <strong>este error lo vas a tener sí o sí</strong>, la semana que conectes el front con el back. La idea del bloque es que cuando pase sepas qué estás mirando.</p>
+
+    <h3>Qué es</h3>
+
+    <p>El navegador tiene una regla vieja llamada <strong>same-origin policy</strong>: el JavaScript de una página solo puede leer respuestas de su mismo origen. Un <strong>origen</strong> es la terna <em>esquema + host + puerto</em>, y los tres tienen que coincidir.</p>
+
+    <pre>http://localhost:5173   ← el front
+http://localhost:3000   ← la API
+                  ↑
+       distinto puerto = OTRO ORIGEN</pre>
+
+    <p><strong>CORS</strong> es el mecanismo por el cual el servidor levanta esa restricción para orígenes específicos, mandando unos headers en la respuesta.</p>
+
+    <h3>El error, y lo que esconde</h3>
+
+    <pre><span class="err">Access to fetch at 'http://localhost:3000/api/productos' from origin
+'http://localhost:5173' has been blocked by CORS policy: No
+'Access-Control-Allow-Origin' header is present on the requested resource.</span></pre>
+
+    <p>Y ahora lo que hay que mostrar al lado, en el log de la API:</p>
+
+    <pre>GET     /api/productos       origin: http://localhost:5173</pre>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      El request <strong>llegó</strong>. El servidor <strong>contestó 200</strong>. Lo que el navegador bloquea es que esa página <em>lea</em> la respuesta. De ahí dos cosas que desconciertan: un <code>POST</code> bloqueado por CORS <strong>igual puede haber creado el registro</strong>, y <code>fetch</code> rechaza con un <code>TypeError: Failed to fetch</code> sin ningún detalle — el motivo real solo está en la consola del navegador.
+    </div>
+
+    <p>Dos consecuencias más, que ordenan todo lo demás:</p>
+
+    <ul>
+      <li><strong>La restricción la aplica el navegador, no el servidor.</strong> Por eso los <code>.http</code>, Postman y <code>curl</code> nunca dan error de CORS: no son navegadores y no tienen a quién proteger. Es exactamente la razón por la que este problema aparece recién cuando entra el front.</li>
+      <li><strong>CORS no protege tu API.</strong> Protege al <em>usuario</em> de que una página cualquiera use su sesión sin que se entere. Cualquiera puede pegarle a tu API desde una terminal. La seguridad la dan la autenticación y la autorización — todo lo anterior.</li>
+    </ul>
+
+    <h3>El preflight</h3>
+
+    <p>Cuando el request lleva el header <code>Authorization</code>, el navegador manda antes uno que nadie escribió:</p>
+
+    <pre>OPTIONS /api/productos
+Origin: http://localhost:5173
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: authorization, content-type</pre>
+
+    <p>Es el <strong>preflight</strong>: "¿me dejás mandar un POST con estos headers?". Si la respuesta no autoriza, <strong>el POST no se manda nunca</strong> — en el log de la API se ve el <code>OPTIONS</code> y no se ve el <code>POST</code>.</p>
+
+    <p>No todos los requests lo disparan; los <em>simples</em> (un <code>GET</code>, un <code>POST</code> de formulario) salen directo. Pero se vuelve no-simple en cuanto lleva <code>Content-Type: application/json</code> o un header propio como <code>Authorization</code> — es decir, <strong>casi cualquier request de una API REST con login</strong>.</p>
+
+    <h3>La configuración</h3>
+
+    <div class="fname">app.ts — y va PRIMERO, antes que las rutas</div>
+    <pre>app.<span class="f">use</span>(<span class="f">cors</span>({
+  origin: env.CORS_ORIGIN,
+  methods: [<span class="s">'GET'</span>, <span class="s">'POST'</span>, <span class="s">'PUT'</span>, <span class="s">'PATCH'</span>, <span class="s">'DELETE'</span>],
+  allowedHeaders: [<span class="s">'Content-Type'</span>, <span class="s">'Authorization'</span>],
+}));</pre>
+
+    <p>Va primero porque, si un error se produce más abajo y la respuesta sale sin los headers de CORS, el front ve un error de CORS en vez del 500 real. Y el origen sale del <code>.env</code> porque cambia por ambiente — bloque 2, otra vez.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      <code>app.use(cors())</code> a secas es <code>origin: '*'</code>: <strong>cualquier página del mundo</strong> puede llamar a la API desde el navegador de tu usuario. Es lo primero que aparece buscando el error y "arregla" el problema al instante. Para una API pública de solo lectura puede estar bien; para una con login, no. Además es <strong>incompatible con <code>credentials: true</code></strong>: si el front manda cookies, hay que declarar el origen exacto igual.
+    </div>
+
+    <h3>El error específico de esta unidad</h3>
+
+    <p>El más difícil de diagnosticar, porque parece que CORS ya está resuelto:</p>
+
+    <pre>app.<span class="f">use</span>(<span class="f">cors</span>({ origin: <span class="s">'http://localhost:5173'</span>, allowedHeaders: [<span class="s">'Content-Type'</span>] }));</pre>
+
+    <p>El origen está bien. El <code>GET</code> público anda perfecto. Y el <code>POST</code> con token falla. Falta <code>Authorization</code> en la lista: el preflight contesta que solo autoriza <code>Content-Type</code> y el navegador corta.</p>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Detalle que sorprende: si <strong>no</strong> se pasa <code>allowedHeaders</code>, el paquete <code>cors</code> copia en la respuesta los headers que el preflight pidió, y <code>Authorization</code> pasa sin problema. O sea que declarar la lista <em>a medias</em> es peor que no declararla. Por eso este error aparece justo cuando alguien "se puso a configurar CORS bien".
+    </div>
+
+    <h3>Checklist para cuando falle</h3>
+
+    <ol class="cycle">
+      <li>¿El middleware de CORS está <strong>antes</strong> que las rutas?</li>
+      <li>¿El <code>origin</code> es <strong>exactamente</strong> el del front? Con el puerto y <strong>sin barra final</strong>.</li>
+      <li>Si declaraste <code>allowedHeaders</code>, ¿está <code>Authorization</code>?</li>
+      <li>Si declaraste <code>methods</code>, ¿está el que usás? El <code>DELETE</code> se olvida seguido.</li>
+      <li>¿Estás leyendo el error en la <strong>consola del navegador</strong>? El de <code>fetch</code> no dice nada.</li>
+    </ol>
+
+
+
+  </section>
+
+
+  <!-- RESUMEN -->
+
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. Un usuario logueado intenta borrar un producto de otro. ¿La API responde 401 o 403, y por qué?</summary>
+      <div class="a"><strong>403.</strong> El 401 es <em>no sé quién sos</em>: falta el token, venció o la firma no cierra, y se arregla yendo a loguearse. Acá el token es válido y la API sabe perfectamente quién sos — lo que falta es el permiso. Volver a loguearte no cambiaría nada, y esa es justo la prueba de que el código correcto es 403.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Por qué no alcanza con cifrar la contraseña antes de guardarla?</summary>
+      <div class="a">Porque cifrar es una operación de <strong>ida y vuelta</strong>: si el sistema puede descifrar, la clave para hacerlo está en el mismo servidor que la base, y quien se lleva una se lleva la otra. Lo que hace falta es un <strong>hash</strong>, que no se puede deshacer ni siquiera desde adentro. La prueba está a la vista en cualquier sitio serio: te ofrecen <em>restablecer</em> la contraseña y nunca <em>recordarla</em>, porque no la tienen.</div>
+    </details>
+    <details class="q">
+      <summary>3. Si el salt de bcrypt es aleatorio y distinto en cada hash, ¿dónde se guarda para poder verificar después?</summary>
+      <div class="a">En ningún lado: <strong>viene adentro del hash</strong>. El string de 60 caracteres tiene cuatro partes — <code>$2b$10$&lt;salt de 22&gt;&lt;hash de 31&gt;</code>: versión, cost factor, salt y hash. Por eso la columna de la base es una sola (<code>varchar(60)</code>) y por eso <code>compare()</code> puede rehashear el candidato con el salt correcto. Que el salt sea público no rompe nada: su trabajo es que dos usuarios con la misma contraseña no compartan hash, no ser secreto.</div>
+    </details>
+    <details class="q">
+      <summary>4. ¿Por qué está bien que bcrypt sea lento, si eso normalmente es un defecto?</summary>
+      <div class="a">Porque el costo es <strong>asimétrico</strong>: vos lo pagás una vez por login, donde 100 ms no los nota nadie; el que intenta adivinar contraseñas lo paga en <em>cada</em> intento. Con SHA-256 se prueba un diccionario entero en segundos; con bcrypt en cost 10, el mismo diccionario tarda semanas. El <strong>cost factor</strong> es exponencial —cada +1 duplica el trabajo— y se sube con los años, sin invalidar los hashes viejos porque cada uno lleva su cost adentro.</div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Podés guardar el DNI del usuario en el payload del JWT para no consultarlo después?</summary>
+      <div class="a">No. El payload es <strong>JSON en base64url</strong>, y base64 no es encriptación: se lee con una línea de código, sin el secret. Cualquiera con el token lo ve — el usuario, una extensión del navegador, jwt.io. Un JWT <strong>no es secreto, es auténtico</strong>: no se puede <em>falsificar</em> sin el secret, que es otra cosa. En el payload va el id, el rol y la expiración: cosas que el propio usuario ya sabe de sí mismo.</div>
+    </details>
+    <details class="q">
+      <summary>6. Editás el payload de tu token para que diga <code>rol: "admin"</code>. ¿Qué pasa cuando lo mandás?</summary>
+      <div class="a">La API responde <strong>401</strong> con <code>invalid signature</code>. La tercera parte del token es la firma: <code>HMAC-SHA256(header + '.' + payload, SECRET)</code>. Al cambiar una letra del payload, la firma que corresponde es otra, y calcularla requiere el secret del servidor. Editar el payload es trivial; hacer que la firma cierre, no. Lo mismo pasa si firmás un token nuevo con un secret inventado.</div>
+    </details>
+    <details class="q">
+      <summary>7. ¿Por qué el login contesta lo mismo cuando el email no existe que cuando la contraseña está mal?</summary>
+      <div class="a">Para no revelar <strong>qué emails están registrados</strong>. Dos mensajes distintos permiten averiguarlo probando de a uno, sin saber ninguna contraseña (se llama <em>enumeración de usuarios</em>). Y unificar el mensaje no alcanza: si cuando el usuario no existe cortás antes de correr bcrypt, la respuesta llega mucho más rápido y <strong>el tiempo filtra lo mismo que el mensaje</strong>. Por eso se compara igual, contra un hash descartable.</div>
+    </details>
+    <details class="q">
+      <summary>8. "Solo el que creó el producto puede borrarlo". ¿Va en un middleware o en el service?</summary>
+      <div class="a">En el <strong>service</strong>. Es la regla que separa las dos clases de autorización: la que depende <em>solo del token</em> ("tenés que ser admin") se resuelve sin tocar la base y es un middleware; la que depende <em>del recurso</em> necesita ir a buscar el producto para ver de quién es. Si la pusieras en un middleware, ese middleware consultaría la base y el service la consultaría otra vez. <strong>Si para contestar hay que ir a la base, es del service.</strong></div>
+    </details>
+    <details class="q">
+      <summary>9. El front tira un error de CORS al llamar a la API. ¿El request llegó al servidor?</summary>
+      <div class="a"><strong>Sí, casi siempre llegó</strong>, y el servidor contestó. Lo que el navegador bloquea es que esa página <em>lea</em> la respuesta. De ahí dos cosas raras: un <code>POST</code> bloqueado por CORS igual puede haber creado el registro, y <code>fetch</code> rechaza con un <code>TypeError: Failed to fetch</code> sin ningún detalle — el motivo real solo está en la consola del navegador. La excepción es cuando hay preflight y se rechaza: ahí el request de verdad nunca sale.</div>
+    </details>
+    <details class="q">
+      <summary>10. Si CORS no protege tu API, ¿de qué protege?</summary>
+      <div class="a">Protege al <strong>usuario</strong>, no al servidor. Sin la same-origin policy, cualquier página que abrieras podría hacerle requests a tu banco <em>con tu sesión</em> y leer las respuestas. La restricción la aplica el <strong>navegador</strong>, así que a tu API le puede pegar cualquiera desde una terminal — por eso los archivos <code>.http</code>, Postman y <code>curl</code> nunca dan error de CORS. La seguridad de la API la dan la autenticación y la autorización.</div>
+    </details>
+    <details class="q">
+      <summary>11. ¿Por qué el <code>.env</code> no se sube al repositorio, pero el <code>.env.example</code> sí?</summary>
+      <div class="a">El <code>.env</code> tiene los valores reales —tu contraseña de MySQL, el secret del JWT— y publicarlos es publicar la llave de tu casa; peor todavía, borrarlos en el commit siguiente <strong>no alcanza</strong>, porque quedan en el historial de git. El <code>.env.example</code> tiene solo los <em>nombres</em> de las variables y valores de ejemplo: es lo que le dice al que clona el repo qué necesita configurar. Sin él, el proyecto no arranca en otra máquina y nadie sabe por qué.</div>
+    </details>
+    </div>
+  </section>
+
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen</h2>
+
+    <ul>
+      <li><strong>Autenticación</strong> es "¿quién sos?" y falla con <strong>401</strong>. <strong>Autorización</strong> es "¿podés hacer esto?" y falla con <strong>403</strong>. Volver a loguearse arregla el primero y no cambia nada en el segundo.</li>
+      <li>Los <strong>secretos salen del código</strong> y van a un <code>.env</code> que no se versiona, con un <code>.env.example</code> que sí. La configuración se valida al arrancar: fallar temprano y ruidosamente.</li>
+      <li>La contraseña <strong>no se guarda</strong>. Se guarda un hash de bcrypt de 60 caracteres, con la versión, el cost y el salt adentro. Cifrar no sirve: es reversible.</li>
+      <li>El <strong>salt</strong> hace que el mismo password dé hashes distintos. El <strong>cost factor</strong> hace que calcularlo sea lento a propósito: se paga una vez por login y millones de veces por ataque.</li>
+      <li>Un login que falla contesta <strong>siempre lo mismo</strong>, y tarda lo mismo en las dos ramas.</li>
+      <li><strong>HTTP no tiene memoria.</strong> El token es la prueba que el cliente vuelve a presentar en cada request.</li>
+      <li>Un JWT <strong>no es secreto, es auténtico</strong>: el payload se lee sin el secret y no se puede falsificar con él. Por eso ahí va el id y el rol, nunca nada privado.</li>
+      <li>En el servidor, <code>verify()</code> siempre; <code>decode()</code> nunca. Y el algoritmo lo fija el servidor, no el header del token.</li>
+      <li>Un JWT es una <strong>foto del momento en que se emitió</strong>. No hay logout real: el servidor no guardó nada que pueda tachar.</li>
+      <li>La autorización que depende <strong>solo del token</strong> es un middleware; la que depende <strong>del recurso</strong> va en el service. Si hay que ir a la base para contestar, es del service.</li>
+      <li><strong>Lo que decide permisos no se le pregunta al cliente</strong>: ni el dueño, ni el rol, ni el algoritmo.</li>
+      <li><strong>CORS no protege la API</strong>, protege al usuario. Lo aplica el navegador, y por eso los <code>.http</code> nunca lo muestran.</li>
+    </ul>
+
+    <h3>Lo que sigue</h3>
+
+    <p>Con la API completa —capas, tipos, base de datos y ahora usuarios— aparece la pregunta que veníamos esquivando: <strong>¿cómo sabés que todo esto anda?</strong> Hasta acá la respuesta fue "corro el <code>.http</code> y miro". La próxima unidad es <strong>testing con Jest</strong>, y la arquitectura en capas de la unidad 6 va a rendir por tercera vez: se puede testear el service mockeando el repository, sin base de datos y sin servidor.</p>
+
+    <h3>Para profundizar</h3>
+    <ul>
+      <li><em>OWASP Cheat Sheet Series</em>, en particular <em>Password Storage</em> y <em>Authentication</em>. Son las guías de referencia de la industria y están escritas para leerse, no para consultarse.</li>
+      <li><em>jwt.io</em> — pegar un token y jugar con el payload. La sección <em>Introduction to JSON Web Tokens</em> es la mejor explicación corta que hay.</li>
+      <li>MDN sobre <strong>CORS</strong>: la tabla de qué requests son "simples" y cuáles disparan preflight vale por sí sola.</li>
+      <li><em>RFC 7519</em> (JWT) y <em>RFC 6750</em> (Bearer). Cortos, y sirven para ver qué es estándar y qué es costumbre.</li>
+      <li><strong>Refresh tokens</strong> y <strong>OAuth</strong> ("iniciar sesión con Google") son el paso siguiente natural, y los dos se entienden fácil con lo de esta unidad en la cabeza.</li>
+    </ul>
+  </section>
+
+</main>
+
+
+
+<script>
+(() => {
+  const storageKey = 'dsw-theme-preference';
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+
+  if (!toggle) return;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Modo oscuro';
+      toggle.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Modo claro';
+    toggle.setAttribute('aria-pressed', 'false');
+  };
+
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(storageKey);
+  } catch (_) {
+    savedTheme = null;
+  }
+
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    applyTheme(nextTheme);
+
+    try {
+      localStorage.setItem(storageKey, nextTheme);
+    } catch (_) {
+      /* la persistencia puede fallar en modo privado: se ignora */
+    }
+  });
+})();
+</script>
+</body>
+</html>
