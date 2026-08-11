@@ -9,7 +9,7 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 2. [02.guia-estudio-funciones-js.html](02.guia-estudio-funciones-js.html) — Funciones en JavaScript
 3. [03.guia-estudio-async-event-loop-js.html](03.guia-estudio-async-event-loop-js.html) — Asincronía y Event Loop en JavaScript
 4. [04.guia-estudio-objetos-js.html](04.guia-estudio-objetos-js.html) — Objetos y JSON en JavaScript
-5. *(Clases en JavaScript — guía pendiente)*
+5. [05.guia-estudio-clases-js.html](05.guia-estudio-clases-js.html) — Clases en JavaScript (POO, encapsulamiento, herencia y el `this` que se pierde)
 6. [06.guia-estudio-express-arquitecturas](06.guia-estudio-express-arquitecturas.html) — Arquitecturas en APIs de Node.js (Express, cómo estructurar un proyecto REST)
 7. [07.guia-estudio-typescript.html](07.guia-estudio-typescript.html) — De JavaScript a TypeScript (tipos, compilación, la API en capas tipada y validación con Zod)
 8. [08.guia-estudio-persistencia-mikroorm.html](08.guia-estudio-persistencia-mikroorm.html) — Persistencia con MikroORM y MySQL (entidades, EntityManager, relaciones y migraciones)

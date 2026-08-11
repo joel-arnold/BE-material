@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clases en JavaScript — Guía de estudio · DSW UTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #8b91a8;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --yellow: #f4c542;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --teal: #2dd4bf;
+    --note-bg: rgba(124,106,247,0.08);
+    --note-border: rgba(124,106,247,0.35);
+    --warn-bg: rgba(244,197,66,0.07);
+    --warn-border: rgba(244,197,66,0.35);
+    --tip-bg: rgba(74,222,128,0.07);
+    --tip-border: rgba(74,222,128,0.35);
+    --heading: #ffffff;
+    --code-comment: #555e7a;
+    --nav-bg: rgba(15,17,23,0.92);
+    --tag-bg: rgba(124,106,247,0.12);
+    --tag-border: rgba(124,106,247,0.3);
+  }
+
+  :root[data-theme='light'] {
+    --bg: #f3f6fb;
+    --bg2: #ffffff;
+    --bg3: #e8eef8;
+    --border: rgba(15,23,42,0.14);
+    --border2: rgba(15,23,42,0.24);
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0d5ea8;
+    --accent2: #0b4f8c;
+    --yellow: #8a3f00;
+    --green: #0f7a44;
+    --red: #b42318;
+    --blue: #005ea8;
+    --orange: #b45309;
+    --teal: #0f766e;
+    --note-bg: rgba(13,94,168,0.09);
+    --note-border: rgba(13,94,168,0.45);
+    --warn-bg: rgba(180,83,9,0.1);
+    --warn-border: rgba(180,83,9,0.45);
+    --tip-bg: rgba(15,118,110,0.1);
+    --tip-border: rgba(15,118,110,0.45);
+    --heading: #0b1220;
+    --code-comment: #475569;
+    --nav-bg: rgba(243,246,251,0.96);
+    --tag-bg: rgba(13,94,168,0.1);
+    --tag-border: rgba(13,94,168,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 2rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  .theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 200;
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    transform: translateY(-1px);
+  }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  :root[data-theme='light'] .theme-toggle {
+    box-shadow: 0 8px 22px rgba(15,23,42,0.16);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
+  }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 2rem 6rem;
+  }
+
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: var(--tag-bg);
+    border: 0.5px solid var(--tag-border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--heading);
+  }
+  .page-header p { color: var(--muted); font-size: 15px; }
+  .page-header .meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 68px;
+  }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  pre {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.4rem;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .kw  { color: var(--accent2); }
+  .fn  { color: var(--yellow); }
+  .str { color: var(--green); }
+  .cm  { color: var(--code-comment); font-style: italic; }
+  .num { color: var(--orange); }
+  .mt  { color: var(--teal); }
+  .op  { color: var(--red); }
+  .tp  { color: var(--blue); }
+  .th  { color: var(--orange); }
+
+  .output-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.3rem 0 0.2rem;
+  }
+  pre.output {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--green);
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  .callout {
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 15px;
+  }
+  .callout.warn { border-left-color: var(--warn-border); background: var(--warn-bg); }
+  .callout.tip  { border-left-color: var(--tip-border);  background: var(--tip-bg); }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--accent2);
+  }
+  .callout.warn .callout-label { color: var(--yellow); }
+  .callout.tip  .callout-label { color: var(--green); }
+  .callout pre { margin: 0.8rem 0 0; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.4rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0 1.4rem;
+  }
+  .two-col pre { margin: 0; }
+
+  /* diagrama de cadena de prototipos */
+  .chain {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    margin: 1.4rem 0;
+    padding: 1.5rem 1.4rem;
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+  }
+  .chain-node {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.55rem 0.85rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .chain-node.obj   { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,247,0.10); }
+  .chain-node.null  { color: var(--muted); border-style: dashed; }
+  .chain-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0.7rem;
+    color: var(--muted);
+  }
+  .chain-arrow .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.03em;
+    margin-bottom: 1px;
+    white-space: nowrap;
+  }
+  .chain-arrow .ln { font-size: 17px; line-height: 1; color: var(--accent2); }
+  .chain-caption { font-size: 12px; color: var(--muted); margin-top: 0.4rem; }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .chain { flex-direction: column; align-items: flex-start; }
+    .chain-arrow { flex-direction: row; gap: 6px; padding: 0.2rem 0 0.2rem 0.6rem; }
+    .chain-arrow .ln { transform: rotate(90deg); }
+    .theme-toggle { right: 0.7rem; bottom: 0.7rem; font-size: 11px; }
+  }
+
+  /* ── autoevaluación ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.4rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 2.6rem 0.9rem 1.1rem; font-size: 14.5px; font-weight: 600; color: var(--text); list-style: none; position: relative; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  details.q[open] summary::after { content: '\2013'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  details.q .a strong { color: var(--text); }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Clases JS</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#azucar">De prototipos a class</a>
+  <a href="#anatomia">Anatomía</a>
+  <a href="#accessors">Getters y setters</a>
+  <a href="#encapsulamiento">Privado y estático</a>
+  <a href="#herencia">Herencia</a>
+  <a href="#this">El this que se pierde</a>
+  <a href="#resumen">Resumen</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+</nav>
+
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar entre modo oscuro y claro" aria-pressed="false">Modo claro</button>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Clases en JavaScript</h1>
+    <p>POO, herencia y el <code>this</code> que se pierde — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: objetos, <code>this</code> y prototipos (guía de Objetos y JSON)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+
+    <p>La guía anterior terminó con una promesa: «a <code>class</code> le vamos a dedicar una clase entera». Esta es. Arranca donde quedó aquella —<code>class</code> es azúcar sintáctico sobre prototipos— y llega a los dos temas que después aparecen en todo el backend: la <strong>herencia</strong> y el <strong><code>this</code> que se pierde</strong> cuando un método se pasa como callback.</p>
+
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">De la constructor function a <code>class</code></div></div>
+      <div class="agenda-item"><div class="topic">Anatomía de una clase</div></div>
+      <div class="agenda-item"><div class="topic">Getters, setters y validación</div></div>
+      <div class="agenda-item"><div class="topic">Encapsulamiento: <code>#</code> y <code>static</code></div></div>
+      <div class="agenda-item"><div class="topic">Herencia y polimorfismo</div></div>
+      <div class="agenda-item"><div class="topic">El <code>this</code> que se pierde</div></div>
+      <div class="agenda-item"><div class="topic">Cierre y lo que sigue</div></div>
+    </div>
+
+    <h3>Un cambio de dominio, a propósito</h3>
+    <p>Hasta la guía anterior los ejemplos fueron <code>Person</code>. Desde acá pasamos a <strong><code>Producto</code></strong>, que es el dominio que se usa en <em>todo</em> lo que queda del año: la API de Express, la versión con TypeScript y, más adelante, la entidad que se guarda en la base de datos. La clase que escribís acá es, literalmente, la que vas a seguir usando.</p>
+
+
+  </section>
+
+
+  <!-- BLOQUE 1: AZÚCAR -->
+  <section id="azucar">
+    <div class="section-num">Bloque 1</div>
+    <h2>De la constructor function a <code>class</code></h2>
+
+    <p>Repasemos lo último de la guía anterior. Estas dos formas de definir <code>Producto</code> hacen <strong>exactamente lo mismo</strong>:</p>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px; color:var(--muted); font-weight:600; margin-bottom:4px;">Constructor function (pre-ES6)</p>
+        <pre><code><span class="kw">function</span> <span class="fn">Producto</span>(nombre, precio) {
+  <span class="kw">this</span>.nombre = nombre;
+  <span class="kw">this</span>.precio = precio;
+}
+
+<span class="fn">Producto</span>.prototype.describir =
+  <span class="kw">function</span>() {
+    <span class="kw">return</span> <span class="str">`<span class="op">${</span><span class="kw">this</span>.nombre<span class="op">}</span>: $<span class="op">${</span><span class="kw">this</span>.precio<span class="op">}</span>`</span>;
+  };</code></pre>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--green); font-weight:600; margin-bottom:4px;">Class (ES6, recomendada)</p>
+        <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  <span class="fn">constructor</span>(nombre, precio) {
+    <span class="kw">this</span>.nombre = nombre;
+    <span class="kw">this</span>.precio = precio;
+  }
+
+  <span class="mt">describir</span>() {
+    <span class="kw">return</span> <span class="str">`<span class="op">${</span><span class="kw">this</span>.nombre<span class="op">}</span>: $<span class="op">${</span><span class="kw">this</span>.precio<span class="op">}</span>`</span>;
+  }
+}</code></pre>
+      </div>
+    </div>
+
+    <p>Y no es una metáfora: se puede verificar que por debajo hay lo mismo de siempre.</p>
+
+    <pre><code><span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="kw">typeof</span> <span class="th">Producto</span>);                              <span class="cm">// 'function' (!)</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="tp">Object</span>.<span class="mt">getPrototypeOf</span>(teclado) === <span class="th">Producto</span>.prototype); <span class="cm">// true</span>
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.<span class="mt">describir</span> === <span class="th">Producto</span>.prototype.<span class="mt">describir</span>);   <span class="cm">// true</span></code></pre>
+
+    <p>Una clase <strong>es</strong> una función, y los métodos viven en <code>Producto.prototype</code>, igual que cuando los poníamos a mano. La cadena de prototipos es idéntica a la que viste en la guía anterior:</p>
+
+    <div class="chain">
+      <div class="chain-node obj">teclado</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Producto.prototype</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Object.prototype</div>
+      <div class="chain-arrow"><span class="lbl">su prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node null">null</div>
+    </div>
+    <p class="chain-caption">La clase no cambió el modelo de objetos de JS: solo cambió cómo se escribe.</p>
+
+    <h3>Cuatro cosas que <code>class</code> sí cambia</h3>
+    <p>Decir «es solo azúcar» es una simplificación útil, pero incompleta. La sintaxis de clase agrega cuatro reglas que la constructor function no tenía:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Regla</th><th>Qué pasa si no se cumple</th></tr></thead>
+        <tbody>
+          <tr><td><code>new</code> es obligatorio</td><td><code>Producto('Teclado', 100)</code> tira <code>TypeError</code>. Con constructor function, la llamada sin <code>new</code> «funcionaba» y ensuciaba variables globales.</td></tr>
+          <tr><td>No hay hoisting utilizable</td><td>Usar la clase antes de su declaración tira <code>ReferenceError</code>. Las funciones sí se podían usar antes (guía de funciones); las clases están en la <em>temporal dead zone</em>, como <code>let</code> y <code>const</code>.</td></tr>
+          <tr><td>Siempre en modo estricto</td><td>El cuerpo de una clase corre en <em>strict mode</em> aunque el archivo no lo declare. Esto es la causa del bug del bloque 6.</td></tr>
+          <tr><td>Los métodos no son enumerables</td><td>No aparecen en <code>Object.keys()</code> ni en <code>for...in</code>. Es lo que uno quiere: al recorrer un producto salen sus datos, no su comportamiento.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <div class="callout tip">
+      <div class="callout-label">Conecta con la clase de asincronía</div>
+      Es el mismo patrón que ya vieron: <code>async/await</code> es azúcar sobre promesas, y <code>class</code> es azúcar sobre prototipos. En los dos casos, el mecanismo de abajo <strong>sigue estando</strong> y aparece cuando algo falla. Por eso no alcanza con la sintaxis nueva: hay que saber qué hay debajo.
+    </div>
+  </section>
+
+
+  <!-- BLOQUE 2: ANATOMÍA -->
+  <section id="anatomia">
+    <div class="section-num">Bloque 2</div>
+    <h2>Anatomía de una clase</h2>
+
+    <p>Una clase tiene tres tipos de miembro que conviene nombrar bien, porque después aparecen en cualquier documentación:</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  <span class="cm">// 1. CAMPOS DE INSTANCIA (instance fields): datos, con valor por defecto</span>
+  stock = <span class="num">0</span>;
+  activo = <span class="kw">true</span>;
+
+  <span class="cm">// 2. CONSTRUCTOR: se ejecuta una vez, al hacer new</span>
+  <span class="fn">constructor</span>(nombre, precio) {
+    <span class="kw">this</span>.nombre = nombre;
+    <span class="kw">this</span>.precio = precio;
+  }
+
+  <span class="cm">// 3. MÉTODOS DE INSTANCIA: comportamiento</span>
+  <span class="mt">describir</span>() {
+    <span class="kw">return</span> <span class="str">`<span class="op">${</span><span class="kw">this</span>.nombre<span class="op">}</span>: $<span class="op">${</span><span class="kw">this</span>.precio<span class="op">}</span> (stock: <span class="op">${</span><span class="kw">this</span>.stock<span class="op">}</span>)`</span>;
+  }
+
+  <span class="mt">precioFinal</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.precio * <span class="num">1.21</span>; <span class="cm">// IVA</span>
+  }
+}
+
+<span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>);
+teclado.stock = <span class="num">12</span>;
+
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.<span class="mt">describir</span>());   <span class="cm">// Teclado: $25000 (stock: 12)</span>
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.<span class="mt">precioFinal</span>()); <span class="cm">// 30250</span></code></pre>
+
+    <p>Notar que los campos con valor por defecto (<code>stock = 0</code>) se escriben <strong>sin</strong> <code>let</code> ni <code>const</code>, y sin coma al final. Es un error de sintaxis frecuente en la primera clase que escribís.</p>
+
+    <h3>Dónde vive cada cosa</h3>
+    <p>Esta es la parte que hay que entender de verdad, porque explica todo lo demás: <strong>los datos van a la instancia, los métodos van al prototipo</strong>.</p>
+
+    <pre><code><span class="mt">console</span>.<span class="mt">log</span>(<span class="tp">Object</span>.<span class="mt">keys</span>(teclado));
+<span class="cm">// ['stock', 'activo', 'nombre', 'precio']  → solo datos</span>
+
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.<span class="mt">hasOwnProperty</span>(<span class="str">'precio'</span>));    <span class="cm">// true  → es suyo</span>
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.<span class="mt">hasOwnProperty</span>(<span class="str">'describir'</span>)); <span class="cm">// false → lo hereda</span></code></pre>
+
+    <p>La consecuencia es de eficiencia y es la razón de ser del prototipo: si creo mil productos, hay <strong>mil copias de <code>nombre</code> y <code>precio</code>, pero una sola copia de <code>describir</code></strong>, compartida por todos.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">Ojo con el atajo de la arrow function</div>
+      Se puede definir un método como campo con arrow function (<code>describir = () =&gt; {...}</code>) y a veces conviene —lo vas a ver en el bloque 6—, pero tiene un costo: deja de ser un método del prototipo y pasa a ser <strong>una copia por instancia</strong>. Por defecto, método normal; la arrow es una excepción con motivo.
+    </div>
+
+    <h3>Métodos <code>async</code> en una clase</h3>
+    <p>Un método puede ser <code>async</code> como cualquier función. No hay sintaxis nueva, y esto es lo que vas a ver en todos los <em>services</em> y <em>repositories</em> de la unidad de APIs:</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">ProductoService</span> {
+  <span class="kw">async</span> <span class="mt">buscarPorId</span>(id) {
+    <span class="kw">const</span> respuesta = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`https://api.ejemplo.com/productos/<span class="op">${</span>id<span class="op">}</span>`</span>);
+    <span class="kw">return</span> <span class="kw">await</span> respuesta.<span class="mt">json</span>();
+  }
+}
+
+<span class="kw">const</span> service = <span class="kw">new</span> <span class="th">ProductoService</span>();
+<span class="kw">const</span> producto = <span class="kw">await</span> service.<span class="mt">buscarPorId</span>(<span class="num">1</span>); <span class="cm">// devuelve una promesa</span></code></pre>
+
+
+  </section>
+
+
+  <!-- BLOQUE 3: GETTERS Y SETTERS -->
+  <section id="accessors">
+    <div class="section-num">Bloque 3</div>
+    <h2>Getters, setters y validación</h2>
+
+    <p>Un <strong>getter</strong> es un método que se usa <em>como si fuera una propiedad</em>: se declara con <code>get</code> y se lee sin paréntesis. Sirve para valores <strong>derivados</strong>, que no se guardan pero se calculan a partir de lo que sí está guardado.</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  <span class="fn">constructor</span>(nombre, precio) {
+    <span class="kw">this</span>.nombre = nombre;
+    <span class="kw">this</span>.precio = precio;
+  }
+
+  <span class="kw">get</span> <span class="mt">precioConIva</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.precio * <span class="num">1.21</span>;
+  }
+}
+
+<span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.precioConIva);   <span class="cm">// 30250 — SIN paréntesis</span>
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.<span class="mt">precioConIva</span>()); <span class="cm">// TypeError: teclado.precioConIva is not a function</span></code></pre>
+
+    <p>Un <strong>setter</strong> es el par: se ejecuta cuando alguien <em>asigna</em> a esa propiedad. Su utilidad real es una sola —<strong>validar antes de guardar</strong>— y esa es la razón por la que existe la encapsulación.</p>
+
+    <h3>El problema que resuelve</h3>
+    <p>Sin setter, cualquiera puede dejar el objeto en un estado inválido, y el error va a aparecer mucho después, en otro archivo:</p>
+
+    <pre><code>teclado.precio = -<span class="num">5000</span>;      <span class="cm">// nadie protesta</span>
+teclado.precio = <span class="str">'muy caro'</span>;  <span class="cm">// tampoco</span>
+
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.precioConIva); <span class="cm">// NaN, tres archivos más adelante</span></code></pre>
+
+    <p>Con setter, el objeto se defiende solo y el error salta <strong>en el momento y el lugar en que se produce</strong>:</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  #precio; <span class="cm">// el dato real, privado (lo vemos en detalle en el bloque 4)</span>
+
+  <span class="fn">constructor</span>(nombre, precio) {
+    <span class="kw">this</span>.nombre = nombre;
+    <span class="kw">this</span>.precio = precio; <span class="cm">// pasa por el setter, así que también valida acá</span>
+  }
+
+  <span class="kw">get</span> <span class="mt">precio</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.#precio;
+  }
+
+  <span class="kw">set</span> <span class="mt">precio</span>(valor) {
+    <span class="kw">if</span> (<span class="kw">typeof</span> valor !== <span class="str">'number'</span> || valor &lt;= <span class="num">0</span>) {
+      <span class="kw">throw</span> <span class="kw">new</span> <span class="tp">Error</span>(<span class="str">'El precio tiene que ser un número positivo'</span>);
+    }
+    <span class="kw">this</span>.#precio = valor;
+  }
+}
+
+<span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>);
+teclado.precio = -<span class="num">5000</span>; <span class="cm">// Error: El precio tiene que ser un número positivo</span></code></pre>
+
+    <p>El detalle importante: como el constructor asigna con <code>this.precio = precio</code>, la validación corre también <strong>al crear</strong> el objeto. No hay forma de fabricar un producto con precio negativo.</p>
+
+    <div class="callout warn">
+      <div class="callout-label">⚠ El error clásico: el setter que se llama a sí mismo</div>
+      Si el campo se llama <strong>igual</strong> que el setter, la asignación de adentro vuelve a disparar el setter, infinitamente:
+      <pre><code><span class="kw">set</span> <span class="mt">precio</span>(valor) {
+  <span class="kw">this</span>.precio = valor; <span class="cm">// ❌ se llama a sí mismo</span>
+}
+<span class="cm">// RangeError: Maximum call stack size exceeded</span></code></pre>
+      La solución es que el dato viva en <strong>otro nombre</strong>: <code>#precio</code> (privado, recomendado) o <code>_precio</code> (convención vieja). Es exactamente el mismo tipo de error que la recursión sin caso base de la guía de funciones.
+    </div>
+
+    <h3>¿Getter o método?</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Usá un getter</th><th>Usá un método</th></tr></thead>
+        <tbody>
+          <tr><td>El valor es un <strong>dato derivado</strong> barato de calcular (<code>precioConIva</code>, <code>nombreCompleto</code>).</td><td>La operación <strong>hace algo</strong>: modifica el objeto, guarda, imprime, pide datos.</td></tr>
+          <tr><td>Leerlo no tiene efectos secundarios ni sorpresas.</td><td>Necesita <strong>parámetros</strong> (un getter no puede recibir ninguno).</td></tr>
+          <tr><td>Se lee como una propiedad y esa lectura es honesta.</td><td>Es lento o asincrónico: que lleve <code>()</code> avisa que ahí pasa algo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+
+  <!-- BLOQUE 4: PRIVADO Y ESTÁTICO -->
+  <section id="encapsulamiento">
+    <div class="section-num">Bloque 4</div>
+    <h2>Encapsulamiento: campos privados y miembros estáticos</h2>
+
+    <h3>Privado de verdad: el prefijo <code>#</code></h3>
+    <p>Durante veinte años, «privado» en JS fue una convención: se ponía un guion bajo adelante (<code>_stock</code>) y se confiaba en que nadie lo tocara. No impedía nada. Desde ES2022 hay campos <strong>realmente</strong> privados: los que empiezan con <code>#</code>.</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  #stock; <span class="cm">// privado: hay que declararlo arriba, antes del constructor</span>
+
+  <span class="fn">constructor</span>(nombre, precio, stock = <span class="num">0</span>) {
+    <span class="kw">this</span>.nombre = nombre;
+    <span class="kw">this</span>.precio = precio;
+    <span class="kw">this</span>.#stock = stock;
+  }
+
+  <span class="kw">get</span> <span class="mt">stock</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.#stock; <span class="cm">// se puede leer, no escribir desde afuera</span>
+  }
+
+  <span class="mt">vender</span>(cantidad) {
+    <span class="kw">this</span>.#<span class="mt">validarCantidad</span>(cantidad); <span class="cm">// método privado</span>
+    <span class="kw">if</span> (cantidad &gt; <span class="kw">this</span>.#stock) {
+      <span class="kw">throw</span> <span class="kw">new</span> <span class="tp">Error</span>(<span class="str">`Stock insuficiente: hay <span class="op">${</span><span class="kw">this</span>.#stock<span class="op">}</span>`</span>);
+    }
+    <span class="kw">this</span>.#stock -= cantidad;
+    <span class="kw">return</span> <span class="kw">this</span>.#stock;
+  }
+
+  <span class="cm">// los métodos también pueden ser privados</span>
+  #<span class="mt">validarCantidad</span>(cantidad) {
+    <span class="kw">if</span> (!<span class="tp">Number</span>.<span class="mt">isInteger</span>(cantidad) || cantidad &lt;= <span class="num">0</span>) {
+      <span class="kw">throw</span> <span class="kw">new</span> <span class="tp">Error</span>(<span class="str">'La cantidad tiene que ser un entero positivo'</span>);
+    }
+  }
+}</code></pre>
+
+    <p>Desde afuera, <code>#stock</code> no existe. Y no es un error en tiempo de ejecución que se pueda atrapar: es un <strong>error de sintaxis</strong>, el archivo no arranca.</p>
+
+    <pre><code><span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>, <span class="num">10</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(teclado.stock);  <span class="cm">// 10 — el getter, sí</span>
+teclado.<span class="mt">vender</span>(<span class="num">3</span>);            <span class="cm">// 7  — la puerta que la clase abrió</span>
+
+<span class="cm">// console.log(teclado.#stock);</span>
+<span class="cm">// SyntaxError: Private field '#stock' must be declared in an enclosing class</span>
+
+teclado.stock = <span class="num">9999</span>;         <span class="cm">// hay getter y no hay setter:</span>
+<span class="cm">// TypeError: Cannot set property stock of #&lt;Producto&gt; which has only a getter</span>
+<span class="cm">// (en modo estricto avisa; sin 'use strict' falla en silencio)</span></code></pre>
+
+    <p>La idea de fondo no es «esconder por esconder»: es que <strong>toda modificación del stock pase por <code>vender()</code></strong>, que es donde vive la regla de negocio. Un dato público es un dato que cualquiera puede dejar inconsistente.</p>
+
+    <h3>Miembros estáticos: lo que es de la clase, no del objeto</h3>
+    <p>Un miembro <code>static</code> pertenece a la <strong>clase</strong> y no a cada instancia. Se usa cuando la operación no necesita un producto concreto: contadores, constantes y <em>fábricas</em>.</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  <span class="kw">static</span> #creados = <span class="num">0</span>;        <span class="cm">// campo estático privado</span>
+  <span class="kw">static</span> IVA = <span class="num">0.21</span>;            <span class="cm">// constante de la clase</span>
+
+  <span class="fn">constructor</span>(nombre, precio) {
+    <span class="kw">this</span>.nombre = nombre;
+    <span class="kw">this</span>.precio = precio;
+    <span class="th">Producto</span>.#creados++;       <span class="cm">// ojo: Producto, no this</span>
+  }
+
+  <span class="kw">static</span> <span class="kw">get</span> <span class="mt">creados</span>() {
+    <span class="kw">return</span> <span class="th">Producto</span>.#creados;
+  }
+
+  <span class="cm">// método fábrica: construye una instancia desde otra representación</span>
+  <span class="kw">static</span> <span class="mt">desdeJSON</span>(texto) {
+    <span class="kw">const</span> datos = <span class="tp">JSON</span>.<span class="mt">parse</span>(texto);
+    <span class="kw">return</span> <span class="kw">new</span> <span class="th">Producto</span>(datos.nombre, datos.precio);
+  }
+}
+
+<span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>);
+<span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Mouse'</span>, <span class="num">12000</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="th">Producto</span>.creados); <span class="cm">// 2  — se pide a la CLASE</span>
+<span class="mt">console</span>.<span class="mt">log</span>(<span class="th">Producto</span>.IVA);     <span class="cm">// 0.21</span></code></pre>
+
+    <p>Un método estático <strong>no ve <code>this</code> como instancia</strong>, porque no hay instancia: si adentro de <code>desdeJSON</code> se escribe <code>this.nombre</code>, no hay nada ahí. Se llama sobre la clase (<code>Producto.desdeJSON(...)</code>), nunca sobre un objeto.</p>
+
+    <h3>Clases y JSON: por qué hace falta la fábrica</h3>
+    <p>Acá se junta con la guía anterior, y es un punto que sorprende:</p>
+
+    <pre><code><span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>, <span class="num">10</span>);
+
+<span class="kw">const</span> texto = <span class="tp">JSON</span>.<span class="mt">stringify</span>(teclado);
+<span class="mt">console</span>.<span class="mt">log</span>(texto); <span class="cm">// {"nombre":"Teclado","precio":25000}</span>
+<span class="cm">// ¡se perdieron los métodos Y el campo privado #stock!</span>
+
+<span class="kw">const</span> recuperado = <span class="tp">JSON</span>.<span class="mt">parse</span>(texto);
+<span class="mt">console</span>.<span class="mt">log</span>(recuperado <span class="kw">instanceof</span> <span class="th">Producto</span>); <span class="cm">// false — es un objeto plano</span>
+<span class="cm">// recuperado.vender(1); → TypeError: recuperado.vender is not a function</span></code></pre>
+
+    <p><code>JSON.parse</code> siempre devuelve objetos <strong>planos</strong>: tienen los datos pero no el comportamiento. Por eso existe <code>Producto.desdeJSON(texto)</code> — es la forma de volver a tener una instancia de verdad. Y si querés controlar qué se serializa (por ejemplo, incluir el <code>#stock</code>), la clase puede definir <code>toJSON()</code>:</p>
+
+    <pre><code>  <span class="mt">toJSON</span>() {
+    <span class="kw">return</span> { nombre: <span class="kw">this</span>.nombre, precio: <span class="kw">this</span>.precio, stock: <span class="kw">this</span>.#stock };
+  }
+<span class="cm">// JSON.stringify lo llama solo: {"nombre":"Teclado","precio":25000,"stock":10}</span></code></pre>
+
+    <div class="callout tip">
+      <div class="callout-label">Conecta con lo que viene</div>
+      Este ida y vuelta es <em>literalmente</em> el trabajo de una API: llega un <code>POST</code> con un JSON, hay que convertirlo en un objeto del dominio, validarlo y guardarlo; y a la salida, convertir el objeto en JSON. En la unidad de APIs ese pasaje va a tener nombre y lugar propio en la arquitectura.
+    </div>
+
+
+  </section>
+
+
+  <!-- BLOQUE 5: HERENCIA -->
+  <section id="herencia">
+    <div class="section-num">Bloque 5</div>
+    <h2>Herencia y polimorfismo</h2>
+
+    <p>Un producto físico y uno digital comparten casi todo —nombre, precio, stock— pero se diferencian en algo: el físico se envía y el digital se descarga. Duplicar la clase entera para cambiar un método sería absurdo. Para eso está <code>extends</code>.</p>
+
+    <pre><code><span class="kw">class</span> <span class="th">ProductoFisico</span> <span class="kw">extends</span> <span class="th">Producto</span> {
+  <span class="fn">constructor</span>(nombre, precio, pesoKg) {
+    <span class="kw">super</span>(nombre, precio); <span class="cm">// ejecuta el constructor de Producto</span>
+    <span class="kw">this</span>.pesoKg = pesoKg;   <span class="cm">// lo propio va después</span>
+  }
+
+  <span class="mt">costoEnvio</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.pesoKg * <span class="num">800</span>;
+  }
+
+  <span class="cm">// sobrescribe el método del padre y lo reutiliza con super.</span>
+  <span class="mt">precioFinal</span>() {
+    <span class="kw">return</span> <span class="kw">super</span>.<span class="mt">precioFinal</span>() + <span class="kw">this</span>.<span class="mt">costoEnvio</span>();
+  }
+}
+
+<span class="kw">class</span> <span class="th">ProductoDigital</span> <span class="kw">extends</span> <span class="th">Producto</span> {
+  <span class="fn">constructor</span>(nombre, precio, tamanioMb) {
+    <span class="kw">super</span>(nombre, precio);
+    <span class="kw">this</span>.tamanioMb = tamanioMb;
+  }
+
+  <span class="cm">// no sobrescribe precioFinal: hereda el de Producto, sin envío</span>
+}</code></pre>
+
+    <p><code>super</code> hace dos trabajos distintos según dónde aparezca:</p>
+    <ul>
+      <li><code>super(...)</code> <strong>en el constructor</strong>: llama al constructor de la clase padre.</li>
+      <li><code>super.metodo()</code> <strong>en un método</strong>: llama a la versión del padre del método que estoy sobrescribiendo.</li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="callout-label">⚠ <code>super()</code> va primero, siempre</div>
+      Tocar <code>this</code> antes de llamar a <code>super()</code> en el constructor de una subclase tira <code>ReferenceError: Must call super constructor ... before accessing 'this'</code>. Es literal: hasta que no corre el constructor del padre, <strong>el objeto todavía no existe</strong>. Y si la subclase no define constructor, JS le pone uno que llama a <code>super(...)</code> con todos los argumentos — por eso a veces «funciona sin escribirlo».
+    </div>
+
+    <h3>Polimorfismo: el mismo mensaje, distinta respuesta</h3>
+    <p>Acá está el pago de todo el bloque. Una vez que las dos subclases responden a <code>precioFinal()</code>, el código que las usa <strong>deja de preguntar de qué tipo son</strong>:</p>
+
+    <pre><code><span class="kw">const</span> carrito = [
+  <span class="kw">new</span> <span class="th">ProductoFisico</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>, <span class="num">0.9</span>),
+  <span class="kw">new</span> <span class="th">ProductoDigital</span>(<span class="str">'Curso de Node'</span>, <span class="num">30000</span>, <span class="num">1200</span>),
+  <span class="kw">new</span> <span class="th">ProductoFisico</span>(<span class="str">'Monitor'</span>, <span class="num">180000</span>, <span class="num">4.2</span>),
+];
+
+<span class="kw">const</span> total = carrito.<span class="mt">reduce</span>((acum, p) <span class="op">=&gt;</span> acum + p.<span class="mt">precioFinal</span>(), <span class="num">0</span>);
+<span class="mt">console</span>.<span class="mt">log</span>(total); <span class="cm">// cada uno calcula lo suyo, el reduce no se entera</span></code></pre>
+
+    <p>Lo que <strong>no</strong> hay que escribir es esto, que es la alternativa sin polimorfismo:</p>
+
+    <pre><code><span class="cm">// ❌ el if que hay que ir a tocar cada vez que aparece un tipo nuevo</span>
+<span class="kw">if</span> (p.tipo === <span class="str">'fisico'</span>) {
+  total += p.precio * <span class="num">1.21</span> + p.pesoKg * <span class="num">800</span>;
+} <span class="kw">else</span> <span class="kw">if</span> (p.tipo === <span class="str">'digital'</span>) {
+  total += p.precio * <span class="num">1.21</span>;
+}</code></pre>
+
+    <div class="callout tip">
+      <div class="callout-label">Conecta con la clase de funciones</div>
+      El <code>reduce</code> de arriba es una <strong>función de orden superior</strong>: recibe una función y la aplica a cada elemento. Polimorfismo y funciones de orden superior tiran para el mismo lado — que el código genérico no necesite saber los detalles de cada caso particular.
+    </div>
+
+    <h3>La cadena, otra vez</h3>
+    <p><code>extends</code> no inventó nada: solo enganchó un eslabón más en la cadena de prototipos.</p>
+
+    <div class="chain">
+      <div class="chain-node obj">teclado</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">ProductoFisico.prototype</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Producto.prototype</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node">Object.prototype</div>
+      <div class="chain-arrow"><span class="lbl">prototipo</span><span class="ln">→</span></div>
+      <div class="chain-node null">null</div>
+    </div>
+    <p class="chain-caption">Al pedir <code>teclado.describir()</code>, JS sube hasta encontrarlo en <code>Producto.prototype</code>. Al pedir <code>precioFinal()</code>, lo encuentra antes, en <code>ProductoFisico.prototype</code>: por eso gana el de la subclase.</p>
+
+    <pre><code><span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">ProductoFisico</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>, <span class="num">0.9</span>);
+
+<span class="mt">console</span>.<span class="mt">log</span>(teclado <span class="kw">instanceof</span> <span class="th">ProductoFisico</span>); <span class="cm">// true</span>
+<span class="mt">console</span>.<span class="mt">log</span>(teclado <span class="kw">instanceof</span> <span class="th">Producto</span>);       <span class="cm">// true — también es un Producto</span>
+<span class="mt">console</span>.<span class="mt">log</span>(teclado <span class="kw">instanceof</span> <span class="tp">Object</span>);         <span class="cm">// true</span></code></pre>
+
+    <p><code>instanceof</code> devuelve <code>true</code> si la clase aparece <strong>en algún lugar</strong> de esa cadena. Y sí: los métodos estáticos también se heredan (<code>ProductoFisico.desdeJSON</code> existe), aunque devuelvan instancias del padre si están escritos con el nombre de la clase fijo.</p>
+
+
+  </section>
+
+
+  <!-- BLOQUE 6: THIS -->
+  <section id="this">
+    <div class="section-num">Bloque 6</div>
+    <h2>El <code>this</code> que se pierde</h2>
+
+    <p>Este es el bloque que más vale de la guía, porque describe un bug que vas a tener sí o sí en el trabajo práctico y que, si es la primera vez que lo ves, es muy difícil de diagnosticar.</p>
+
+    <p>La regla de la guía anterior sigue valiendo: <strong><code>this</code> apunta al objeto sobre el que se invocó el método</strong>. La trampa está en la palabra <em>invocó</em>: no depende de dónde se escribió el método, sino de <strong>cómo se lo llama</strong>.</p>
+
+    <pre><code><span class="kw">const</span> teclado = <span class="kw">new</span> <span class="th">Producto</span>(<span class="str">'Teclado'</span>, <span class="num">25000</span>);
+
+teclado.<span class="mt">describir</span>();  <span class="cm">// ✅ 'Teclado: $25000' — se invocó SOBRE teclado</span>
+
+<span class="kw">const</span> describir = teclado.<span class="mt">describir</span>; <span class="cm">// guardo la función, sin llamarla</span>
+<span class="fn">describir</span>();
+<span class="cm">// ❌ TypeError: Cannot read properties of undefined (reading 'nombre')</span></code></pre>
+
+    <p>Es la misma función. Lo que cambió es que en la segunda llamada <strong>no hay ningún objeto a la izquierda del punto</strong>, así que <code>this</code> queda en <code>undefined</code> — acordate de que el cuerpo de una clase corre siempre en modo estricto (bloque 1), y en modo estricto <code>this</code> no cae al objeto global: queda <code>undefined</code>.</p>
+
+    <h3>Dónde aparece de verdad</h3>
+    <p>Nadie escribe <code>const describir = teclado.describir</code> a propósito. El problema real es que <strong>pasar un método como callback hace exactamente eso</strong>:</p>
+
+    <pre><code><span class="kw">const</span> carrito = <span class="kw">new</span> <span class="th">Carrito</span>();
+
+<span class="cm">// las tres formas rompen igual: se pasa la función suelta</span>
+[<span class="str">'Teclado'</span>, <span class="str">'Mouse'</span>].<span class="mt">forEach</span>(carrito.<span class="mt">agregar</span>);   <span class="cm">// ❌</span>
+<span class="fn">setTimeout</span>(carrito.<span class="mt">vaciar</span>, <span class="num">1000</span>);                     <span class="cm">// ❌</span>
+router.<span class="mt">get</span>(<span class="str">'/api/productos'</span>, controller.<span class="mt">getAll</span>);      <span class="cm">// ❌ (Express)</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-label">⚠ Este es el bug del TP</div>
+      La última línea es la que te vas a encontrar en la unidad de APIs: un controller escrito como clase, pasado a la ruta de Express, que explota con <code>Cannot read properties of undefined</code> apenas se hace el primer <code>GET</code>. El código «se ve bien» y por eso puede costarte una tarde. Haberlo visto acá, con un ejemplo de diez líneas, es la diferencia.
+    </div>
+
+    <h3>Las tres soluciones</h3>
+
+    <pre><code><span class="cm">// 1. bind — devuelve una función nueva con el this fijado</span>
+[<span class="str">'Teclado'</span>, <span class="str">'Mouse'</span>].<span class="mt">forEach</span>(carrito.<span class="mt">agregar</span>.<span class="mt">bind</span>(carrito));  <span class="cm">// ✅</span>
+
+<span class="cm">// 2. envolver en una arrow function — la invocación conserva el punto</span>
+[<span class="str">'Teclado'</span>, <span class="str">'Mouse'</span>].<span class="mt">forEach</span>((n) <span class="op">=&gt;</span> carrito.<span class="mt">agregar</span>(n));      <span class="cm">// ✅</span>
+
+<span class="cm">// 3. definir el método como campo con arrow function, en la clase</span>
+<span class="kw">class</span> <span class="th">Carrito</span> {
+  items = [];
+
+  agregar = (nombre) <span class="op">=&gt;</span> {   <span class="cm">// this queda atado a la instancia, siempre</span>
+    <span class="kw">this</span>.items.<span class="mt">push</span>(nombre);
+  };
+}</code></pre>
+
+    <p>La tercera funciona porque, como viste en la guía de funciones, <strong>una arrow function no tiene <code>this</code> propio</strong>: lo toma del lugar donde fue creada, que acá es la instancia. Y ese es el motivo por el que la arrow no sirve como método de un objeto literal, pero sí sirve como campo de una clase — vale la pena detenerse en esa aparente contradicción, porque es la misma regla aplicada dos veces.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Solución</th><th>Cuándo conviene</th></tr></thead>
+        <tbody>
+          <tr><td><code>bind</code></td><td>Puntual, cuando se pasa el método una sola vez. Explícito y estándar.</td></tr>
+          <tr><td>Arrow que envuelve</td><td>Lo más legible y lo más común hoy. Además deja controlar qué argumentos se pasan.</td></tr>
+          <tr><td>Campo con arrow</td><td>Cuando el método <em>siempre</em> se va a usar como callback. Costo: una copia por instancia, no se hereda ni se sobrescribe bien.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Composición: cuándo <em>no</em> heredar</h3>
+    <p>Una pregunta que parece inocente: ¿conviene escribir <code>ProductoEnOferta extends Producto</code>? El problema es que <strong>la clase de un objeto no se puede cambiar</strong>: si la oferta termina, no hay forma de que el objeto deje de ser un <code>ProductoEnOferta</code>. Y si además el producto es digital, harían falta <code>ProductoDigitalEnOferta</code> y <code>ProductoFisicoEnOferta</code>: la jerarquía se multiplica.</p>
+
+    <p>La oferta no es <em>una especie</em> de producto: es algo que el producto <strong>tiene</strong>. Eso se modela con <strong>composición</strong> — un objeto que contiene a otro:</p>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px; color:var(--red); font-weight:600; margin-bottom:4px;">Herencia (rígido)</p>
+        <pre><code><span class="kw">class</span> <span class="th">ProductoEnOferta</span>
+  <span class="kw">extends</span> <span class="th">Producto</span> { <span class="cm">/* ... */</span> }
+
+<span class="cm">// ¿y ProductoDigitalEnOferta?</span>
+<span class="cm">// ¿y cuando la oferta termina?</span></code></pre>
+      </div>
+      <div>
+        <p style="font-size:13px; color:var(--green); font-weight:600; margin-bottom:4px;">Composición (flexible)</p>
+        <pre><code><span class="kw">class</span> <span class="th">Producto</span> {
+  descuento = <span class="kw">null</span>;
+
+  <span class="mt">precioFinal</span>() {
+    <span class="kw">const</span> base = <span class="kw">this</span>.precio * <span class="num">1.21</span>;
+    <span class="kw">return</span> <span class="kw">this</span>.descuento
+      ? <span class="kw">this</span>.descuento.<span class="mt">aplicar</span>(base)
+      : base;
+  }
+}</code></pre>
+      </div>
+    </div>
+
+    <p>La regla práctica, y sirve como criterio de diseño para el TP: <strong>heredá cuando la subclase <em>es</em> un tipo distinto y permanente; componé cuando es algo que el objeto <em>tiene</em> y puede cambiar</strong>. En la práctica, jerarquías de más de dos niveles casi siempre son un error de modelado.</p>
+
+  </section>
+
+
+  <!-- RESUMEN -->
+
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. Si <code>class</code> es azúcar sintáctico sobre prototipos, ¿qué agrega que la función constructora no tenía?</summary>
+      <div class="a">Cuatro reglas: <code>new</code> es obligatorio (llamarla sin <code>new</code> tira <code>TypeError</code>), no hay hoisting utilizable (está en la temporal dead zone, como <code>let</code>), el cuerpo corre siempre en modo estricto, y los métodos no son enumerables (no salen en <code>Object.keys()</code>).</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Dónde vive un campo de instancia y dónde vive un método? ¿Por qué importa?</summary>
+      <div class="a">El campo vive en cada instancia; el método, en <code>Clase.prototype</code>. Por eso con mil objetos hay mil copias de los datos y una sola del método. Se comprueba con <code>obj.hasOwnProperty('describir')</code>, que da <code>false</code>: el método se hereda por la cadena de prototipos.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Para qué sirve un setter, y por qué el dato que guarda tiene que llamarse distinto?</summary>
+      <div class="a">Sirve para <strong>validar antes de guardar</strong>, así el objeto nunca queda en un estado inválido. Si el campo se llama igual que el setter (<code>set precio</code> guardando en <code>this.precio</code>), la asignación de adentro vuelve a disparar el setter y se cae con <code>RangeError: Maximum call stack size exceeded</code>. Por eso el dato va en <code>#precio</code>.</div>
+    </details>
+    <details class="q">
+      <summary>4. ¿Qué diferencia hay entre <code>_stock</code> y <code>#stock</code>?</summary>
+      <div class="a"><code>_stock</code> es una convención: avisa «no lo toques», pero no impide nada. <code>#stock</code> es privado de verdad — acceder desde afuera de la clase es un <strong>error de sintaxis</strong>, así que el archivo ni siquiera arranca. Sirve para que toda modificación pase por el método que tiene la regla de negocio.</div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Cuándo conviene un miembro <code>static</code>?</summary>
+      <div class="a">Cuando la operación no necesita una instancia concreta: constantes de la clase, contadores y métodos fábrica como <code>Producto.desdeJSON(texto)</code>. Se llaman sobre la clase, no sobre un objeto — igual que <code>Math.random()</code> o <code>Number.isInteger()</code>, que ya venís usando.</div>
+    </details>
+    <details class="q">
+      <summary>6. ¿Por qué <code>super()</code> tiene que ir antes de tocar <code>this</code> en el constructor de una subclase?</summary>
+      <div class="a">Porque hasta que no corre el constructor del padre, el objeto todavía no existe. Si lo hacés al revés, JS tira <code>ReferenceError: Must call super constructor … before accessing 'this'</code>. Si la subclase no define constructor, JS le pone uno que llama a <code>super(...)</code> con todos los argumentos.</div>
+    </details>
+    <details class="q">
+      <summary>7. Tenés un array con productos físicos y digitales y querés el total. ¿Qué te evita el polimorfismo?</summary>
+      <div class="a">El <code>if</code> por tipo. Si cada subclase implementa <code>precioFinal()</code> a su manera, el <code>reduce</code> que suma no necesita saber qué tipo es cada uno — y agregar una clase nueva no obliga a tocar ese código.</div>
+    </details>
+    <details class="q">
+      <summary>8. ¿Por qué <code>['a','b'].forEach(carrito.agregar)</code> falla, y cómo se arregla?</summary>
+      <div class="a">Porque <code>this</code> depende de <strong>cómo se invoca</strong> el método, no de dónde se escribió: al pasarlo suelto no hay objeto a la izquierda del punto, y como el cuerpo de una clase corre en modo estricto, <code>this</code> queda <code>undefined</code>. Se arregla con <code>carrito.agregar.bind(carrito)</code>, envolviéndolo en una arrow (<code>(x) =&gt; carrito.agregar(x)</code>) o definiendo el método como campo con arrow function.</div>
+    </details>
+    <details class="q">
+      <summary>9. ¿Cuándo heredar y cuándo componer?</summary>
+      <div class="a">Heredá cuando la subclase <em>es</em> un tipo distinto y permanente; componé cuando es algo que el objeto <em>tiene</em> y puede cambiar. Un producto en oferta no es una especie de producto: la oferta empieza y termina, y la clase de un objeto no se puede cambiar. En la práctica, jerarquías de más de dos niveles casi siempre son un error de modelado.</div>
+    </details>
+    <details class="q">
+      <summary>10. Serializás una instancia con <code>JSON.stringify</code> y la volvés a leer con <code>JSON.parse</code>. ¿Qué te queda?</summary>
+      <div class="a">Un objeto <strong>plano</strong>: tiene los datos públicos, pero perdió los métodos y los campos privados (<code>#stock</code> no se serializa). <code>plano instanceof Producto</code> da <code>false</code> y llamar a <code>plano.vender(1)</code> tira <code>TypeError</code>. Para recuperar una instancia de verdad hace falta un método fábrica; para controlar qué sale, <code>toJSON()</code>.</div>
+    </details>
+    </div>
+  </section>
+
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen de la clase</h2>
+
+    <h3>Puntos clave para recordar</h3>
+    <ul>
+      <li><code>class</code> es <strong>azúcar sintáctico sobre prototipos</strong>: los métodos siguen viviendo en <code>Clase.prototype</code>. Pero suma reglas propias: <code>new</code> obligatorio, sin hoisting, modo estricto siempre y métodos no enumerables.</li>
+      <li>Los <strong>datos van a la instancia</strong> y los <strong>métodos al prototipo</strong>: mil objetos, mil copias de los datos y una sola del método.</li>
+      <li>Un <strong>getter</strong> se lee sin paréntesis y sirve para valores derivados; un <strong>setter</strong> existe para <strong>validar antes de guardar</strong>. Si el campo se llama igual que el setter, hay recursión infinita: el dato va en <code>#campo</code>.</li>
+      <li>El prefijo <code>#</code> hace un campo o método <strong>privado de verdad</strong> (acceder desde afuera es error de sintaxis). El objetivo es que las reglas de negocio no se puedan esquivar.</li>
+      <li><code>static</code> es de la <strong>clase</strong>, no de la instancia: contadores, constantes y métodos fábrica como <code>Producto.desdeJSON()</code>.</li>
+      <li><code>JSON.parse</code> devuelve <strong>objetos planos</strong>, no instancias: se pierden los métodos y los campos privados. Para volver a una instancia hace falta una fábrica; para controlar la salida, <code>toJSON()</code>.</li>
+      <li><code>extends</code> + <code>super()</code> agrega un eslabón a la cadena de prototipos. <code>super()</code> va <strong>antes</strong> de tocar <code>this</code>.</li>
+      <li><strong>Polimorfismo</strong>: si cada subclase implementa el mismo método a su manera, el código que las usa deja de necesitar <code>if</code> por tipo.</li>
+      <li><code>this</code> depende de <strong>cómo se invoca</strong>, no de dónde se escribió. Pasar un método como callback lo pierde: se arregla con <code>bind</code>, con una arrow que envuelve, o con un campo de clase arrow.</li>
+      <li><strong>Heredá cuando <em>es</em>; componé cuando <em>tiene</em>.</strong></li>
+    </ul>
+
+    <h3>Para profundizar (MDN)</h3>
+    <ul>
+      <li><em>Classes</em> — en especial <em>Private properties</em> y <em>Static properties</em>.</li>
+      <li><em>Inheritance and the prototype chain</em>, para conectar esta guía con la anterior.</li>
+      <li><em>Function.prototype.bind()</em> y la guía <em>this</em>, que juntan lo del bloque 6.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-label">Lo que viene</div>
+      Con esto se cierra la unidad de JavaScript. La próxima es <strong>Express y arquitecturas de API</strong>, y las clases de esta guía reaparecen enseguida: los <em>services</em> y <em>repositories</em> se escriben así, y el bug del <code>this</code> perdido aparece la primera vez que se pasa un método de un controller a una ruta. Más adelante, en <strong>TypeScript</strong>, esta misma sintaxis suma <code>private</code>, <code>readonly</code> y tipos; y en la unidad de <strong>persistencia</strong>, la clase <code>Producto</code> de acá se convierte —casi sin tocarla— en la <em>entidad</em> que se guarda en la base de datos.
+    </div>
+  </section>
+
+</main>
+
+
+<script>
+(() => {
+  const storageKey = 'dsw-theme-preference';
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+
+  if (!toggle) return;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Modo oscuro';
+      toggle.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Modo claro';
+    toggle.setAttribute('aria-pressed', 'false');
+  };
+
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(storageKey);
+  } catch (_) {
+    savedTheme = null;
+  }
+
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    applyTheme(nextTheme);
+
+    try {
+      localStorage.setItem(storageKey, nextTheme);
+    } catch (_) {
+      /* la persistencia puede fallar en modo privado: se ignora */
+    }
+  });
+})();
+</script>
+</body>
+</html>
