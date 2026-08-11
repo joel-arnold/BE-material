@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testing con Jest — Guía de estudio · DSW UTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #14171f;
+    --bg3: #1b1f2a;
+    --border: #232838;
+    --border2: #2c3245;
+    --text: #e8eaf0;
+    --muted: #98a0b3;
+    --accent: #7c6af7;
+    --accent2: #a99cff;
+    --blue: #58a6ff;
+    --green: #3fd68c;
+    --orange: #ffa657;
+    --type: #4fd1c5;
+    --nav-bg: rgba(13,15,20,0.85);
+    --tag-bg: rgba(124,106,247,0.1);
+    --tag-border: rgba(124,106,247,0.35);
+    --step-bg: rgba(124,106,247,0.14);
+    --toggle-shadow: rgba(0,0,0,0.22);
+  }
+
+  :root[data-theme='light'] {
+    --bg: #f3f6fb;
+    --bg2: #ffffff;
+    --bg3: #e8eef8;
+    --border: rgba(15,23,42,0.14);
+    --border2: rgba(15,23,42,0.24);
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0d5ea8;
+    --accent2: #0b4f8c;
+    --blue: #005ea8;
+    --green: #0f7a44;
+    --orange: #b45309;
+    --type: #0f766e;
+    --nav-bg: rgba(243,246,251,0.96);
+    --tag-bg: rgba(13,94,168,0.1);
+    --tag-border: rgba(13,94,168,0.35);
+    --step-bg: rgba(13,94,168,0.12);
+    --toggle-shadow: rgba(15,23,42,0.16);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 1.2rem; height: 52px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--accent2); margin-right: 1rem; flex-shrink: 0;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    padding: 5px 10px; border-radius: 6px; flex-shrink: 0;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+
+  /* ── ALTERNADOR DE TEMA ── */
+  .theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 200;
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--toggle-shadow);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    transform: translateY(-1px);
+  }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 96px 2rem 5rem; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 3.4rem; }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    background: var(--tag-bg);
+    border: 0.5px solid var(--tag-border);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .page-header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 2.3rem; line-height: 1.15; margin-bottom: 0.5rem;
+  }
+  .page-header p { color: var(--muted); font-size: 1.02rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; margin-top: 1.1rem; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── SECCIONES ── */
+  section { margin-bottom: 3.4rem; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.55rem; line-height: 1.25; margin-bottom: 1rem;
+  }
+  h3 {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 1.12rem; margin: 1.7rem 0 0.7rem;
+  }
+  p { margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+  ul, ol { padding-left: 1.3rem; margin-bottom: 0.9rem; }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--accent2); font-style: italic; }
+  a { color: var(--accent2); }
+
+  /* ── CÓDIGO ── */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--bg3); padding: 1px 6px; border-radius: 3px;
+    color: var(--accent2);
+  }
+  pre {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-radius: 10px; padding: 1rem 1.2rem; margin: 0.9rem 0 1.3rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    line-height: 1.6; overflow-x: auto; color: var(--text);
+  }
+  pre .k { color: var(--accent2); }           /* keyword */
+  pre .f { color: var(--blue); }              /* función / método */
+  pre .s { color: var(--green); }             /* string */
+  pre .n { color: var(--orange); }            /* número */
+  pre .t { color: var(--type); }              /* tipo */
+  pre .c { color: var(--muted); font-style: italic; } /* comentario */
+  pre .err { color: var(--orange); font-style: italic; } /* error del compilador */
+  .fname {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--muted); margin: 1.1rem 0 -2px;
+  }
+  pre.tree { color: var(--muted); }
+  pre.tree b { color: var(--text); font-weight: 500; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem 0;
+    font-size: 14px; color: var(--text);
+  }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.orange { border-left-color: var(--orange); }
+  .callout.orange .callout-label { color: var(--orange); }
+
+  /* ── AGENDA CARD ── */
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* ── PIEZAS (capas) ── */
+  .pieces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0; }
+  .piece { background: var(--bg2); border: 0.5px solid var(--border2); border-top: 2px solid var(--muted); border-radius: 8px; padding: 1rem 1.1rem; }
+  .piece-h { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .piece-d { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .piece.route { border-top-color: var(--blue); }   .piece.route .piece-h { color: var(--blue); }
+  .piece.ctrl  { border-top-color: var(--accent); } .piece.ctrl .piece-h  { color: var(--accent2); }
+  .piece.svc   { border-top-color: var(--green); }  .piece.svc .piece-h   { color: var(--green); }
+  .piece.repo  { border-top-color: var(--orange); } .piece.repo .piece-h  { color: var(--orange); }
+  .piece.mw    { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .pieces { grid-template-columns: 1fr; } .piece.mw { grid-column: auto; } }
+
+  /* ── CICLO NUMERADO ── */
+  .cycle { counter-reset: step; list-style: none; padding: 0; margin: 1.2rem 0; }
+  .cycle li { counter-increment: step; position: relative; padding: 0.7rem 0 0.7rem 2.7rem; border-bottom: 0.5px solid var(--border); font-size: 15px; color: var(--text); }
+  .cycle li:last-child { border-bottom: none; }
+  .cycle li::before { content: counter(step); position: absolute; left: 0; top: 0.55rem; width: 1.7rem; height: 1.7rem; background: var(--step-bg); border: 0.5px solid var(--accent); color: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── DOS COLUMNAS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .grid2 pre { margin: 0.4rem 0 0.6rem; }
+  .col-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); margin-top: 0.6rem; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── TABLA ── */
+  table.tbl { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 14px; }
+  table.tbl th {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border2);
+  }
+  table.tbl td { padding: 0.65rem 0.8rem; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  table.tbl td:first-child { white-space: nowrap; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .theme-toggle { right: 0.7rem; bottom: 0.7rem; font-size: 11px; }
+    table.tbl td:first-child { white-space: normal; }
+  }
+
+  /* ── autoevaluación ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.4rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 2.6rem 0.9rem 1.1rem; font-size: 14.5px; font-weight: 600; color: var(--text); list-style: none; position: relative; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  details.q[open] summary::after { content: '\2013'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  details.q .a strong { color: var(--text); }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Testing</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#anda">¿Anda?</a>
+  <a href="#primer-test">El primer test</a>
+  <a href="#configuracion">Configuración</a>
+  <a href="#problema">El problema</a>
+  <a href="#inyeccion">Inyectar</a>
+  <a href="#mock-modulos">Mock de módulos</a>
+  <a href="#reglas">Las reglas</a>
+  <a href="#cobertura">Cobertura</a>
+  <a href="#resumen">Resumen</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+</nav>
+
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar entre modo oscuro y claro" aria-pressed="false">Modo claro</button>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Testing con Jest</h1>
+    <p>Cómo saber que la API anda sin abrir el <code>.http</code> — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: la arquitectura en capas (unidad 6), TypeScript (unidad 7) y la API con autenticación (unidad 9)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+
+    <p>Esta es la unidad donde la arquitectura de la unidad 6 <strong>cobra por tercera vez</strong>. Separamos en capas para poder cambiar de base de datos (unidad 8) y para meter autenticación sin tocar el service (unidad 9). Acá se ve la razón por la que se separa en capas en primer lugar: <strong>un service que no sabe de dónde salen los datos se puede probar sin datos</strong>.</p>
+
+    <p>Una advertencia antes de empezar: el testing es fácil de convertir en <em>ceremonia</em> —escribir tests porque hay que escribirlos, y terminar con doscientos que no dicen nada—. Nada de lo que sigue tiene sentido como obligación moral. Tiene sentido por una razón concreta y egoísta: <strong>son lo que te deja tocar tu código sin miedo</strong>.</p>
+
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">¿Cómo sabemos que esto anda?</div></div>
+      <div class="agenda-item"><div class="topic">El primer test: anatomía y matchers</div></div>
+      <div class="agenda-item"><div class="topic">El peaje: Jest con ESM y TypeScript</div></div>
+      <div class="agenda-item"><div class="topic">El problema: el service agarra su repository</div></div>
+      <div class="agenda-item"><div class="topic">Inyectar la dependencia</div></div>
+      <div class="agenda-item"><div class="topic">El otro camino: mockear el módulo</div></div>
+      <div class="agenda-item"><div class="topic">Los tests como documentación de las reglas</div></div>
+      <div class="agenda-item"><div class="topic">Cobertura, y qué NO testear</div></div>
+    </div>
+
+
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La frase que ordena toda esta guía: <strong>lo difícil de testear no es el test, es el código</strong>. Cuando un test es imposible de escribir, el problema casi nunca está en el test.
+    </div>
+  </section>
+
+
+  <!-- ¿ANDA? -->
+  <section id="anda">
+    <div class="section-num">Bloque 1</div>
+    <h2>¿Cómo sabemos que esto anda?</h2>
+
+    <p>Abrí el <code>productos.http</code> del 9.3 y corrélo entero: listar, crear sin token, loguearte, crear con token, borrar el propio, borrar el ajeno, borrar uno que no existe. Siete requests, uno por uno, mirando cada respuesta.</p>
+
+    <p>Y después la pregunta: <em>¿cuánto tardaste?</em> Dos, tres minutos. Segunda pregunta, la que importa: <em>mañana tocás el service, ¿los corrés todos de nuevo?</em></p>
+
+    <p>Nadie los corre todos de nuevo. Corrés el que estabas tocando, y los otros seis quedan a la suerte.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Conviene decirlo explícito: <strong>ya venías testeando</strong>. Todo el cuatrimestre estuviste testeando. Lo que pasa es que lo hacías a mano, no queda registro, y depende de que alguien se acuerde. Acá no empezás a testear: empezás a <em>automatizar</em> lo que ya hacías.
+    </div>
+
+    <p>Un test automatizado es solamente esto: <strong>código que ejecuta tu código y afirma qué tendría que haber pasado</strong>. Nada más. Si la afirmación se cumple, pasa; si no, falla y dice dónde.</p>
+
+    <h3>Los tres niveles</h3>
+
+    <div class="pieces">
+      <div class="piece svc">
+        <div class="piece-h">Unitario</div>
+        <div class="piece-d">Una pieza sola, con todo lo demás de mentira. Milisegundos. <strong>Es el 90% de lo que vas a escribir</strong> y el foco de esta guía.</div>
+      </div>
+      <div class="piece ctrl">
+        <div class="piece-h">Integración</div>
+        <div class="piece-d">Varias piezas juntas: la ruta, el middleware, el controller y el errorHandler. Segundos. Es el ejemplo 10.4.</div>
+      </div>
+      <div class="piece route">
+        <div class="piece-h">End-to-end</div>
+        <div class="piece-d">El sistema completo, con navegador y base de verdad. Minutos, y se rompen solos. Pocos y solo para los caminos críticos.</div>
+      </div>
+      <div class="piece repo">
+        <div class="piece-h">La regla práctica</div>
+        <div class="piece-d">Muchos abajo, pocos arriba. No porque los de arriba sean malos: porque cuestan caro de escribir y más caro de mantener.</div>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Dónde termina "unitario" y empieza "integración" es una discusión de internet que no tiene respuesta y no vale tu tiempo. Si te preguntás si el 10.4 es unitario o de integración: no importa. Lo que importa es <strong>cuánto tarda</strong> y <strong>qué te dice cuando se pone rojo</strong>.
+    </div>
+
+
+  </section>
+
+
+  <!-- EL PRIMER TEST -->
+  <section id="primer-test">
+    <div class="section-num">Bloque 2</div>
+    <h2>El primer test: anatomía y matchers</h2>
+
+    <p>Empecemos por lo más fácil que hay: una función que no depende de nada. Le entra un número, sale un número.</p>
+
+    <div class="fname">src/precios.ts</div>
+    <pre><span class="k">export function</span> <span class="f">aplicarDescuento</span>(precio: <span class="t">number</span>, porcentaje: <span class="t">number</span>): <span class="t">number</span> {
+  <span class="k">if</span> (porcentaje &lt; <span class="n">0</span> || porcentaje &gt; <span class="n">100</span>) {
+    <span class="k">throw new</span> <span class="t">RangeError</span>(<span class="s">'El descuento va de 0 a 100'</span>);
+  }
+
+  <span class="k">return</span> precio - (precio * porcentaje) / <span class="n">100</span>;
+}</pre>
+
+    <p>Y su test:</p>
+
+    <div class="fname">src/precios.test.ts</div>
+    <pre><span class="k">import</span> { describe, it, expect } <span class="k">from</span> <span class="s">'@jest/globals'</span>;
+<span class="k">import</span> { aplicarDescuento } <span class="k">from</span> <span class="s">'./precios.js'</span>;
+
+<span class="f">describe</span>(<span class="s">'aplicarDescuento'</span>, () <span class="k">=&gt;</span> {
+  <span class="f">it</span>(<span class="s">'descuenta el porcentaje indicado'</span>, () <span class="k">=&gt;</span> {
+    <span class="c">// ARRANGE — preparar</span>
+    <span class="k">const</span> precio = <span class="n">1000</span>;
+    <span class="k">const</span> porcentaje = <span class="n">20</span>;
+
+    <span class="c">// ACT — ejecutar UNA sola cosa</span>
+    <span class="k">const</span> resultado = <span class="f">aplicarDescuento</span>(precio, porcentaje);
+
+    <span class="c">// ASSERT — afirmar</span>
+    <span class="f">expect</span>(resultado).<span class="f">toBe</span>(<span class="n">800</span>);
+  });
+});</pre>
+
+    <p>Tres piezas y ninguna más: <code>describe</code> agrupa, <code>it</code> es un test, <code>expect</code> es la afirmación. Y las tres partes de adentro son el patrón <strong>AAA</strong> (<em>Arrange-Act-Assert</em>), que no hace falta comentar porque se nota en la forma.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El nombre del test se lee en voz alta pegado al <code>describe</code>: <em>"aplicarDescuento descuenta el porcentaje indicado"</em>. Si eso no suena a español, el test está mal nombrado; y si para que suene bien hace falta un "y" en el medio, el test está probando dos cosas y hay que partirlo. Es un truco tonto que ordena la mitad de los problemas de una suite.
+    </div>
+
+    <h3>El matcher del primer día</h3>
+
+    <p>Este error lo vas a cometer, así que mejor provocarlo a propósito una vez y reconocerlo:</p>
+
+    <pre><span class="f">expect</span>({ nombre: <span class="s">'Mate'</span>, precio: <span class="n">5000</span> }).<span class="f">toBe</span>({ nombre: <span class="s">'Mate'</span>, precio: <span class="n">5000</span> });</pre>
+
+    <p>Falla. Y el mensaje es memorable:</p>
+
+    <pre><span class="err">Expected: {"nombre": "Mate", "precio": 5000}
+Received: serializes to the same string</span></pre>
+
+    <p><em>"Se serializa igual"</em> es Jest diciendo: <strong>el contenido es idéntico, pero me pediste identidad</strong>. <code>toBe</code> compara con <code>Object.is</code>, o sea que para objetos pregunta si son <em>el mismo objeto en memoria</em>. Es el paso por compartición de la unidad 4 volviendo a aparecer.</p>
+
+    <table class="tbl">
+      <tr><th>Matcher</th><th>Para qué</th><th>Ojo con</th></tr>
+      <tr><td><code>toBe</code></td><td>números, strings, booleanos</td><td>objetos y arrays: casi nunca es lo que querés</td></tr>
+      <tr><td><code>toEqual</code></td><td>objetos y arrays, por contenido</td><td>ignora las claves con <code>undefined</code></td></tr>
+      <tr><td><code>toThrow</code></td><td>que algo explote</td><td>se le pasa una <strong>función</strong>, no el resultado</td></tr>
+      <tr><td><code>toHaveLength</code></td><td>largo de un array</td><td>mejor mensaje que <code>.length</code> + <code>toBe</code></td></tr>
+    </table>
+
+    <p>El de <code>toThrow</code> merece atención aparte porque la forma es contraintuitiva:</p>
+
+    <pre><span class="c">// MAL: el error explota antes de que expect llegue a existir</span>
+<span class="f">expect</span>(<span class="f">aplicarDescuento</span>(<span class="n">1000</span>, -<span class="n">5</span>)).<span class="f">toThrow</span>();
+
+<span class="c">// BIEN: se le pasa la función SIN ejecutar, para que la ejecute Jest</span>
+<span class="f">expect</span>(() <span class="k">=&gt;</span> <span class="f">aplicarDescuento</span>(<span class="n">1000</span>, -<span class="n">5</span>)).<span class="f">toThrow</span>(<span class="t">RangeError</span>);</pre>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Esa función que se pasa sin ejecutar es una <strong>función de orden superior</strong> de la unidad 2, exactamente igual que el callback de <code>forEach</code>. Es el mismo mecanismo —"te paso la función para que la llames vos"— y acá sirve para que quien la llame pueda envolverla en un <code>try</code>.
+    </div>
+
+    <h3>Muchos datos, un solo test</h3>
+
+    <pre><span class="f">it.each</span>([
+  [<span class="n">1000</span>, <span class="n">1210</span>],
+  [<span class="n">100</span>, <span class="n">121</span>],
+  [<span class="n">0</span>, <span class="n">0</span>],
+  [<span class="n">1999.99</span>, <span class="n">2419.99</span>],   <span class="c">// el redondeo: sin él daría 2419.9879</span>
+])(<span class="s">'a $%s le suma IVA y da $%s'</span>, (precio, esperado) <span class="k">=&gt;</span> {
+  <span class="f">expect</span>(<span class="f">precioConIva</span>(precio)).<span class="f">toBe</span>(esperado);
+});</pre>
+
+    <p>Cuando cambian los datos y no la lógica del test, repetir el <code>it</code> es ruido. Y si falla la tercera fila, Jest dice cuál falló.</p>
+
+
+  </section>
+
+
+  <!-- CONFIGURACIÓN -->
+  <section id="configuracion">
+    <div class="section-num">Bloque 3</div>
+    <h2>El peaje: Jest con ESM y TypeScript</h2>
+
+    <p>Jest nació en el mundo de <code>require</code> y nosotros venimos escribiendo <strong>ESM + TypeScript</strong> desde la unidad 7. Eso cuesta cuatro líneas de configuración, y las cuatro tienen motivo.</p>
+
+    <div class="fname">jest.config.js</div>
+    <pre><span class="k">export default</span> {
+  <span class="c">// Jest no entiende TypeScript: ts-jest transforma los .ts antes de</span>
+  <span class="c">// ejecutarlos. La variante "-esm" respeta "type": "module".</span>
+  preset: <span class="s">'ts-jest/presets/default-esm'</span>,
+
+  testEnvironment: <span class="s">'node'</span>,
+
+  <span class="c">// Nuestros imports dicen './precios.js' y el archivo es .ts. Jest lee sin</span>
+  <span class="c">// compilar y busca un .js que todavía no existe.</span>
+  moduleNameMapper: {
+    <span class="s">'^(\\.{1,2}/.*)\\.js$'</span>: <span class="s">'$1'</span>,
+  },
+};</pre>
+
+    <p>Más una en <code>tsconfig.json</code> (<code>"isolatedModules": true</code>, porque ts-jest transpila archivo por archivo) y una en el script de npm:</p>
+
+    <div class="fname">package.json</div>
+    <pre><span class="s">"test"</span>: <span class="s">"node --experimental-vm-modules node_modules/jest/bin/jest.js"</span></pre>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      La documentación de Jest dice <code>NODE_OPTIONS=--experimental-vm-modules jest</code>. Esa forma es <strong>sintaxis de shell de Unix y falla en la terminal de Windows</strong>: es literalmente la razón por la que a la mitad del curso no le arranca. La versión de arriba hace lo mismo y funciona en los tres sistemas: copiá esa.
+    </div>
+
+    <h3>Los cuatro errores del primer día</h3>
+
+    <table class="tbl">
+      <tr><th>El mensaje</th><th>Qué falta</th></tr>
+      <tr><td><code>Cannot find module './precios.js'</code></td><td>el <code>moduleNameMapper</code>, o le falta una barra invertida</td></tr>
+      <tr><td><code>Cannot use import statement outside a module</code></td><td>el preset ESM, el <code>"type": "module"</code> o la bandera de Node</td></tr>
+      <tr><td><code>describe is not defined</code></td><td>el import de <code>@jest/globals</code></td></tr>
+      <tr><td>el test pasa y no debería</td><td>un <code>async</code> sin <code>await</code></td></tr>
+    </table>
+
+    <p>El último es el peligroso, porque no se ve. Un test que devuelve una promesa que nadie espera termina antes que la afirmación, y Jest lo da por bueno.</p>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Usamos <code>import { describe, it, expect } from '@jest/globals'</code> y no las variables globales que Jest inyecta. En JavaScript las globales funcionan igual; en TypeScript, sin ese import haría falta <code>@types/jest</code> para que el compilador sepa qué es <code>describe</code>. Un import explícito es una dependencia menos. Si copiás de un tutorial y no aparece el import, es por eso.
+    </div>
+
+  </section>
+
+
+  <!-- EL PROBLEMA -->
+  <section id="problema">
+    <div class="section-num">Bloque 4</div>
+    <h2>El problema: el service agarra su repository</h2>
+
+    <p>Lo anterior era fácil porque <code>aplicarDescuento</code> no depende de nada. Ahora abrí el service de productos del 9.3, que es lo que de verdad querés testear:</p>
+
+    <div class="fname">9.3-api-auth/src/services/productos.service.ts</div>
+    <pre><span class="k">import</span> * <span class="k">as</span> repo <span class="k">from</span> <span class="s">'../repositories/productos.repository.js'</span>;
+
+<span class="k">export async function</span> <span class="f">crearProducto</span>(datos, autor) {
+  <span class="k">const</span> existente = <span class="k">await</span> repo.<span class="f">findByNombre</span>(datos.nombre);
+
+  <span class="k">if</span> (existente) {
+    <span class="k">throw new</span> <span class="t">ValidationError</span>(<span class="s">`Ya existe un producto llamado "${datos.nombre}"`</span>);
+  }
+
+  <span class="k">return</span> repo.<span class="f">guardar</span>(datos, <span class="t">Number</span>(autor.sub));
+}</pre>
+
+    <p>Y ahí está el problema, en la primera línea. Ese <code>repo</code> va a <strong>MySQL</strong>. Para testear <code>crearProducto</code> tal como está haría falta:</p>
+
+    <ol class="cycle">
+      <li>Un MySQL andando. En tu máquina, en la de cada compañero, y en el servidor donde corran los tests.</li>
+      <li>Datos conocidos adentro, porque el test necesita saber qué hay antes de empezar.</li>
+      <li>Limpiar la base entre test y test, o el segundo test ve lo que dejó el primero.</li>
+      <li>Que nadie más esté usando esa base al mismo tiempo.</li>
+    </ol>
+
+    <p>Un test así es <strong>lento</strong> (segundos en vez de milisegundos), <strong>frágil</strong> (falla porque el MySQL no arrancó, no porque el código esté mal) y <strong>no determinista</strong> (pasa o no según lo que haya quedado de la corrida anterior).</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Un test que falla por motivos que no son el código es <strong>peor que no tener test</strong>. Enseña a ignorar el rojo. Después de la tercera vez que la suite falla por la base, la gente corre los tests y sigue de largo sin mirar — y ahí el test ya no sirve para nada, pero da la sensación de que el proyecto está cubierto.
+    </div>
+
+    <h3>Lo que queremos</h3>
+
+    <p>El service no necesita MySQL: necesita <em>que alguien le conteste</em> cuando pregunta si existe un producto con ese nombre. Si en vez de la base le contesta un objeto que dice "no, no hay ninguno", el service no puede notar la diferencia.</p>
+
+    <p>Eso es un <strong>doble de prueba</strong>: algo que ocupa el lugar de una dependencia real durante el test. Como el doble de riesgo en una película — se viste igual, hace la escena, y no es el actor.</p>
+
+    <table class="tbl">
+      <tr><th>Nombre</th><th>Qué hace</th></tr>
+      <tr><td>Stub</td><td>Contesta lo que le dijiste que conteste. Nada más.</td></tr>
+      <tr><td>Spy</td><td>Además anota cómo lo llamaron, para poder revisarlo después.</td></tr>
+      <tr><td>Fake</td><td>Tiene una implementación de verdad, pero simplificada (un array en vez de MySQL).</td></tr>
+      <tr><td>Mock</td><td>En la literatura, uno con expectativas adentro. En la práctica, todo el mundo le dice "mock" a cualquiera de los anteriores.</td></tr>
+    </table>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      No te pelees con la taxonomía. Los cuatro nombres tienen definiciones precisas que nadie respeta, y discutirlas gasta tiempo sin agregar nada. Lo que sí importa distinguir son los <strong>dos usos</strong>: <em>preparar la respuesta</em> (para poner al service en la situación que querés probar) y <em>verificar la llamada</em> (porque hablar con el repository también es parte de lo que el service tiene que hacer). Eso sí cambia cómo se escribe el test.
+    </div>
+
+
+  </section>
+
+
+  <!-- INYECTAR -->
+  <section id="inyeccion">
+    <div class="section-num">Bloque 5</div>
+    <h2>Inyectar la dependencia</h2>
+
+    <p>La respuesta es más simple de lo que parece: <strong>que el service no elija</strong>. Que reciba el repository desde afuera.</p>
+
+    <div class="grid2">
+      <div>
+        <div class="col-title">Antes (9.3)</div>
+        <pre><span class="k">import</span> * <span class="k">as</span> repo <span class="k">from</span> <span class="s">'../repositories/productos.repository.js'</span>;
+
+<span class="k">export async function</span> <span class="f">crearProducto</span>(datos, autor) {
+  <span class="k">const</span> existente = <span class="k">await</span> repo.<span class="f">findByNombre</span>(...);
+  <span class="c">// ...</span>
+}</pre>
+      </div>
+      <div>
+        <div class="col-title">Después (10.2)</div>
+        <pre><span class="k">export function</span> <span class="f">crearProductosService</span>(repo: <span class="t">ProductosRepository</span>) {
+  <span class="k">return</span> {
+    <span class="k">async</span> <span class="f">crear</span>(datos, autor) {
+      <span class="k">const</span> existente = <span class="k">await</span> repo.<span class="f">findByNombre</span>(...);
+      <span class="c">// ...</span>
+    },
+  };
+}</pre>
+      </div>
+    </div>
+
+    <p>El cuerpo de la función es <strong>idéntico</strong>. Lo único que cambió es de dónde sale <code>repo</code>: antes lo agarraba solo, ahora se lo dan.</p>
+
+    <p>Y el contrato es un tipo, no una clase ni nada ceremonioso:</p>
+
+    <pre><span class="k">export type</span> <span class="t">ProductosRepository</span> = {
+  <span class="f">findAll</span>(): <span class="t">Promise</span>&lt;<span class="t">Producto</span>[]&gt;;
+  <span class="f">findByNombre</span>(nombre: <span class="t">string</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span> | <span class="k">null</span>&gt;;
+  <span class="f">findById</span>(id: <span class="t">number</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span> | <span class="k">null</span>&gt;;
+  <span class="f">guardar</span>(datos: <span class="t">ProductoNuevo</span>, creadoPorId: <span class="t">number</span>): <span class="t">Promise</span>&lt;<span class="t">Producto</span>&gt;;
+  <span class="f">eliminar</span>(producto: <span class="t">Producto</span>): <span class="t">Promise</span>&lt;<span class="k">void</span>&gt;;
+};</pre>
+
+    <p>Cinco firmas. No dice MySQL, no dice MikroORM, no dice nada de cómo se guardan las cosas. Y un tipo así lo puede cumplir un objeto de mentira escrito en tres líneas.</p>
+
+    <h3>El repository falso</h3>
+
+    <pre><span class="k">const</span> repo = {
+  <span class="f">findAll</span>: jest.<span class="f">fn</span>&lt;<span class="t">ProductosRepository</span>[<span class="s">'findAll'</span>]&gt;(),
+  <span class="f">findByNombre</span>: jest.<span class="f">fn</span>&lt;<span class="t">ProductosRepository</span>[<span class="s">'findByNombre'</span>]&gt;(),
+  <span class="f">findById</span>: jest.<span class="f">fn</span>&lt;<span class="t">ProductosRepository</span>[<span class="s">'findById'</span>]&gt;(),
+  <span class="f">guardar</span>: jest.<span class="f">fn</span>&lt;<span class="t">ProductosRepository</span>[<span class="s">'guardar'</span>]&gt;(),
+  <span class="f">eliminar</span>: jest.<span class="f">fn</span>&lt;<span class="t">ProductosRepository</span>[<span class="s">'eliminar'</span>]&gt;(),
+};
+
+<span class="k">const</span> service = <span class="f">crearProductosService</span>(repo);</pre>
+
+    <p><code>jest.fn()</code> devuelve una función que no hace nada pero que <strong>anota</strong>: con qué argumentos la llamaron, cuántas veces, qué devolvió. Y se le puede decir qué contestar.</p>
+
+    <p>Con eso, el test entero:</p>
+
+    <pre><span class="f">it</span>(<span class="s">'guarda el producto cuando el nombre está libre'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> {
+  repo.findByNombre.<span class="f">mockResolvedValue</span>(<span class="k">null</span>);
+  repo.guardar.<span class="f">mockResolvedValue</span>(mate);
+
+  <span class="k">const</span> creado = <span class="k">await</span> service.<span class="f">crear</span>({ nombre: <span class="s">'Mate'</span>, precio: <span class="n">5000</span> }, juan);
+
+  <span class="f">expect</span>(creado).<span class="f">toEqual</span>(mate);
+});</pre>
+
+    <p>Sin MySQL, sin servidor, sin token de verdad. Milisegundos.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El parámetro de tipo del <code>jest.fn&lt;...&gt;()</code> no es adorno: hace que TypeScript verifique que lo que le mandás contestar tenga la forma correcta. Si mañana el repository cambia su firma, el archivo de tests <strong>deja de compilar</strong> y te enterás antes de correr nada. Es la unidad 7 trabajando para la 10, y es la ventaja grande de este camino sobre el del bloque 6.
+    </div>
+
+    <h3>Dónde se juntan las piezas</h3>
+
+    <p>En producción alguien tiene que pasarle el repository de verdad. Ese lugar es uno solo y se llama <em>composition root</em>:</p>
+
+    <div class="fname">src/main.ts</div>
+    <pre><span class="k">const</span> service = <span class="f">crearProductosService</span>(productosRepository);</pre>
+
+    <p>Una línea. Es el único archivo de la aplicación que sabe cuál es el repository "de verdad".</p>
+
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Esto es lo que quiere decir <em>"lo difícil de testear no es el test, es el código"</em>. No inventamos una técnica de testing: <strong>desacoplamos el código</strong>, y el test salió gratis. El test es el segundo cliente que tiene tu service, y un segundo cliente siempre encuentra las suposiciones que el primero dejaba pasar.
+    </div>
+
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      No es gratis, y conviene saberlo para no volverse fanático: inyectar todo lleva a fábricas de fábricas y a un <em>composition root</em> ilegible. La regla razonable es inyectar <strong>lo que cruza el borde de tu aplicación</strong> —base de datos, red, reloj, sistema de archivos— y nada más. Una función de utilidad que suma precios se importa y listo.
+    </div>
+  </section>
+
+
+  <!-- MOCK DE MÓDULOS -->
+  <section id="mock-modulos">
+    <div class="section-num">Bloque 6</div>
+    <h2>El otro camino: mockear el módulo</h2>
+
+    <p>Lo anterior pide tocar el código de producción. Con el TP ya escrito, la pregunta llega sola: <em>¿y si no puedo?</em></p>
+
+    <p>Se puede igual. En vez de cambiar el service para que reciba otro repository, se le cambia el repository <strong>por debajo</strong>: cuando pida ese módulo, Jest le entrega otro.</p>
+
+    <pre><span class="c">// 1. El módulo falso: las mismas claves que exporta el original.</span>
+<span class="k">const</span> repo = {
+  <span class="f">findById</span>: jest.<span class="f">fn</span>&lt;<span class="k">typeof</span> RepoModule.findById&gt;(),
+  <span class="c">// ...</span>
+};
+
+<span class="c">// 2. Registrarlo.</span>
+jest.<span class="f">unstable_mockModule</span>(<span class="s">'../repositories/productos.repository.js'</span>, () <span class="k">=&gt;</span> repo);
+
+<span class="c">// 3. RECIÉN AHORA importar el service. Dinámico, nunca arriba del archivo.</span>
+<span class="k">const</span> { crearProducto } = <span class="k">await import</span>(<span class="s">'./productos.service.js'</span>);</pre>
+
+    <p>El paso 3 es el que sorprende, y la explicación vale porque es la misma razón por la que ESM se comporta distinto en todo lo demás.</p>
+
+    <p>En <strong>CommonJS</strong>, <code>jest.mock()</code> se <em>hoistea</em>: Jest reescribe el archivo al compilarlo y sube esa llamada arriba de todos los <code>require</code>. Por eso en los tutoriales aparece en el medio del archivo y anda igual.</p>
+
+    <p>En <strong>ESM eso es imposible</strong>. Los <code>import</code> se resuelven <em>antes</em> de que corra la primera línea del archivo — es parte de la definición del formato. Si el service estuviera importado arriba con un <code>import</code> normal, ya se habría cargado con el repository de verdad y el mock llegaría tarde.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Si copiás <code>jest.mock()</code> de un tutorial, en un proyecto ESM <strong>no intercepta nada y no avisa</strong>: sin error, sin warning. El test corre contra el repository de verdad, que en el 9.3 significa contra MySQL. El síntoma es un <code>connect ECONNREFUSED 127.0.0.1:3306</code> en un test que "estaba mockeado". Cuando veas eso, el problema no es la base: es que el mock nunca se aplicó.
+    </div>
+
+    <h3>Los dos caminos, comparados</h3>
+
+    <table class="tbl">
+      <tr><th></th><th>Inyección (10.2)</th><th>Mock de módulo (10.3)</th></tr>
+      <tr><td>Código de producción</td><td>hay que cambiarlo</td><td>queda igual</td></tr>
+      <tr><td>El test</td><td>se lee solo</td><td>tres pasos, y el orden importa</td></tr>
+      <tr><td>Si cambia la firma del repo</td><td>no compila: te enterás</td><td>compila, y el mock queda mintiendo</td></tr>
+      <tr><td>Acoplamiento</td><td>el service no sabe quién lo cumple</td><td>el test conoce la ruta interna del import</td></tr>
+      <tr><td>Cuándo</td><td>siempre que se pueda</td><td>cuando no se puede tocar el código</td></tr>
+    </table>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La fila que más duele en la práctica es la tercera. Un mock de módulo puede quedar <strong>desactualizado en silencio</strong>: si el repository real pasa a devolver otra cosa, el falso sigue devolviendo lo de antes, los tests siguen verdes y la aplicación está rota. Es la peor combinación posible — el test no solo no encuentra el bug, sino que da confianza de que no lo hay.
+    </div>
+
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      El prefijo <code>unstable_</code> es del propio Jest y significa que la API puede cambiar. Está así desde 2021 y es la forma oficial de mockear módulos ESM. Que el nombre incomode viene bien: el 10.2 es el camino recomendado y este es la salida de emergencia.
+    </div>
+  </section>
+
+
+  <!-- LAS REGLAS -->
+  <section id="reglas">
+    <div class="section-num">Bloque 7</div>
+    <h2>Los tests como documentación de las reglas</h2>
+
+    <p>Hasta acá los tests fueron una red de seguridad. Falta la otra mitad, que es la que convence a los escépticos. Volvamos a la regla de autorización de la unidad 9:</p>
+
+    <p><em>"Solo el que lo creó, o un admin, puede borrar un producto."</em></p>
+
+    <p>Eso hoy vive en un comentario y en la cabeza de quien lo escribió. Como tests, vive así:</p>
+
+    <pre><span class="f">describe</span>(<span class="s">'eliminar'</span>, () <span class="k">=&gt;</span> {
+  <span class="f">it</span>(<span class="s">'deja borrar al dueño'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> { <span class="c">/* ... */</span> });
+  <span class="f">it</span>(<span class="s">'deja borrar a un admin aunque no sea el dueño'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> { <span class="c">/* ... */</span> });
+  <span class="f">it</span>(<span class="s">'no deja borrar el producto de otro'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> { <span class="c">/* ... */</span> });
+  <span class="f">it</span>(<span class="s">'avisa que no existe'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> { <span class="c">/* ... */</span> });
+  <span class="f">it</span>(<span class="s">'contesta 404 y no 403 cuando el producto no existe'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> { <span class="c">/* ... */</span> });
+});</pre>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      Leídos de corrido, esos cinco nombres <strong>son la especificación de la regla</strong>. Y es la única forma de documentación que no puede quedar desactualizada: si algún día miente, se pone roja. Un comentario que miente se queda ahí durante años.
+    </div>
+
+    <h3>Los errores esperados</h3>
+
+    <pre><span class="f">it</span>(<span class="s">'no deja borrar el producto de otro'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> {
+  repo.findById.<span class="f">mockResolvedValue</span>(mate);   <span class="c">// mate es de juan (7)</span>
+
+  <span class="k">await</span> <span class="f">expect</span>(service.<span class="f">eliminar</span>(<span class="n">1</span>, ana)).rejects.<span class="f">toThrow</span>(<span class="t">ForbiddenError</span>);
+  <span class="f">expect</span>(repo.eliminar).not.<span class="f">toHaveBeenCalled</span>();
+});</pre>
+
+    <p>Dos cosas nuevas y las dos importan:</p>
+
+    <p><code>rejects</code> es para promesas que tienen que fallar. Y el <code>await</code> de adelante no es opcional: <strong>sin él el test pasa siempre</strong>, porque termina antes de que la promesa se resuelva. Es el error más silencioso de toda la unidad.</p>
+
+    <p>El segundo <code>expect</code> es el que suele faltar. Un error tirado a tiempo también significa <em>no hacer lo que seguía</em>. Verificar que el borrado no ocurrió es la mitad importante de la regla.</p>
+
+    <h3>El test que vale doble</h3>
+
+    <pre><span class="f">it</span>(<span class="s">'usa como dueño el id del token, no lo que venga en los datos'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> {
+  repo.findByNombre.<span class="f">mockResolvedValue</span>(<span class="k">null</span>);
+  repo.guardar.<span class="f">mockResolvedValue</span>(mate);
+
+  <span class="k">await</span> service.<span class="f">crear</span>({ nombre: <span class="s">'Mate'</span>, precio: <span class="n">5000</span> }, juan);
+
+  <span class="f">expect</span>(repo.guardar).<span class="f">toHaveBeenCalledWith</span>({ nombre: <span class="s">'Mate'</span>, precio: <span class="n">5000</span> }, <span class="n">7</span>);
+});</pre>
+
+    <p>Este test es la regla de seguridad de la unidad 9 —<em>lo que decide permisos no se le pregunta al cliente</em>— convertida en código ejecutable. Si alguien "arregla" el service para tomar el dueño del body, el test del camino feliz sigue verde y <strong>este</strong> se pone rojo.</p>
+
+
+    <h3>El detalle que arruina suites enteras</h3>
+
+    <pre><span class="f">beforeEach</span>(() <span class="k">=&gt;</span> {
+  jest.<span class="f">clearAllMocks</span>();
+});</pre>
+
+    <p>Sin eso, un test ve las llamadas del anterior y <code>toHaveBeenCalledTimes</code> empieza a contar de más. Produce el bug más desconcertante que hay: <strong>la suite entera pasa, pero un test solo falla</strong>. O al revés, que es peor.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      La regla general es que <strong>ningún test puede depender de otro</strong>, ni del orden en que corren. Jest de hecho corre los archivos en paralelo y en orden variable, así que un test que dependa del anterior va a fallar en la máquina de otro y no en la tuya. Si dos tests necesitan compartir preparación, va en <code>beforeEach</code>, nunca en el cuerpo del primero.
+    </div>
+
+  </section>
+
+
+  <!-- COBERTURA -->
+  <section id="cobertura">
+    <div class="section-num">Bloque 8</div>
+    <h2>Cobertura, y qué NO testear</h2>
+
+    <p>Jest mide qué líneas de tu código se ejecutaron durante los tests. Sobre los once tests de integración del 10.4:</p>
+
+    <pre>File                      | % Stmts | % Branch | % Funcs | % Lines | Uncovered
+--------------------------|---------|----------|---------|---------|----------
+All files                 |   94.23 |    91.66 |     100 |   94.23 |
+  app.ts                  |     100 |      100 |     100 |     100 |
+  productos.controller.ts |   93.33 |      100 |     100 |   93.33 | 12
+  autenticar.ts           |     100 |      100 |     100 |     100 |
+  productos.routes.ts     |     100 |      100 |     100 |     100 |
+  errorHandler.ts         |   86.66 |     87.5 |     100 |   86.66 | 44-45</pre>
+
+    <p>94% suena a mucho. Hay dos lecturas y la segunda es la que importa.</p>
+
+    <p><strong>Las líneas que faltan son las correctas.</strong> La 44-45 del <code>errorHandler</code> es la rama del 500, el error que no reconocemos. Provocarla adrede pide fabricar un fallo inesperado y como test aporta poco. Saber <em>cuál</em> es el 6% que falta vale mucho más que el 94.</p>
+
+    <p><strong>Y faltan archivos enteros.</strong> No están <code>productos.service.ts</code>, ni <code>productos.repository.ts</code>, ni <code>server.ts</code>: Jest solo mide los archivos que los tests <em>importaron</em>. Un archivo sin un solo test no baja el porcentaje — directamente no aparece.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      La cobertura mide qué código <strong>se ejecutó</strong>, no qué código <strong>se verificó</strong>. Este test da 100% de cobertura de una ruta y no comprueba absolutamente nada:
+      <pre><span class="f">it</span>(<span class="s">'anda'</span>, <span class="k">async</span> () <span class="k">=&gt;</span> {
+  <span class="k">await</span> <span class="f">request</span>(app).<span class="f">get</span>(<span class="s">'/api/productos'</span>);
+});</pre>
+      Sirve para <em>encontrar lo que no probaste</em>, leyendo la columna de líneas descubiertas. Como nota, se manipula sin esfuerzo.
+    </div>
+
+    <h3>Qué no testear</h3>
+
+    <table class="tbl">
+      <tr><th>No</th><th>Por qué</th></tr>
+      <tr><td>Getters y setters triviales</td><td>Si se rompen, se rompe todo lo demás y ya te enteraste.</td></tr>
+      <tr><td>Librerías de terceros</td><td>Que Express rutee bien no es tu problema. Ya tiene sus tests.</td></tr>
+      <tr><td>La configuración</td><td>Que el <code>.env</code> se lea se ve al arrancar la aplicación.</td></tr>
+      <tr><td>Los detalles internos</td><td>Un test atado a <em>cómo</em> está hecho algo se rompe con cada refactor sin que nada esté mal.</td></tr>
+    </table>
+
+    <h3>Qué sí</h3>
+
+    <ol class="cycle">
+      <li><strong>Las reglas de negocio.</strong> Todo lo que tenga un "solo si", un "salvo que" o un "no puede".</li>
+      <li><strong>Los casos borde.</strong> El vacío, el cero, el límite, el negativo, el que no existe.</li>
+      <li><strong>Los bugs que ya encontraste.</strong> Primero el test que lo reproduce, después el arreglo. Así ese bug no vuelve nunca: se llama <em>test de regresión</em> y es el que más rinde de todos.</li>
+      <li><strong>Lo que te da miedo tocar.</strong> Literalmente. El miedo es una medida bastante buena de dónde hacen falta.</li>
+    </ol>
+
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El <code>.http</code> no se tira. Sigue siendo la mejor herramienta para <em>explorar</em> mientras escribís código nuevo. Lo que cambia después de hoy es que deja de ser <strong>la única prueba de que la API anda</strong>.
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Lo que sigue</div>
+      La última unidad es <strong>deploy</strong>: poner la API en internet. Y ahí los tests cobran una vez más — el lugar donde de verdad se paga tener una suite es en el servidor que, antes de publicar una versión nueva, corre <code>npm test</code> y se niega a subirla si algo está en rojo.
+    </div>
+
+  </section>
+
+
+  <!-- RESUMEN -->
+
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. ¿Por qué es un problema que un test necesite MySQL andando, si al final prueba lo mismo?</summary>
+      <div class="a">Porque es <strong>lento</strong> (segundos en vez de milisegundos), <strong>frágil</strong> (falla porque la base no arrancó, no porque tu código esté mal) y <strong>no determinista</strong> (pasa o no según lo que haya quedado de la corrida anterior). Y hay una consecuencia peor: un test que falla por motivos que no son el código te enseña a ignorar el rojo. Después de la tercera vez, corrés la suite y seguís de largo sin mirar.</div>
+    </details>
+    <details class="q">
+      <summary>2. Comparás el producto que devolvió el service con <code>{ id: 1, nombre: 'Mate' }</code> y el test falla diciendo <em>"serializes to the same string"</em>. ¿Qué pasó?</summary>
+      <div class="a">Usaste <code>toBe</code> con un objeto. <code>toBe</code> compara con <code>Object.is</code>: para objetos pregunta si son <strong>el mismo objeto en memoria</strong>, y dos objetos idénticos escritos en dos lugares distintos no lo son (es el paso por compartición de la unidad 4). El mensaje es Jest diciéndote <em>"el contenido es idéntico, pero me pediste identidad"</em>. Querías <code>toEqual</code>.</div>
+    </details>
+    <details class="q">
+      <summary>3. ¿Qué hay que cambiarle al service del 9.3 para poder testearlo sin base de datos?</summary>
+      <div class="a">Que <strong>reciba el repository por parámetro</strong> en vez de importarlo. El cuerpo de las funciones no cambia en nada: lo único distinto es de dónde sale <code>repo</code>. Con eso, en producción se le pasa el repository de MySQL y en el test un objeto de mentira, y el service no puede notar la diferencia porque nunca eligió.</div>
+    </details>
+    <details class="q">
+      <summary>4. Copiaste <code>jest.mock()</code> de un tutorial y el test falla con <code>connect ECONNREFUSED 127.0.0.1:3306</code>. ¿Cuál es el problema?</summary>
+      <div class="a">Que el mock nunca se aplicó: en un proyecto <strong>ESM</strong>, <code>jest.mock()</code> no intercepta nada — y no avisa, no tira error ni warning. Tu test está corriendo contra el repository de verdad. En ESM los <code>import</code> se resuelven antes de que corra la primera línea, así que no existe el <em>hoisting</em> de CommonJS: va <code>jest.unstable_mockModule()</code> y después <code>await import()</code> del service, en ese orden.</div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Por qué <code>await expect(service.eliminar(1, ana)).rejects.toThrow()</code> necesita el <code>await</code> de adelante?</summary>
+      <div class="a">Porque sin él el test <strong>pasa siempre</strong>. La afirmación devuelve una promesa; si nadie la espera, el test termina antes de que se resuelva y Jest lo da por bueno. Es el error más silencioso de la unidad: no te da un test roto, te da un test que miente. La misma regla aplica a cualquier <code>it</code> asincrónico.</div>
+    </details>
+    <details class="q">
+      <summary>6. Tu test verifica que <code>crear</code> devuelve el producto esperado. ¿Qué bug de la unidad 9 <strong>no</strong> atrapa, y cómo se atrapa?</summary>
+      <div class="a">No atrapa que el dueño salga del <code>body</code> en vez del token. Si alguien cambia el service para tomar el <code>creadoPorId</code> de lo que manda el cliente, <code>crear</code> sigue devolviendo un producto y tu test sigue verde — con un agujero de seguridad adentro. Se atrapa verificando la <em>llamada</em> y no solo el resultado: <code>expect(repo.guardar).toHaveBeenCalledWith(datos, 7)</code>.</div>
+    </details>
+    <details class="q">
+      <summary>7. Tenés 100% de cobertura. ¿Qué significa exactamente, y qué no?</summary>
+      <div class="a">Significa que <strong>todas las líneas se ejecutaron</strong> durante los tests. No significa que se hayan verificado: un <code>it</code> que llama a la función y no tiene ni un <code>expect</code> suma cobertura igual. Además Jest solo mide los archivos que los tests importaron, así que un archivo sin ningún test no baja el porcentaje — directamente no aparece en la tabla. Sirve para <em>encontrar lo que no probaste</em>, leyendo qué líneas quedaron afuera; como nota se manipula sin esfuerzo.</div>
+    </details>
+    <details class="q">
+      <summary>8. ¿Para qué está el <code>jest.clearAllMocks()</code> en el <code>beforeEach</code>?</summary>
+      <div class="a">Para que cada test arranque de cero. Los <code>jest.fn()</code> acumulan las llamadas que recibieron, así que sin eso un test ve las del anterior y <code>toHaveBeenCalledTimes</code> empieza a contar de más. Produce el bug más desconcertante que hay: <strong>la suite entera pasa pero un test solo falla</strong>, o al revés. La regla general es que ningún test puede depender de otro ni del orden en que corren.</div>
+    </details>
+    </div>
+  </section>
+
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen</h2>
+
+    <ul>
+      <li>Un test automatizado es <strong>código que ejecuta tu código y afirma qué tenía que pasar</strong>. Ya testeábamos a mano con el <code>.http</code>; hoy lo automatizamos.</li>
+      <li>El argumento no es moral: los tests son lo que te deja <strong>cambiar el código sin miedo</strong>.</li>
+      <li><code>describe</code> agrupa, <code>it</code> es un test, <code>expect</code> afirma. Adentro, <strong>AAA</strong>: preparar, ejecutar una sola cosa, afirmar.</li>
+      <li><code>toBe</code> para números y strings; <code>toEqual</code> para objetos y arrays. <em>"Serializes to the same string"</em> es Jest diciendo que querías <code>toEqual</code>.</li>
+      <li>Los <strong>casos borde</strong> son los que encuentran bugs: el vacío, el cero, el límite, el que no existe.</li>
+      <li>Jest con ESM y TypeScript pide cuatro líneas de configuración. Es andamiaje: se copia del 10.1 y se sigue.</li>
+      <li>Un test que necesita MySQL es <strong>lento, frágil y no determinista</strong>. Y un test que falla por motivos que no son el código enseña a ignorar el rojo.</li>
+      <li><strong>Inyectar la dependencia</strong> —que el service reciba el repository en vez de importarlo— es todo el truco. El cuerpo del service no cambia.</li>
+      <li>El contrato es un <strong>tipo</strong> con cinco firmas, y un objeto de mentira lo cumple en tres líneas. Los tipos de la unidad 7 avisan si el falso se desactualiza.</li>
+      <li>En ESM, <code>jest.mock()</code> <strong>no funciona y no avisa</strong>. La forma es <code>unstable_mockModule</code> + <code>await import()</code>, en ese orden, porque el hoisting de CommonJS no existe acá.</li>
+      <li>Los tests son la <strong>documentación de las reglas de negocio que no puede mentir</strong>: si miente, se pone roja.</li>
+      <li>Verificar la llamada (<code>toHaveBeenCalledWith</code>) atrapa cosas que verificar el resultado no ve — como que el dueño salga del token y no del body.</li>
+      <li>Para promesas que fallan: <code>await expect(...).rejects.toThrow()</code>. <strong>Sin el <code>await</code>, el test pasa siempre.</strong></li>
+      <li><code>jest.clearAllMocks()</code> en un <code>beforeEach</code>. Ningún test puede depender de otro ni del orden.</li>
+      <li>La cobertura mide qué se <strong>ejecutó</strong>, no qué se <strong>verificó</strong>. Sirve para encontrar lo que falta, no como nota.</li>
+      <li>Lo que más rinde: reglas de negocio, casos borde, los bugs que ya aparecieron, y lo que te da miedo tocar.</li>
+    </ul>
+
+    <h3>Lo que sigue</h3>
+
+    <p>Queda una sola unidad: <strong>deploy</strong>. La API tiene capas, tipos, base de datos, usuarios y ahora tests — le falta estar en internet. Y ahí los tests aparecen por última vez, en el lugar donde de verdad se pagan solos: el servidor que corre <code>npm test</code> antes de publicar y se niega a subir una versión rota.</p>
+
+    <h3>Para profundizar</h3>
+    <ul>
+      <li>La <strong>documentación de Jest</strong>, en particular la lista de <em>matchers</em> y la página de <em>ECMAScript Modules</em>. Es buena y corta.</li>
+      <li><em>Working Effectively with Legacy Code</em>, de Michael Feathers, para el capítulo sobre "costuras" (<em>seams</em>): es la idea del bloque 5 explicada quince años antes de que existiera Jest.</li>
+      <li>El artículo <em>Mocks Aren't Stubs</em>, de Martin Fowler, si alguien quiere la taxonomía completa de dobles de prueba.</li>
+      <li><strong>Vitest</strong>: la alternativa moderna a Jest. API casi idéntica y soporte de ESM y TypeScript sin nada de la configuración del bloque 3. Vale tenerla en el radar: si arrancás un proyecto nuevo el año que viene, es probable que uses esa.</li>
+      <li>Sobre <strong>TDD</strong> (escribir el test antes que el código): es una disciplina que se aprende mejor una vez que testear ya no cuesta. El orden de esta materia es a propósito.</li>
+    </ul>
+  </section>
+
+</main>
+
+
+
+<script>
+(() => {
+  const storageKey = 'dsw-theme-preference';
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+
+  if (!toggle) return;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Modo oscuro';
+      toggle.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Modo claro';
+    toggle.setAttribute('aria-pressed', 'false');
+  };
+
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(storageKey);
+  } catch (_) {
+    savedTheme = null;
+  }
+
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    applyTheme(nextTheme);
+
+    try {
+      localStorage.setItem(storageKey, nextTheme);
+    } catch (_) {
+      /* la persistencia puede fallar en modo privado: se ignora */
+    }
+  });
+})();
+</script>
+</body>
+</html>
