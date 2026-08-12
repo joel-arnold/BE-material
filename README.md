@@ -15,6 +15,7 @@ Guías en HTML autocontenidas (sin dependencias externas de build) sobre JavaScr
 8. [08.guia-estudio-persistencia-mikroorm.html](08.guia-estudio-persistencia-mikroorm.html) — Persistencia con MikroORM y MySQL (entidades, EntityManager, relaciones y migraciones)
 9. [09.guia-estudio-autenticacion.html](09.guia-estudio-autenticacion.html) — Autenticación y autorización (contraseñas con bcrypt, JWT, middleware de auth, permisos, variables de entorno y CORS)
 10. [10.guia-estudio-testing-jest.html](10.guia-estudio-testing-jest.html) — Testing con Jest (matchers, casos borde, testear services con el repository inyectado o mockeado, y cobertura)
+11. [11.guia-estudio-deploy.html](11.guia-estudio-deploy.html) — Deploy (el build a `dist/`, el arranque en un servidor, la base en la nube, publicar en Render y el pipeline que frena una versión rota)
 
 Para consultarlas, basta con abrir el archivo `.html` correspondiente en el navegador.
 

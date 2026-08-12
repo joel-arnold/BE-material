@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy — Guía de estudio · DSW UTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #14171f;
+    --bg3: #1b1f2a;
+    --border: #232838;
+    --border2: #2c3245;
+    --text: #e8eaf0;
+    --muted: #98a0b3;
+    --accent: #7c6af7;
+    --accent2: #a99cff;
+    --blue: #58a6ff;
+    --green: #3fd68c;
+    --orange: #ffa657;
+    --type: #4fd1c5;
+    --nav-bg: rgba(13,15,20,0.85);
+    --tag-bg: rgba(124,106,247,0.1);
+    --tag-border: rgba(124,106,247,0.35);
+    --step-bg: rgba(124,106,247,0.14);
+    --toggle-shadow: rgba(0,0,0,0.22);
+  }
+
+  :root[data-theme='light'] {
+    --bg: #f3f6fb;
+    --bg2: #ffffff;
+    --bg3: #e8eef8;
+    --border: rgba(15,23,42,0.14);
+    --border2: rgba(15,23,42,0.24);
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0d5ea8;
+    --accent2: #0b4f8c;
+    --blue: #005ea8;
+    --green: #0f7a44;
+    --orange: #b45309;
+    --type: #0f766e;
+    --nav-bg: rgba(243,246,251,0.96);
+    --tag-bg: rgba(13,94,168,0.1);
+    --tag-border: rgba(13,94,168,0.35);
+    --step-bg: rgba(13,94,168,0.12);
+    --toggle-shadow: rgba(15,23,42,0.16);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 1.2rem; height: 52px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--accent2); margin-right: 1rem; flex-shrink: 0;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    padding: 5px 10px; border-radius: 6px; flex-shrink: 0;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+
+  /* ── ALTERNADOR DE TEMA ── */
+  .theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 200;
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--toggle-shadow);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    transform: translateY(-1px);
+  }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 96px 2rem 5rem; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 3.4rem; }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    background: var(--tag-bg);
+    border: 0.5px solid var(--tag-border);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .page-header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 2.3rem; line-height: 1.15; margin-bottom: 0.5rem;
+  }
+  .page-header p { color: var(--muted); font-size: 1.02rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; margin-top: 1.1rem; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── SECCIONES ── */
+  section { margin-bottom: 3.4rem; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.55rem; line-height: 1.25; margin-bottom: 1rem;
+  }
+  h3 {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 1.12rem; margin: 1.7rem 0 0.7rem;
+  }
+  p { margin-bottom: 0.9rem; }
+  li { margin-bottom: 0.3rem; color: var(--text); }
+  ul, ol { padding-left: 1.3rem; margin-bottom: 0.9rem; }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--accent2); font-style: italic; }
+  a { color: var(--accent2); }
+
+  /* ── CÓDIGO ── */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--bg3); padding: 1px 6px; border-radius: 3px;
+    color: var(--accent2);
+  }
+  pre {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-radius: 10px; padding: 1rem 1.2rem; margin: 0.9rem 0 1.3rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    line-height: 1.6; overflow-x: auto; color: var(--text);
+  }
+  pre .k { color: var(--accent2); }           /* keyword */
+  pre .f { color: var(--blue); }              /* función / método */
+  pre .s { color: var(--green); }             /* string */
+  pre .n { color: var(--orange); }            /* número */
+  pre .t { color: var(--type); }              /* tipo */
+  pre .c { color: var(--muted); font-style: italic; } /* comentario */
+  pre .err { color: var(--orange); font-style: italic; } /* error del compilador */
+  .fname {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--muted); margin: 1.1rem 0 -2px;
+  }
+  pre.tree { color: var(--muted); }
+  pre.tree b { color: var(--text); font-weight: 500; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    background: var(--bg2); border: 0.5px solid var(--border2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem 0;
+    font-size: 14px; color: var(--text);
+  }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.orange { border-left-color: var(--orange); }
+  .callout.orange .callout-label { color: var(--orange); }
+
+  /* ── AGENDA CARD ── */
+  .agenda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .agenda-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .agenda-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .agenda-item .topic {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* ── PIEZAS (capas) ── */
+  .pieces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0; }
+  .piece { background: var(--bg2); border: 0.5px solid var(--border2); border-top: 2px solid var(--muted); border-radius: 8px; padding: 1rem 1.1rem; }
+  .piece-h { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+  .piece-d { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .piece.route { border-top-color: var(--blue); }   .piece.route .piece-h { color: var(--blue); }
+  .piece.ctrl  { border-top-color: var(--accent); } .piece.ctrl .piece-h  { color: var(--accent2); }
+  .piece.svc   { border-top-color: var(--green); }  .piece.svc .piece-h   { color: var(--green); }
+  .piece.repo  { border-top-color: var(--orange); } .piece.repo .piece-h  { color: var(--orange); }
+  .piece.mw    { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .pieces { grid-template-columns: 1fr; } .piece.mw { grid-column: auto; } }
+
+  /* ── CICLO NUMERADO ── */
+  .cycle { counter-reset: step; list-style: none; padding: 0; margin: 1.2rem 0; }
+  .cycle li { counter-increment: step; position: relative; padding: 0.7rem 0 0.7rem 2.7rem; border-bottom: 0.5px solid var(--border); font-size: 15px; color: var(--text); }
+  .cycle li:last-child { border-bottom: none; }
+  .cycle li::before { content: counter(step); position: absolute; left: 0; top: 0.55rem; width: 1.7rem; height: 1.7rem; background: var(--step-bg); border: 0.5px solid var(--accent); color: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── DOS COLUMNAS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .grid2 pre { margin: 0.4rem 0 0.6rem; }
+  .col-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); margin-top: 0.6rem; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── TABLA ── */
+  table.tbl { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 14px; }
+  table.tbl th {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border2);
+  }
+  table.tbl td { padding: 0.65rem 0.8rem; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  table.tbl td:first-child { white-space: nowrap; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    main { padding: 80px 1.2rem 4rem; }
+    h2 { font-size: 1.3rem; }
+    .page-header h1 { font-size: 1.7rem; }
+    .theme-toggle { right: 0.7rem; bottom: 0.7rem; font-size: 11px; }
+    table.tbl td:first-child { white-space: normal; }
+  }
+
+  /* ── autoevaluación ── */
+  .quiz { display: flex; flex-direction: column; gap: 10px; margin: 1.4rem 0; }
+  details.q { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; }
+  details.q summary { cursor: pointer; padding: 0.9rem 2.6rem 0.9rem 1.1rem; font-size: 14.5px; font-weight: 600; color: var(--text); list-style: none; position: relative; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary::after { content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  details.q[open] summary::after { content: '\2013'; }
+  details.q[open] summary { border-bottom: 0.5px solid var(--border); }
+  details.q .a { padding: 0.9rem 1.1rem; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  details.q .a strong { color: var(--text); }
+  details.q .a code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); padding: 1px 6px; border-radius: 3px; color: var(--accent2); }
+  details.q .a pre { margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">DSW · Deploy</span>
+  <a href="#agenda">Contenidos</a>
+  <a href="#mi-maquina">En mi máquina</a>
+  <a href="#build">El build</a>
+  <a href="#arranque">El arranque</a>
+  <a href="#base">La base</a>
+  <a href="#render">Subirla</a>
+  <a href="#log">Cuando falla</a>
+  <a href="#pipeline">El portero</a>
+  <a href="#internet">En internet</a>
+  <a href="#resumen">Resumen</a>
+  <a href="#ponete-a-prueba">Ponete a prueba</a>
+</nav>
+
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar entre modo oscuro y claro" aria-pressed="false">Modo claro</button>
+
+<main>
+
+  <div class="page-header">
+    <div class="tag">Desarrollo de Software · 3er año · ISI</div>
+    <h1>Deploy</h1>
+    <p>Sacar la API de tu máquina y ponerla en internet — Material de estudio</p>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-dot"></div> Prerequisito: la API con TypeScript (unidad 7), MikroORM y migraciones (unidad 8), variables de entorno y JWT (unidad 9) y tests (unidad 10)</div>
+    </div>
+  </div>
+
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <div class="section-num">Introducción</div>
+    <h2>Contenidos de la guía</h2>
+
+    <p>Última unidad de la materia, y la que cobra todo lo anterior de golpe. Hasta hoy cada unidad dejó una promesa: el <code>.env</code> de la 9 existe <em>porque en producción la configuración no puede estar en el código</em>; las migraciones de la 8.4 existen <em>porque contra una base con datos no se puede sincronizar el esquema a lo bruto</em>; los tests de la 10 existen, entre otras cosas, <em>para que un servidor pueda negarse a publicar una versión rota</em>. Hoy se cobran las tres.</p>
+
+    <p>Una advertencia antes de arrancar: esta guía usa Render y Aiven, pero <strong>no es un tutorial de Render</strong>. Los paneles cambian cada seis meses y el que aprendió a apretar botones no aprendió nada. Lo que conviene que te quede son las preguntas que cualquier plataforma le hace a cualquier aplicación, que no cambiaron en veinte años.</p>
+
+    <div class="agenda">
+      <div class="agenda-item"><div class="topic">"Anda en mi máquina"</div></div>
+      <div class="agenda-item"><div class="topic">El build: de tsx a dist/</div></div>
+      <div class="agenda-item"><div class="topic">El arranque, y el healthcheck</div></div>
+      <div class="agenda-item"><div class="topic">La base deja de ser tuya</div></div>
+      <div class="agenda-item"><div class="topic">Subirla</div></div>
+      <div class="agenda-item"><div class="topic">Cuando falla: leer el log</div></div>
+      <div class="agenda-item"><div class="topic">Que no se suba nada roto</div></div>
+      <div class="agenda-item"><div class="topic">Lo que cambia en internet, y cierre</div></div>
+    </div>
+
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      <strong>Creá las cuentas antes de necesitarlas.</strong> La base de Aiven tarda varios minutos en pasar de <em>Rebuilding</em> a <em>Running</em>, y el primer build de Render otros tantos. Si dejás los dos registros para el día de la entrega, esos minutos aparecen justo cuando no los tenés. Ninguna de las dos pide tarjeta.
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La frase que ordena toda la guía: <strong>deployar no es reescribir la aplicación, es terminar de resolver lo que la aplicación daba por sentado</strong>. El puerto, la dirección, cuánto vive el proceso, quién le pasa la configuración. En tu máquina esas preguntas tienen respuestas obvias, y por eso nunca las hiciste.
+    </div>
+  </section>
+
+
+  <!-- EN MI MÁQUINA -->
+  <section id="mi-maquina">
+    <div class="section-num">Bloque 1</div>
+    <h2>"Anda en mi máquina"</h2>
+
+    <p>Levantá el <code>9.3</code> como venías haciendo: <code>npm run dev</code>, el <code>productos.http</code>, login, crear, borrar. Todo funciona. Y ahí llega la pregunta:</p>
+
+    <p><em>Mandame el link.</em></p>
+
+    <p>No hay link. Hay <code>http://localhost:3000</code>, que en la computadora de cualquier otro apunta a su propia máquina, donde no hay nada. Después de tres meses de trabajo, la API la puede usar exactamente una persona.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      <code>localhost</code> no es una dirección de internet: es <strong>"esta computadora"</strong>. Suena obvio dicho así y no lo es — mucha gente pasa un cuatrimestre entero sin haberlo pensado.
+    </div>
+
+    <h3>Las tres piezas</h3>
+
+    <p>Deployar es resolver tres cosas, y conviene tenerlas claras antes de tocar nada:</p>
+
+    <div class="pieces">
+      <div class="piece ctrl">
+        <div class="piece-h">Dónde corre el proceso</div>
+        <div class="piece-d">Una máquina prendida siempre, con Node, que ejecuta tu código y escucha requests. Es lo que hace Render.</div>
+      </div>
+      <div class="piece repo">
+        <div class="piece-h">Dónde viven los datos</div>
+        <div class="piece-d">Un MySQL que no es el tuyo, también prendido siempre, al que se llega por internet. Es lo que hace Aiven.</div>
+      </div>
+      <div class="piece svc">
+        <div class="piece-h">De dónde sale la configuración</div>
+        <div class="piece-d">Las credenciales de esa base y el secret del JWT, que no pueden estar en el repositorio. Ya lo resolvimos en la unidad 9.</div>
+      </div>
+      <div class="piece route">
+        <div class="piece-h">Y una cuarta, gratis</div>
+        <div class="piece-d">Un dominio y un certificado HTTPS, que las plataformas dan hechos. Hace diez años era medio día de trabajo.</div>
+      </div>
+    </div>
+
+    <p>La tercera ya está resuelta desde la unidad 9, y vale decirlo en voz alta: <strong>el <code>.env</code> no era una prolijidad, era esto</strong>.</p>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Las palabras que van a leer en todos lados: <em>hosting</em> es alquilar la máquina, <em>deploy</em> es el acto de poner tu versión ahí, <em>PaaS</em> (Render, Railway, Fly) es que la plataforma se ocupe del sistema operativo por vos, y <em>IaaS</em> (una máquina virtual pelada) es que te lo ocupes vos. Nosotros usamos PaaS, que es a un servidor de verdad lo que un ORM es a escribir SQL a mano: te ahorra el 90% y te oculta cosas que en algún momento vas a querer saber.
+    </div>
+
+
+  </section>
+
+
+  <!-- EL BUILD -->
+  <section id="build">
+    <div class="section-num">Bloque 2</div>
+    <h2>El build: de <code>tsx</code> a <code>dist/</code></h2>
+
+    <p>La primera pregunta que le hace cualquier plataforma a cualquier aplicación es <strong>"¿con qué comando te ejecuto?"</strong>. Y ahí aparece un problema que veníamos esquivando desde la unidad 7.</p>
+
+    <p>En el servidor no hay <code>tsx</code>. Hay <code>node</code>, y <code>node</code> no entiende TypeScript.</p>
+
+    <div class="fname">package.json</div>
+    <pre><span class="s">"dev"</span>: <span class="s">"tsx watch src/server.ts"</span>,     <span class="c">// tu máquina</span>
+<span class="s">"build"</span>: <span class="s">"tsc"</span>,                       <span class="c">// src/ -&gt; dist/</span>
+<span class="s">"start"</span>: <span class="s">"node dist/server.js"</span>       <span class="c">// el servidor</span></pre>
+
+    <p>Es la primera vez en toda la materia que <code>npm run build</code> deja de ser decorativo. Corrélo y abrí <code>dist/</code>: JavaScript plano, sin un solo tipo, ejecutable por cualquier Node.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La fila que sorprende de esa tabla es una sola: <strong><code>tsx</code> no chequea tipos</strong>. Los borra y ejecuta. Por eso un proyecto puede venir andando perfecto con <code>npm run dev</code> durante tres semanas y romperse en el primer <code>npm run build</code> — que va a ser el día del deploy, con el TP para entregar. Ese es el motivo del <code>npm run check</code> que arrastramos desde la unidad 7, y el motivo por el que hay que correrlo <em>antes</em> de subir nada.
+    </div>
+
+    <h3>Qué se sube al servidor</h3>
+
+    <p>Otra sorpresa: <strong>no se sube <code>dist/</code></strong>. Se sube el repositorio, y el servidor compila.</p>
+
+    <pre>npm ci &amp;&amp; npm run build     <span class="c">// build command</span>
+npm start                    <span class="c">// start command</span></pre>
+
+    <p><code>dist/</code> está en el <code>.gitignore</code> y ahí se queda. Un <code>dist/</code> commiteado es la forma más rápida de que lo que corre en producción no sea lo que dice el repositorio: alguien toca el <code>.ts</code>, se olvida de recompilar, y el servidor sigue con el <code>.js</code> viejo.</p>
+
+    <table class="tbl">
+      <tr><th>Comando</th><th>Qué hace</th><th>Dónde</th></tr>
+      <tr><td><code>npm install</code></td><td>instala y <strong>puede modificar</strong> el <code>package-lock.json</code></td><td>tu máquina</td></tr>
+      <tr><td><code>npm ci</code></td><td>instala <strong>exactamente</strong> lo del lock, y falla si no coincide</td><td>el servidor, siempre</td></tr>
+      <tr><td><code>--omit=dev</code></td><td>saltea las <code>devDependencies</code></td><td>después de compilar</td></tr>
+    </table>
+
+    <p>Que <code>npm ci</code> falle cuando el <code>package.json</code> y el lock no coinciden es una virtud, no una molestia: en el servidor querés que el deploy se niegue antes que instalar una versión distinta de la que probaste.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      El error de razonamiento que hace todo el mundo la primera vez: <em>"en producción no necesito las devDependencies, entonces <code>npm ci --omit=dev</code>"</em>. Y el build muere con <code>Cannot find module 'typescript'</code>, porque <strong>TypeScript es una devDependency y el build lo necesita</strong>. Primero se instala todo y se compila; recién después, si querés adelgazar, <code>npm prune --omit=dev</code>. En el 11.1 la diferencia es medible: 49 MB contra 3,5 MB.
+    </div>
+
+    <h3>La trampa de nuestro stack</h3>
+
+    <p>Esta no está en ningún tutorial de deploy, porque es consecuencia de una decisión de la unidad 8. Usamos <code>TsMorphMetadataProvider</code>: para saber que <code>precio: number</code> es un decimal y <code>nombre: string</code> un varchar, MikroORM <strong>lee los tipos de los archivos TypeScript</strong> al arrancar.</p>
+
+    <p>En el servidor corre <code>node dist/server.js</code>, y en <code>dist/</code> hay JavaScript. La aplicación muere al arrancar:</p>
+
+    <pre><span class="err">MetadataError: Source file './dist/entities/usuario.entity.ts' not found.
+Check your 'entitiesTs' option and verify you have 'compilerOptions.declaration'
+enabled in your 'tsconfig.json'.</span></pre>
+
+    <p>La solución está adentro del error, que es una rareza. Una línea en el <code>tsconfig.json</code>:</p>
+
+    <div class="fname">tsconfig.json</div>
+    <pre>{
+  <span class="s">"compilerOptions"</span>: {
+    <span class="s">"declaration"</span>: <span class="k">true</span>     <span class="c">// emite los .d.ts al lado de cada .js</span>
+  }
+}</pre>
+
+    <p>Los <code>.d.ts</code> son archivos de solo tipos, sin código. Ahí está lo que el ORM necesita.</p>
+
+
+  </section>
+
+
+  <!-- EL ARRANQUE -->
+  <section id="arranque">
+    <div class="section-num">Bloque 3</div>
+    <h2>El arranque, y el healthcheck</h2>
+
+    <p>Tres líneas que en tu máquina no cambian absolutamente nada, y sin las cuales el deploy no termina. Es lo que las hace difíciles: <strong>no hay forma de darse cuenta de que faltan hasta que fallan</strong>.</p>
+
+    <h3>1. El puerto no lo elegís vos</h3>
+
+    <pre><span class="c">// Lo que veníamos haciendo</span>
+app.<span class="f">listen</span>(<span class="n">3000</span>);
+
+<span class="c">// Lo que hay que hacer</span>
+<span class="k">const</span> PORT = <span class="t">Number</span>(process.env.PORT) || <span class="n">3000</span>;</pre>
+
+    <p>La plataforma corre muchas aplicaciones en la misma máquina y le asigna a cada una su puerto por variable de entorno. Si te aferrás al 3000, escuchás en un puerto al que nadie te va a hablar. La plataforma espera respuesta, no la recibe, y el deploy se queda colgado hasta que muere con <em>"no open ports detected"</em>.</p>
+
+    <h3>2. La interfaz tampoco</h3>
+
+    <pre>app.<span class="f">listen</span>(PORT, <span class="s">'0.0.0.0'</span>);</pre>
+
+    <p><code>0.0.0.0</code> significa "aceptá conexiones por cualquier interfaz de red". <code>localhost</code> significa "solo desde esta máquina" — y adentro de un contenedor eso quiere decir <em>solo desde adentro del contenedor</em>, con el proxy de la plataforma del lado de afuera.</p>
+
+    <h3>3. Apagarse bien</h3>
+
+    <pre>process.<span class="f">on</span>(<span class="s">'SIGTERM'</span>, () <span class="k">=&gt;</span> {
+  server.<span class="f">close</span>(<span class="k">async</span> () <span class="k">=&gt;</span> {
+    <span class="k">await</span> orm.<span class="f">close</span>();
+    process.<span class="f">exit</span>(<span class="n">0</span>);
+  });
+});</pre>
+
+    <p>Para publicar una versión nueva, la plataforma no mata el proceso viejo: le manda <code>SIGTERM</code> y espera unos segundos. Si lo ignorás, llega <code>SIGKILL</code>, que no se puede ignorar, y los requests que estaban a mitad de camino se cortan.</p>
+
+    <p>El orden importa: primero <code>server.close()</code>, que deja de aceptar requests nuevos y termina los que están en curso; <strong>después</strong> la base. Al revés, los requests a mitad de camino se encuentran con la conexión cerrada y contestan 500 justo durante el deploy.</p>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Este bloque es el event loop de la unidad 3 apareciendo por última vez. Un proceso Node vive mientras tenga <em>algo pendiente</em>: el servidor escuchando es un <em>handle</em> abierto, y por eso <code>npm run dev</code> no termina nunca. Cerrarlo es lo que deja que el proceso muera solo. El <code>setTimeout(...).unref()</code> del 11.2 es la contracara exacta: un timer que <em>no</em> cuenta para mantener vivo el proceso.
+    </div>
+
+    <h3>El healthcheck</h3>
+
+    <pre>app.<span class="f">get</span>(<span class="s">'/health'</span>, (req, res) <span class="k">=&gt;</span> {
+  res.<span class="f">json</span>({ estado: <span class="s">'ok'</span> });
+});</pre>
+
+    <p>Una ruta que no hace nada. Es cómo la plataforma se entera de si la aplicación está viva: le pega cada pocos segundos y, si deja de contestar, reinicia la instancia. Sin healthcheck, lo único que la plataforma sabe es que <strong>el proceso no se cayó</strong>, que no es lo mismo que que la API esté respondiendo.</p>
+
+    <table class="tbl">
+      <tr><th>Regla</th><th>Por qué</th></tr>
+      <tr><td>Que sea barata</td><td>Si consulta la base, un pico de carga la hace tardar, la plataforma te da por muerto y te reinicia justo cuando más tráfico tenías</td></tr>
+      <tr><td>Que no pida token</td><td>El que pregunta es un robot sin credenciales</td></tr>
+      <tr><td>Que no cuente nada</td><td>Es una URL pública: ni versiones de librerías ni estado interno</td></tr>
+    </table>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      La primera regla es más contraintuitiva de lo que parece, y en internet hay discusión: <em>"si la base está caída, la API no sirve, ¿no tendría que dar rojo?"</em>. El problema es la consecuencia: dar rojo hace que te reinicien, y reiniciar no arregla una base caída — solo agrega downtime a un problema que ya tenías. El healthcheck contesta <strong>"¿este proceso está vivo?"</strong>, no <strong>"¿todo el sistema funciona?"</strong>.
+    </div>
+
+
+  </section>
+
+
+  <!-- LA BASE -->
+  <section id="base">
+    <div class="section-num">Bloque 4</div>
+    <h2>La base deja de ser tuya</h2>
+
+    <p>Hasta hoy MySQL estuvo en <code>localhost:3306</code>, con usuario <code>root</code> y contraseña <code>root</code>, en la misma máquina que la API. Tres cosas que dejan de ser ciertas todas juntas.</p>
+
+    <h3>Por qué la base va afuera</h3>
+
+    <p>La pregunta llega sola: <em>¿por qué no instalamos MySQL en el mismo servidor?</em> Y la respuesta es la más importante del bloque:</p>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      El disco del contenedor donde corre tu aplicación es <strong>efímero</strong>: se borra entero en cada deploy. Todo lo que escribas ahí —archivos subidos, logs, una base de datos— desaparece la próxima vez que hagas <code>git push</code>. Por eso la base vive afuera, en un servicio que sí tiene disco persistente. Es la misma razón por la que un archivo que sube un usuario no se guarda en <code>uploads/</code> sino en un servicio aparte.
+    </div>
+
+    <h3>TLS, y el atajo que anula el punto</h3>
+
+    <p>Una base gestionada rechaza las conexiones sin cifrar. Tiene sentido: en <code>localhost</code> el tráfico no sale de tu máquina, pero ahora las contraseñas y los datos de tus usuarios cruzan la red de terceros.</p>
+
+    <div class="fname">src/mikro-orm.config.ts</div>
+    <pre>driverOptions: {
+  connection: {
+    ssl: { ca: env.DB_SSL_CA, rejectUnauthorized: <span class="k">true</span> }
+  }
+}</pre>
+
+    <p>El <code>ca</code> es el certificado de la autoridad que firmó el del servidor: sirve para verificar que del otro lado está tu base y no alguien haciéndose pasar por ella. Se descarga del panel del proveedor y va como variable de entorno, porque el repositorio no tiene por qué llevar certificados.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Lo que aparece en la mitad de los tutoriales y en la primera respuesta de Stack Overflow:
+      <pre>ssl: { rejectUnauthorized: <span class="k">false</span> }</pre>
+      Arregla el error en un segundo y desactiva justo la parte que importa. Sigue cifrando, pero deja de verificar <em>con quién</em> está hablando: es TLS sin la garantía de TLS. Lo vas a encontrar igual, así que mejor que sea acá primero y con el motivo — es la diferencia entre pegarlo sin pensar y saber qué estás desactivando.
+    </div>
+
+    <h3>Y <code>schema.update()</code> se termina</h3>
+
+    <p>Este es el cambio de fondo. En las unidades 8 y 9, el <code>db.ts</code> decía:</p>
+
+    <pre><span class="k">await</span> orm.schema.<span class="f">update</span>();   <span class="c">// comodísimo, y solo mientras la base sea tuya</span></pre>
+
+    <p><code>schema.update()</code> compara tus entidades con la base y genera el SQL para que se parezcan. Cuando la diferencia es "sobra una columna", el SQL que genera es un <code>DROP COLUMN</code>. No pregunta, no avisa y no hay Ctrl+Z.</p>
+
+    <p>Renombrar un campo en una entidad —dos segundos de trabajo— borra la columna vieja con todo lo que tenía adentro.</p>
+
+    <pre><span class="c">// Antes</span>
+@<span class="f">Property</span>()
+nombre!: <span class="t">string</span>;
+
+<span class="c">// Después: para el ORM, "falta 'titulo' y sobra 'nombre'"</span>
+@<span class="f">Property</span>()
+titulo!: <span class="t">string</span>;</pre>
+
+    <p>La versión que sirve es la de la unidad 8.4: cada cambio de esquema es un archivo de migración versionado, revisable en un pull request, y la tabla <code>mikro_orm_migrations</code> lleva la cuenta de cuáles se aplicaron en cada base.</p>
+
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      En el 11.2 las migraciones corren <strong>al arrancar la aplicación</strong> (ver <code>db.ts</code>). Lo prolijo es que sean un paso aparte —un <em>pre-deploy command</em>— para que una migración fallida no deje la aplicación en un bucle de reinicios. Los planes gratuitos no tienen ese paso, y hacerlo al arrancar es la opción razonable. Tenelo como lo que es —un atajo—, porque en el trabajo vas a ver las dos formas.
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Abrí el <code>9.3</code> y el <code>11.2</code> lado a lado, en <code>services/</code>, <code>controllers/</code>, <code>entities/</code> y <code>schemas/</code>: <strong>idénticos</strong>. Todo lo que cambió está en <code>config/</code>, <code>db.ts</code>, <code>server.ts</code> y el <code>tsconfig</code>. Eso no es casualidad ni suerte: es la arquitectura de la unidad 6 haciendo su trabajo por cuarta vez.
+    </div>
+
+  </section>
+
+
+  <!-- SUBIRLA -->
+  <section id="render">
+    <div class="section-num">Bloque 5</div>
+    <h2>Subirla</h2>
+
+    <p>Esta parte se aprende haciéndola. Dos servicios y un orden que importa: <strong>la base primero</strong>, porque la API no arranca sin ella.</p>
+
+    <h3>Paso 1 — la base (Aiven)</h3>
+
+    <ol class="cycle">
+      <li>Crear el servicio <strong>Aiven for MySQL</strong>, plan Free: 1 CPU, 1 GB de RAM, 1 GB de disco, sin tarjeta y sin vencimiento.</li>
+      <li>Elegir región cerca de donde va a estar la API. Cada consulta cruza esa distancia; base en Europa y API en Oregon son cien milisegundos por query.</li>
+      <li>Esperar a que pase de <em>Rebuilding</em> a <em>Running</em>.</li>
+      <li>De <strong>Connection information</strong> salen los cinco valores del <code>.env</code> y el <code>ca.pem</code>.</li>
+    </ol>
+
+    <p>Y antes de tocar Render, el paso que ahorra media hora de adivinanza: <strong>apuntar el <code>.env</code> local a la base de la nube y correr <code>npm run dev</code></strong>. Si arranca y aplica las migraciones, la base está bien y todo lo que falle después es del hosting. Dos problemas separados se resuelven en la mitad de tiempo que dos problemas juntos.</p>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Render también ofrece bases de datos, y las gratuitas <strong>se borran a los 30 días</strong>. Para algo que tiene que llegar vivo a la defensa del TP, la base va afuera. Si el proyecto usa PostgreSQL, Neon es el equivalente de Aiven; para MikroORM el cambio es chico —otro paquete de driver— pero hay que regenerar las migraciones, porque el SQL no es el mismo.
+    </div>
+
+    <h3>Paso 2 — la API (Render)</h3>
+
+    <table class="tbl">
+      <tr><th>Campo</th><th>Valor</th></tr>
+      <tr><td>Build Command</td><td><code>npm ci &amp;&amp; npm run build</code></td></tr>
+      <tr><td>Start Command</td><td><code>npm start</code></td></tr>
+      <tr><td>Health Check Path</td><td><code>/health</code></td></tr>
+      <tr><td>Root Directory</td><td>la carpeta del proyecto, si el repositorio tiene varios</td></tr>
+      <tr><td>Instance Type</td><td>Free</td></tr>
+    </table>
+
+    <p>Después, las variables de entorno en el panel: las mismas del <code>.env.example</code> <strong>menos <code>PORT</code></strong>, que la pone Render. Y ahí conviene detenerse un segundo, porque es la unidad 9 cerrando el círculo: <em>este panel es el <code>.env</code> de producción</em>. Mismo concepto, otro lugar, y por eso el código no necesita un solo <code>if</code>.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      El <code>JWT_SECRET</code> de producción tiene que ser <strong>otro</strong>, distinto al del <code>.env</code> de desarrollo. Si son el mismo, cualquiera que vea el repositorio del TP puede firmar tokens que el servidor de verdad acepta — y en un repositorio de facultad, "cualquiera" incluye a todo el curso. Render lo puede generar solo (<code>generateValue: true</code> en el <code>render.yaml</code>), que es mejor que cualquier cosa que escribamos nosotros.
+    </div>
+
+    <h3>Y el archivo que evita todos esos clics</h3>
+
+    <p>Todo lo anterior, escrito:</p>
+
+    <div class="fname">render.yaml</div>
+    <pre>services:
+  - type: web
+    name: dsw-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci &amp;&amp; npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PASSWORD
+        sync: <span class="k">false</span>       <span class="c"># existe, pero el valor se carga a mano</span>
+      - key: JWT_SECRET
+        generateValue: <span class="k">true</span>  <span class="c"># que lo invente Render</span></pre>
+
+    <p><code>sync: false</code> es la forma de declarar un secreto: queda documentado que la variable hace falta, sin que el valor toque el repositorio.</p>
+
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Antes del <code>git push</code>, verificá que el <code>.env</code> no esté en el repositorio: <code>git status</code>, y que no lo nombre. Hacelo aunque parezca innecesario. Es el error más caro de toda la materia y no se arregla borrando el archivo después: <strong>queda en el historial de git para siempre</strong>, y lo único que sirve es rotar todos los secretos que se filtraron.
+    </div>
+
+  </section>
+
+
+  <!-- CUANDO FALLA -->
+  <section id="log">
+    <div class="section-num">Bloque 6</div>
+    <h2>Cuando falla: leer el log</h2>
+
+    <p>Va a fallar. No es una posibilidad, es el trámite: la primera vez le falla a todo el mundo. Y la habilidad que hay que llevarse de esta unidad no es acertar de una — es <strong>saber qué mirar</strong>.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Que quede dicho antes de que pase, y en serio: <strong>el primer deploy siempre falla</strong>. No es que lo hiciste mal. Lo que separa a alguien que resuelve esto en diez minutos de alguien que pierde la tarde no es la experiencia con Render — es abrir el log y leerlo, en vez de volver a apretar "Deploy" a ver si esta vez sale.
+    </div>
+
+    <table class="tbl">
+      <tr><th>Lo que dice el log</th><th>Qué es</th></tr>
+      <tr><td><code>No open ports detected</code></td><td>El puerto fijo, o <code>localhost</code> en vez de <code>0.0.0.0</code></td></tr>
+      <tr><td><code>✖ Falta configuración: JWT_SECRET</code></td><td>Falta una variable en el panel</td></tr>
+      <tr><td><code>Source file './dist/...ts' not found</code></td><td>Falta <code>"declaration": true</code></td></tr>
+      <tr><td><code>ETIMEDOUT</code> / <code>ECONNREFUSED</code></td><td>Host o puerto de la base mal, o la base todavía se está creando</td></tr>
+      <tr><td><code>Connections using insecure transport are prohibited</code></td><td>Falta el <code>DB_SSL_CA</code></td></tr>
+      <tr><td><code>Cannot find module 'typescript'</code></td><td>El build corrió con <code>--omit=dev</code></td></tr>
+      <tr><td>Compila y muere sin decir nada</td><td>Casi siempre memoria: 512 MB y <code>tsc</code> están cerca</td></tr>
+    </table>
+
+    <p>El segundo merece un párrafo aparte, porque es el único que no es un error de la plataforma sino un mensaje <em>nuestro</em>. Ese <code>✖ Falta configuración</code> lo escribimos en el <code>env.ts</code> de la unidad 9, y aparece porque validamos la configuración al arrancar en vez de dejar que explote en el primer login.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Idea central</div>
+      <strong>Fallá al arrancar y en voz alta.</strong> En producción esto vale el doble que en tu máquina: el log del deploy dice exactamente qué falta, en el primer segundo, en vez de dejarte una API que levanta contenta y se rompe cuando el primer usuario intenta loguearse. Una aplicación que no arranca es un problema de dos minutos; una que arranca mal es un problema de dos horas.
+    </div>
+
+    <h3>El que más cuesta es el que no aparece</h3>
+
+    <p>El deploy dice <em>Live</em>, la URL contesta, el <code>.http</code> anda perfecto — y el front sigue viendo un error de CORS.</p>
+
+    <p>No hay nada roto. Falta el dominio del front en <code>CORS_ORIGIN</code>, con <code>https://</code> y sin barra final. Es la unidad 9 otra vez, y ahora con dominios de verdad en vez de <code>localhost:5173</code>.</p>
+
+
+  </section>
+
+
+  <!-- EL PORTERO -->
+  <section id="pipeline">
+    <div class="section-num">Bloque 7</div>
+    <h2>Que no se suba nada roto</h2>
+
+    <p>Render conectado a GitHub deploya solo en cada push a <code>main</code>. Es cómodo, y esa comodidad tiene un agujero que se ve enseguida:</p>
+
+    <p><strong>Deploya aunque los tests estén rojos.</strong></p>
+
+    <p>Acá termina de pagarse la unidad 10. Una suite que corre en tu máquina cuando te acordás sirve bastante; una que corre sola y <em>frena el deploy</em> sirve mucho más.</p>
+
+    <h3>Qué es GitHub Actions, en un minuto</h3>
+
+    <p>Un servidor que GitHub te presta. Ante un evento que elegís —un push, un pull request— levanta una máquina virtual <strong>vacía</strong>, corre los pasos que le pediste, y la tira.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Que la máquina empiece vacía es la mitad del valor: <strong>es "anda en mi máquina" verificado por alguien que no es tu máquina</strong>. No tiene tu <code>node_modules</code>, ni tu <code>.env</code>, ni esa librería que instalaste global hace tres meses y te olvidaste. Si el proyecto anda ahí, anda en cualquier lado.
+    </div>
+
+    <div class="fname">.github/workflows/ci.yml</div>
+    <pre>on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: <span class="s">'22'</span>
+      - run: npm ci
+      - run: npm run check     <span class="c"># tsx no chequea tipos: este es el único lugar</span>
+      - run: npm test
+      - run: npm run build     <span class="c"># que pasen los tests no garantiza que compile</span></pre>
+
+    <p>El resultado queda pegado al commit: el tilde verde o la cruz roja que aparece en la lista de commits y arriba de cada pull request. En un TP de equipo, el de los pull requests es el que más rinde: la rama se testea <strong>antes</strong> de mezclarse, sin que nadie tenga que acordarse de correr nada.</p>
+
+    <h3>Y el portero</h3>
+
+    <p>Para que el deploy dependa de los tests hay que sacarle el volante a Render (Auto-Deploy: OFF) y dispararlo desde el workflow. Todo el archivo existe por una línea:</p>
+
+    <pre>publicar:
+  needs: verificar</pre>
+
+    <p><code>needs</code> significa "no arranques hasta que <code>verificar</code> haya terminado <strong>bien</strong>". Sin esa línea, los dos trabajos corren en paralelo: el pipeline mira los tests fallar y publica igual.</p>
+
+    <div class="callout">
+      <div class="callout-label">Dato</div>
+      Los nombres: <strong>CI</strong> (<em>integración continua</em>) es que cada cambio se verifique automáticamente; <strong>CD</strong> (<em>entrega continua</em>) es que además se publique solo. Suenan a metodología de libro y son literalmente estos dos archivos. Vale desmitificarlo: no es una arquitectura, son treinta líneas de YAML.
+    </div>
+
+
+  </section>
+
+
+  <!-- EN INTERNET -->
+  <section id="internet">
+    <div class="section-num">Bloque 8</div>
+    <h2>Lo que cambia cuando está en internet</h2>
+
+    <p>Está publicada. Cuatro cosas que ahora son distintas, y la última es la que más sorprende.</p>
+
+    <h3>Se duerme</h3>
+
+    <p>El plan gratuito de Render apaga el servicio a los <strong>15 minutos sin tráfico</strong>. El primer request lo despierta: entre 30 y 60 segundos, con la base reconectando encima. No es un bug, es el trato — la máquina se la prestan a otro mientras no la usás.</p>
+
+    <div class="callout orange">
+      <div class="callout-label">Cuidado</div>
+      Esto tiene una consecuencia muy concreta: <strong>el día de la defensa del TP, entrá a la URL diez minutos antes</strong>. Si el tribunal es el primero en pegarle en horas, la primera pantalla que vean va a ser un minuto de carga. Es el detalle más práctico de toda esta guía.
+    </div>
+
+    <h3>No hay consola</h3>
+
+    <p>El <code>console.log</code> sigue existiendo, pero sale en el panel de la plataforma, mezclado con todo y con un límite de retención. Por eso el <code>errorHandler</code> del 11.2 le pone un identificador a cada 500:</p>
+
+    <pre>{ <span class="s">"error"</span>: <span class="s">"Error interno del servidor"</span>, <span class="s">"id"</span>: <span class="s">"3f9a2b1c"</span> }</pre>
+
+    <p>El usuario dice "me tiró error 3f9a2b1c" y eso se busca en el log. Encontrarlo pasa de adivinanza a búsqueda.</p>
+
+    <h3>Cualquiera le pega</h3>
+
+    <p>A las pocas horas de estar publicada, el log va a tener requests a <code>/wp-login.php</code>, <code>/.env</code> y <code>/admin</code>. Son robots que barren internet buscando servidores mal configurados, y no tienen nada personal contra el TP.</p>
+
+    <div class="callout green">
+      <div class="callout-label">Importante</div>
+      Cuando tu servicio lleve un rato arriba, <strong>abrí el log y buscá esos requests</strong>. Es el mejor argumento de toda la materia para la unidad 9 y no necesita ninguna explicación: alguien, ahora mismo, está probando si tenés el <code>.env</code> expuesto. Todo lo que se dijo sobre secretos, hashes y no contar de más en el 500 deja de ser teoría en ese momento.
+    </div>
+
+    <h3>Y cambiar algo cuesta</h3>
+
+    <p>Se acabó el <code>npm run dev</code> que recarga al guardar. Cada cambio es commit, push, build y arranque: dos o tres minutos, en los que la versión vieja sigue andando hasta que la nueva pasa el healthcheck.</p>
+
+
+  </section>
+
+
+  <!-- RESUMEN -->
+
+  <section id="ponete-a-prueba">
+    <div class="section-num">Autoevaluación</div>
+    <h2>Ponete a prueba</h2>
+    <p>Respondé cada pregunta mentalmente y después tocá para revelar la respuesta y verificar.</p>
+    <div class="quiz">
+    <details class="q">
+      <summary>1. En tu máquina la API arranca con <code>npm run dev</code>. ¿Por qué en el servidor no alcanza con eso?</summary>
+      <div class="a">Porque <code>npm run dev</code> usa <strong>tsx</strong>, que transpila TypeScript en memoria y lo ejecuta. En el servidor no hay tsx: hay <code>node</code>, y <code>node</code> no entiende TypeScript. Por eso el proyecto necesita <code>npm run build</code> (<code>tsc</code> compila <code>src/</code> a <code>dist/</code>) y <code>npm start</code> (<code>node dist/server.js</code>). Hay un efecto secundario que conviene tener presente: <strong>tsx no chequea tipos</strong>, así que un proyecto puede venir andando semanas con <code>npm run dev</code> y romperse en el primer build.</div>
+    </details>
+    <details class="q">
+      <summary>2. ¿Por qué <code>dist/</code> no se versiona en git?</summary>
+      <div class="a">Porque es una <strong>salida generada</strong>, no código fuente. Lo que se versiona es <code>src/</code>, y el build es un paso reproducible que el servidor vuelve a correr en cada deploy. Si commiteás <code>dist/</code>, tarde o temprano alguien toca un <code>.ts</code>, se olvida de recompilar, y <strong>lo que corre en producción deja de ser lo que dice el repositorio</strong> — con la particularidad de que nada lo avisa. Es la misma idea que las migraciones: se versiona el cambio, no el estado resultante.</div>
+    </details>
+    <details class="q">
+      <summary>3. Ponés <code>npm ci --omit=dev &amp;&amp; npm run build</code> como comando de build y falla con <code>Cannot find module 'typescript'</code>. ¿Qué pasó?</summary>
+      <div class="a">Que <strong>TypeScript es una <code>devDependency</code></strong> y <code>--omit=dev</code> justamente la saltea. El razonamiento de fondo ("en producción no necesito las herramientas de desarrollo") es correcto, pero el orden está al revés: <strong>el build es parte del desarrollo</strong>, no de la ejecución. Lo que corresponde es <code>npm ci &amp;&amp; npm run build</code>, y recién después, si querés adelgazar, <code>npm prune --omit=dev</code>.</div>
+    </details>
+    <details class="q">
+      <summary>4. El deploy queda colgado y termina con <code>No open ports detected</code>, pero en tu máquina la API arranca perfecto. ¿Cuáles son las dos causas posibles?</summary>
+      <div class="a">Las dos tienen que ver con <strong>dónde estás escuchando</strong>, y las dos funcionan igual en tu máquina, que es lo que las hace difíciles de encontrar:<ul><li><strong>El puerto está fijo</strong> (<code>app.listen(3000)</code>). La plataforma te asigna un puerto por variable de entorno y hay que usar ese: <code>Number(process.env.PORT) || 3000</code>.</li><li><strong>Estás escuchando en <code>localhost</code></strong> en vez de <code>0.0.0.0</code>. Adentro de un contenedor, <code>localhost</code> significa "solo desde adentro del contenedor", y el proxy de la plataforma queda del lado de afuera.</li></ul></div>
+    </details>
+    <details class="q">
+      <summary>5. ¿Por qué el healthcheck no debería consultar la base de datos?</summary>
+      <div class="a">Porque el healthcheck responde <strong>"¿este proceso está vivo?"</strong>, no <em>"¿todo el sistema funciona?"</em>. Si consulta la base, un pico de carga hace que tarde, la plataforma te da por muerto y te <strong>reinicia justo cuando más tráfico tenías</strong>. Y si la base está caída de verdad, reiniciar la API no la arregla: solo agrega downtime a un problema que ya tenías. Las otras dos reglas: que <strong>no pida token</strong> (el que pregunta es un robot sin credenciales) y que <strong>no cuente nada</strong> (es una URL pública).</div>
+    </details>
+    <details class="q">
+      <summary>6. Venías usando <code>orm.schema.update()</code> al arrancar y funcionaba perfecto. ¿Qué tiene de peligroso contra la base de producción?</summary>
+      <div class="a">Que compara tus entidades con la base y genera el SQL para que se parezcan — <strong>sin preguntar</strong>. Cuando la diferencia es "sobra una columna", el SQL que genera es un <code>DROP COLUMN</code>. Renombrar un campo en una entidad (dos segundos de trabajo) borra la columna vieja con todos los datos que tenía adentro, y no hay Ctrl+Z. Mientras la base es tuya y está vacía no pasa nada; con datos de usuarios reales, no. La alternativa son las <strong>migraciones</strong>: cada cambio de esquema es un archivo versionado, revisable, y la tabla <code>mikro_orm_migrations</code> lleva la cuenta de cuáles se aplicaron en cada base.</div>
+    </details>
+    <details class="q">
+      <summary>7. El deploy dice <em>Live</em>, la URL contesta y el <code>.http</code> anda perfecto — pero el front sigue viendo un error de CORS. ¿Dónde está el problema?</summary>
+      <div class="a">En ningún lado: <strong>no hay nada roto</strong>. Falta el dominio del front en la variable <code>CORS_ORIGIN</code>, con <code>https://</code> y sin barra final. Y el <code>.http</code> nunca lo iba a detectar, porque <strong>CORS no existe fuera del navegador</strong>: es una restricción que aplica el navegador, no el servidor. Es el error más frustrante del primer deploy justamente porque todas las señales dicen que está bien.</div>
+    </details>
+    <details class="q">
+      <summary>8. Al conectar con la base gestionada te tira un error de TLS, y la primera respuesta que encontrás es <code>ssl: { rejectUnauthorized: false }</code>. Hace desaparecer el error. ¿Por qué no conviene?</summary>
+      <div class="a">Porque desactiva justo la parte que importa. Con esa opción la conexión <strong>sigue cifrada, pero deja de verificar con quién está hablando</strong>: es TLS sin la garantía de TLS. Cualquiera que se meta en el medio puede presentarse como tu base y recibir las credenciales y los datos. Lo correcto es pasarle el certificado de la autoridad certificante que publica el proveedor: <code>ssl: { ca: env.DB_SSL_CA, rejectUnauthorized: true }</code>, con el certificado como variable de entorno para que no viaje en el repositorio.</div>
+    </details>
+    </div>
+  </section>
+
+  <section id="resumen">
+    <div class="section-num">Cierre</div>
+    <h2>Resumen</h2>
+
+    <ul>
+      <li>Deployar no es reescribir la aplicación: es <strong>terminar de resolver lo que la aplicación daba por sentado</strong>. Entre el <code>9.3</code> y el <code>11.2</code>, el código de negocio no cambia ni una línea.</li>
+      <li>Tres piezas: dónde corre el proceso, dónde viven los datos, de dónde sale la configuración. La tercera estaba resuelta desde la unidad 9.</li>
+      <li>En el servidor no hay <code>tsx</code>: hay <code>node</code>. <code>npm run build</code> compila <code>src/</code> a <code>dist/</code>, y <code>dist/</code> <strong>no se versiona</strong> — se genera en el servidor en cada deploy.</li>
+      <li><strong><code>tsx</code> no chequea tipos.</strong> Un proyecto puede andar tres semanas con <code>npm run dev</code> y romperse en el primer build. Por eso existe <code>npm run check</code>.</li>
+      <li><code>npm ci</code> en el servidor, no <code>npm install</code>: instalación exacta desde el lock, y falla si no coincide. Y sin <code>--omit=dev</code>, porque el build necesita TypeScript.</li>
+      <li>Con <code>TsMorphMetadataProvider</code> hace falta <code>"declaration": true</code>: el ORM lee los <strong>tipos</strong> para armar el esquema, y en <code>dist/</code> hay JavaScript.</li>
+      <li>El puerto sale de <code>process.env.PORT</code> y se escucha en <code>0.0.0.0</code>. Las dos cosas funcionan igual en tu máquina y las dos rompen el deploy.</li>
+      <li><code>SIGTERM</code> primero cierra el servidor, después la base. Al revés, los requests en curso contestan 500 durante el deploy.</li>
+      <li>El <strong>healthcheck</strong> responde por el proceso, no por sus dependencias: barato, sin token y sin contar nada.</li>
+      <li>El disco del contenedor es <strong>efímero</strong>: se borra en cada deploy. Por eso la base va afuera, y los archivos que suben los usuarios también.</li>
+      <li>Contra una base gestionada, TLS es obligatorio. <code>rejectUnauthorized: false</code> "arregla" el error y desactiva justo la garantía que da TLS.</li>
+      <li><code>schema.update()</code> contra una base con datos genera <code>DROP COLUMN</code> sin preguntar. De acá en adelante, <strong>migraciones</strong>.</li>
+      <li><strong>Fallá al arrancar y en voz alta.</strong> Una aplicación que no arranca es un problema de dos minutos; una que arranca mal, de dos horas.</li>
+      <li>El primer deploy siempre falla. La habilidad es <strong>leer el log</strong>, no acertar de una.</li>
+      <li>El auto-deploy publica aunque los tests estén rojos. <code>needs</code> en el workflow es lo que lo cierra.</li>
+      <li>El plan gratuito duerme el servicio a los 15 minutos. <strong>Entrar a la URL antes de la defensa.</strong></li>
+    </ul>
+
+    <h3>El checklist de entrega</h3>
+
+    <ol class="cycle">
+      <li>La URL de la API contesta, y el <code>.http</code> del TP anda contra ella.</li>
+      <li>El <code>.env</code> <strong>no</strong> está en el repositorio; el <code>.env.example</code> sí.</li>
+      <li>El <code>JWT_SECRET</code> de producción es distinto al de desarrollo.</li>
+      <li>Las migraciones están aplicadas en la base de la nube.</li>
+      <li><code>CORS_ORIGIN</code> tiene el dominio del front, con <code>https://</code> y sin barra final.</li>
+      <li>Hay un usuario admin, creado a mano en la base.</li>
+      <li>Entrar a la URL diez minutos antes de mostrarla.</li>
+    </ol>
+
+    <h3>Lo que sigue</h3>
+
+    <p>Se terminan las unidades. Lo que queda afuera, en orden de qué conviene aprender primero:</p>
+
+    <ul>
+      <li><strong>Docker.</strong> Es lo que hace que "anda en mi máquina" deje de ser un problema del todo: la aplicación viaja con su sistema operativo adentro. La cátedra tiene material y es el paso natural después de hoy.</li>
+      <li><strong>Deployar el front.</strong> Otra cosa: archivos estáticos, sin proceso Node corriendo. Vercel, Netlify o Cloudflare Pages, en dos clics.</li>
+      <li><strong>Observabilidad.</strong> Logs estructurados, métricas y alertas. Cuando el sistema tiene usuarios de verdad, enterarse de que algo se rompió por un mail y no por un mensaje de un usuario es la diferencia.</li>
+      <li><strong>Ambientes.</strong> Una copia de producción donde probar antes. Es lo primero que se agrega en cualquier equipo.</li>
+      <li><strong>Escalar.</strong> Varias instancias, balanceo, caché. No hace falta hasta que hace falta, y hace falta mucho más tarde de lo que uno cree.</li>
+    </ul>
+
+    <h3>El año, en once unidades</h3>
+
+    <p>El recorrido completo, que visto de una sola vez cuenta una historia y no una lista de temas:</p>
+
+    <table class="tbl">
+      <tr><th>Unidades</th><th>Qué se aprendió</th></tr>
+      <tr><td>1 a 5</td><td>El lenguaje: sintaxis, funciones, asincronía, objetos y clases</td></tr>
+      <tr><td>6</td><td>Cómo se estructura una API para que se pueda cambiar</td></tr>
+      <tr><td>7</td><td>Cómo se escriben los contratos para que el compilador los verifique</td></tr>
+      <tr><td>8</td><td>Cómo se guardan los datos para que sobrevivan al proceso</td></tr>
+      <tr><td>9</td><td>Cómo se protege lo que no es de todos</td></tr>
+      <tr><td>10</td><td>Cómo se sabe que todo eso sigue andando</td></tr>
+      <tr><td>11</td><td>Cómo lo usa alguien que no sos vos</td></tr>
+    </table>
+
+    <p>Y el ejemplo que atraviesa las seis últimas: <code>6.3</code> → <code>7.2</code> → <code>7.3</code> → <code>8.2</code> → <code>9.3</code> → <code>11.2</code>. El mismo proyecto, seis veces, con un producto que tiene un nombre y un precio.</p>
+
+    <h3>Para profundizar</h3>
+    <ul>
+      <li><strong>The Twelve-Factor App</strong> (<em>12factor.net</em>). Doce reglas para aplicaciones que se deployan, escritas en 2011 y todavía vigentes. Las de configuración, procesos y <em>disposability</em> son literalmente los bloques 3 y 4 de esta guía, mejor explicadas.</li>
+      <li>La <strong>documentación de Render</strong>, en particular las páginas de <em>Environment Variables</em> y <em>Blueprints</em>. Es corta y está bien escrita.</li>
+      <li>La página de <strong>deployment de MikroORM</strong>, para la alternativa del caché generado que evita necesitar ts-morph en producción.</li>
+      <li><strong>Docker</strong>, cuando quieran que el deploy deje de depender de que la plataforma adivine cómo construir el proyecto.</li>
+      <li>Si alguien pregunta por <strong>AWS, Azure o GCP</strong>: son lo mismo con muchas más piezas y una factura. Lo que aprendieron hoy —puerto, configuración, healthcheck, migraciones— es exactamente lo que se necesita ahí también, con otros nombres.</li>
+    </ul>
+  </section>
+
+</main>
+<script>
+(() => {
+  const storageKey = 'dsw-theme-preference';
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+
+  if (!toggle) return;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Modo oscuro';
+      toggle.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Modo claro';
+    toggle.setAttribute('aria-pressed', 'false');
+  };
+
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(storageKey);
+  } catch (_) {
+    savedTheme = null;
+  }
+
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    applyTheme(nextTheme);
+
+    try {
+      localStorage.setItem(storageKey, nextTheme);
+    } catch (_) {
+      /* la persistencia puede fallar en modo privado: se ignora */
+    }
+  });
+})();
+</script>
+</body>
+</html>
