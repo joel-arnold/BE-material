@@ -446,7 +446,7 @@ npm start                    <span class="c">// start command</span></pre>
 
     <h3>La trampa de nuestro stack</h3>
 
-    <p>Esta no está en ningún tutorial de deploy, porque es consecuencia de una decisión de la unidad 8. Usamos <code>TsMorphMetadataProvider</code>: para saber que <code>precio: number</code> es un decimal y <code>nombre: string</code> un varchar, MikroORM <strong>lee los tipos de los archivos TypeScript</strong> al arrancar.</p>
+    <p>Esta no está en ningún tutorial de deploy, porque es consecuencia de una decisión de la unidad 8. Usamos <code>TsMorphMetadataProvider</code>: para saber que <code>nombre: string</code> es un varchar y que <code>precio</code>, un decimal en la base, tiene que volver como <code>number</code> y no como texto, MikroORM <strong>lee los tipos de los archivos TypeScript</strong> al arrancar.</p>
 
     <p>En el servidor corre <code>node dist/server.js</code>, y en <code>dist/</code> hay JavaScript. La aplicación muere al arrancar:</p>
 
